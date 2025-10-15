@@ -1,0 +1,255 @@
+---
+title: 'Array Destructuring in Javascript'
+publishedAt: '2024-09-29'
+featured: false
+lang: 'en'
+translationSlug: 'destructuring-array'
+---
+
+Array destructuring in JavaScript lets you extract values from arrays into distinct variables using a concise syntax. This feature makes your code cleaner and more readable. If previously we performed destructuring on objects, we can also perform destructuring on arrays.
+
+## Basics of Array Destructuring
+
+Extract values from an array into separate variables:
+
+```js
+const fruits = ['apple', 'banana', 'grape', 'orange']
+
+// Destructuring
+const [first, second, third, fourth] = fruits
+
+console.log(first) // "apple"
+console.log(second) // "banana"
+```
+
+## Advanced Destructuring Techniques
+
+### Skipping Elements
+
+Skip unwanted array elements using commas:
+
+```js
+const fruits = ['apple', 'banana', 'grape', 'orange']
+const [first, , third] = fruits
+
+console.log(first) // "apple"
+console.log(third) // "grape"
+```
+
+### Rest Operator
+
+Collect remaining elements using the rest operator (...):
+
+```js
+const fruits = ['apple', 'banana', 'grape', 'orange']
+const [first, second, ...remaining] = fruits
+
+console.log(first) // "apple"
+console.log(remaining) // ["grape", "orange"]
+```
+
+### Default Values
+
+Provide default values for missing or undefined elements:
+
+```js
+const colors = ['red']
+const [primary, secondary = 'blue'] = colors
+
+console.log(primary) // "red"
+console.log(secondary) // "blue" (default value is used)
+```
+
+### Nested Array Destructuring
+
+Extract values from nested arrays:
+
+```js
+const fruits = ['apple', ['red', 'green'], 'banana']
+const [name, [color1, color2]] = fruits
+
+console.log(name) // "apple"
+console.log(color1) // "red"
+console.log(color2) // "green"
+```
+
+### Combining with Object Destructuring
+
+Destructuring can be combined between arrays and objects:
+
+```js
+const data = ['apple', { color: 'red', weight: 150 }]
+const [name, { color, weight }] = data
+
+console.log(name) // "apple"
+console.log(color) // "red"
+console.log(weight) // 150
+```
+
+### Function Parameter Destructuring
+
+Destructure arrays directly in function parameters:
+
+```js
+function analyzeFruits([first, second, ...others]) {
+  console.log(`First fruit: ${first}`)
+  console.log(`Second fruit: ${second}`)
+  console.log(`Other fruits: ${others.join(', ')}`)
+}
+
+analyzeFruits(['apple', 'banana', 'grape', 'orange'])
+```
+
+### Swapping Values
+
+Easily swap values between variables:
+
+```js
+let a = 'apple'
+let b = ('banana'[
+  // Swap values
+  (a, b)
+] = [b, a])
+
+console.log(a) // "banana"
+console.log(b) // "apple"
+```
+
+### Error Handling
+
+Destructuring with empty arrays or undefined needs to be handled carefully:
+
+```js
+// Example 1: With empty array and default value
+const [first = 'default'] = []
+console.log(first) // "default"
+
+// Example 2: Error handling when destructuring null
+try {
+  const [a, b] = null // Will generate TypeError
+} catch (error) {
+  console.error('Be careful when destructuring null/undefined')
+}
+```
+
+### Destructuring with Other Iterables
+
+Destructuring can be used for other iterables, not just arrays:
+
+```js
+// String iterable
+const [a, b, c] = 'xyz'
+console.log(a, b, c) // "x" "y" "z"
+
+// Set iterable
+const [first, ...rest] = new Set([1, 2, 3])
+console.log(first, rest) // 1, [2, 3]
+```
+
+## Practical Usage Examples
+
+### 1. Function Returns
+
+```js
+function getCoordinates() {
+  // Clear implementation
+  return [10, 20, 30] // x, y, z coordinates
+}
+
+const [x, y, z] = getCoordinates()
+console.log(x, y, z) // 10, 20, 30
+```
+
+### 2. Array Processing
+
+```js
+const numbers = [1, 2, 3, 4, 5]
+const [head, ...tail] = numbers
+
+console.log(head) // 1
+console.log(tail) // [2, 3, 4, 5]
+```
+
+### 3. Multiple Value Assignment
+
+```js
+const dateString = '2024-09-29'
+const [year, month, day] = dateString.split('-')
+
+console.log(`Day: ${day}, Month: ${month}, Year: ${year}`)
+```
+
+### 4. React Hooks
+
+```js
+// Using array destructuring in React Hooks
+const [count, setCount] = useState(0)
+const [isLoading, setIsLoading] = useState(false)
+
+// Custom hooks also use the same pattern
+const [data, loading, error] = useCustomData()
+```
+
+### 5. Pattern Matching
+
+```js
+// Using destructuring for pattern matching
+function processAction(actionData) {
+  if (Array.isArray(actionData) && actionData.length >= 2) {
+    const [action, payload] = actionData
+
+    if (action === 'ADD_USER') {
+      // Process adding user with payload
+      return `User ${payload.name} added`
+    }
+  }
+  return 'Invalid action format'
+}
+
+console.log(processAction(['ADD_USER', { name: 'John' }]))
+```
+
+## Performance Considerations
+
+While destructuring is very useful, some performance considerations should be noted:
+
+- Avoid excessive destructuring in loops with a large number of iterations
+- For repeated operations on the same data, store the destructuring results outside the loop
+- If you only need one or two items from a large array, consider direct index access
+
+```js
+// Less efficient in large loops
+for (let i = 0; i < 10000; i++) {
+  const [a, b] = getBigArray() // Overhead if done repeatedly
+}
+
+// More efficient
+const bigArray = getBigArray()
+const [a, b] = bigArray // Destructure once
+for (let i = 0; i < 10000; i++) {
+  // Use a and b without destructuring again
+}
+```
+
+## Best Practices
+
+✅ Do:
+
+- Use destructuring for multiple return values
+- Name variables clearly based on their content
+- Use rest operator for flexibility
+- Destructure function parameters when dealing with arrays
+- Always provide default values for elements that might be undefined
+
+❌ Avoid:
+
+- Destructuring deeply nested arrays (more than 2-3 levels)
+- Using too many empty slots (skipped elements)
+- Over-destructuring when only a few values are needed
+- Performing destructuring repeatedly in large loops
+
+## Next Steps
+
+Learn how to apply these same principles to objects in our next article: [Destructuring Objects in JavaScript](https://fadjarrafi.com/blog/destructuring-object).
+
+**Thanks for Reading! ✌️**

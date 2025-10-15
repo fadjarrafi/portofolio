@@ -1,0 +1,189 @@
+---
+title: 'ES Module System in Modern JavaScript'
+publishedAt: '2025-04-20'
+featured: true
+lang: 'en'
+translationSlug: 'es-module'
+---
+
+ES Module (ESM) is a standard modularization system introduced in ECMAScript 2015 (ES6). This system provides a standard for organizing and dividing JavaScript code into _reusable_ components.
+
+## What is an ES Module?
+
+ES Module is a standard way to divide JavaScript code into separate parts that can be interconnected. Before ES Modules, JavaScript developers used various non-standard approaches such as:
+
+- IIFE (Immediately Invoked Function Expression) Pattern
+- CommonJS (used in Node.js)
+- AMD (Asynchronous Module Definition, popular with RequireJS)
+- UMD (Universal Module Definition)
+
+## Why are ES Modules Important?
+
+1. **Standardization**: It is the official JavaScript modularization system natively supported by modern browsers
+2. **Code Organization**: Logically separating code into different files
+3. **Reusability**: Making components reusable
+4. **Tree Shaking**: Modern frameworks can eliminate unused code
+5. **Lazy Loading**: Modules can be loaded only when needed
+
+## Basic ES Module Syntax
+
+### Export
+
+To make code available to other files, we use the `export` keyword.
+
+```javascript
+// utils.js
+// Export named
+export function sum(a, b) {
+  return a + b;
+}
+
+export const PI = 3.14159;
+
+// Export default
+export default function greet(name) {
+  return `Hello, ${name}!`;
+}
+```
+
+There are two types of exports:
+
+- **Named exports**: Can have many per file
+- **Default export**: Only one allowed per file
+
+### Import
+
+To use code from other modules, we use the `import` keyword.
+
+```javascript
+// app.js
+// Import default export
+import greet from './utils.js';
+
+// Import named exports
+import { sum, PI } from './utils.js';
+
+// Import with alias
+import { sum as addNumbers } from './utils.js';
+
+// Import all named exports
+import * as Utils from './utils.js';
+
+console.log(greet('World')); // "Hello, World!"
+console.log(sum(2, 3)); // 5
+console.log(PI); // 3.14159
+console.log(addNumbers(4, 5)); // 9
+console.log(Utils.PI); // 3.14159
+```
+
+## Differences With CommonJS
+
+If you're familiar with CommonJS (used in Node.js), there are several important differences:
+
+```javascript
+// CommonJS
+const { sum } = require('./utils.js');
+module.exports = { myFunction };
+
+// ES Module
+import { sum } from './utils.js';
+export const myFunction = () => {};
+```
+
+Main differences:
+
+1. ES Module uses static `import`/`export` syntax that is analyzed at compile time
+2. CommonJS uses dynamic `require()`/`module.exports` that are executed at runtime
+3. ES Module supports "tree shaking" because its import structure is static
+4. ES Module is asynchronous by default, while CommonJS is synchronous
+
+## Using ES Modules in the Browser
+
+To use ES Modules directly in the browser, add the `type="module"` attribute to the script:
+
+```html
+<script type="module">
+  import { sum } from './utils.js';
+  console.log(sum(1, 2));
+</script>
+
+<!-- Or import from a separate file -->
+<script type="module" src="app.js"></script>
+```
+
+Important to remember:
+
+- ES Module files are served with CORS
+- Must be served from a web server (can't use the `file://` protocol)
+- Automatically runs in strict mode
+- Executed asynchronously
+
+## Dynamic Imports
+
+ES Modules also support dynamic imports to load modules only when needed:
+
+```javascript
+button.addEventListener('click', async () => {
+  // Module is loaded only when the button is clicked
+  const { renderChart } = await import('./chart.js');
+  renderChart(data);
+});
+```
+
+This is very useful for:
+
+- Lazy loading
+- Code splitting
+- Reducing initial loading time
+
+## ES Modules and Modern Frameworks
+
+If you plan to learn React, Vue, or other modern frameworks, understanding ES Modules is essential because:
+
+```javascript
+// React Component using ES Module
+import React from 'react';
+import { useState } from 'react';
+import Header from './components/Header';
+
+export default function App() {
+  const [count, setCount] = useState(0);
+  return (/* ... */);
+}
+```
+
+```javascript
+// Vue Component using ES Module
+import { ref } from 'vue';
+import Header from './components/Header.vue';
+
+export default {
+  components: { Header },
+  setup() {
+    const count = ref(0);
+    return { count };
+  }
+};
+```
+
+Modern frameworks use build systems like [Webpack](https://webpack.js.org/), [Rollup](https://rollupjs.org/), or [Vite](https://vite.dev/) that leverage ES Modules for:
+
+1. **Tree shaking**: Eliminating unused code
+2. **Code splitting**: Breaking applications into separate bundles
+3. **Hot Module Replacement**: Updating modules without a full reload
+
+## Best Practices
+
+1. **Use one module per file** with filenames that describe their contents
+2. **Choose between named export or default export** consistently
+3. **Avoid side effects** in modules (operations that change global state)
+4. **Choose clear paths** with `.js` file extensions for clarity
+5. **Consider performance** with code splitting and lazy loading techniques
+
+## Conclusion
+
+The ES Module system is an essential element in the modern JavaScript ecosystem. By understanding how it works, you have a strong foundation for learning front-end frameworks like React and Vue.
+
+This modularization concept is not just about `import`/`export` syntax, but about how to logically organize code, improve maintainability, and optimize the performance of modern web applications.
+
+**Thanks for Reading! ✌️**

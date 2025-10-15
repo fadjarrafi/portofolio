@@ -1,0 +1,213 @@
+---
+title: 'Ternary Operator di JavaScript'
+publishedAt: '2024-09-28'
+featured: false
+lang: 'id'
+translationSlug: 'ternary-operator'
+---
+Operator ternary pada JavaScript menyediakan cara singkat untuk menulis pernyataan kondisional. Ini adalah bentuk singkat yang ampuh untuk ekspresi if-else yang dapat membuat kode kamu lebih bersih dan mudah dibaca.
+
+## Apa itu Operator Ternary?
+
+Operator ternary menggunakan sintaks berikut:
+
+```js
+kondisi ? nilaiJikaBenar : nilaiJikaFalse
+```
+
+Mari bandingkan if-else tradisional dengan operator ternary:
+
+```js
+// If-else tradisional
+let keranjang = 'apel'
+if (keranjang === 'apel') {
+  hasil = 'Keranjang ini berisi apel'
+} else {
+  hasil = 'Keranjang ini tidak berisi apel'
+}
+
+// Operator ternary
+let keranjang = 'apel'
+let hasil = keranjang === 'apel' ? 'Keranjang ini berisi apel' : 'Keranjang ini tidak berisi apel'
+```
+
+## Praktik Terbaik Menggunakan Operator Ternary
+
+1. **Gunakan untuk Kondisi Sederhana**: Paling cocok untuk keputusan benar/salah yang sederhana
+2. **Usahakan Dalam Satu Baris**: Bila memungkinkan, tulis seluruh ekspresi dalam satu baris
+3. **Gunakan Spasi yang Tepat**: Tambahkan spasi di sekitar operator untuk keterbacaan yang lebih baik
+4. **Gunakan Tanda Kurung untuk Kejelasan**: Saat menggabungkan dengan operasi lain, gunakan tanda kurung untuk memperjelas maksud kamu
+5. **Mengembalikan Nilai**: Operator ternary sangat baik untuk mengembalikan nilai dari fungsi
+
+## Contoh Praktis dalam Dunia Nyata
+
+### 1. Rendering Kondisional di React
+
+Operator ternary sangat umum digunakan dalam komponen React untuk rendering kondisional:
+
+```jsx
+// Rendering kondisional sederhana
+return (
+  <div>{isMasuk ? <DashboardPengguna /> : <FormLogin />}</div>
+
+  // Nama kelas kondisional
+)
+;<button className={isAktif ? 'btn-aktif' : 'btn-nonaktif'}>Klik saya</button>
+```
+
+### 2. Menangani Nilai Default
+
+```js
+// Menetapkan nilai default saat mendestrukturisasi objek
+const { nama = 'Tamu' } = pengguna
+
+// Alternatif dengan ternary
+const nama = pengguna.nama ? pengguna.nama : 'Tamu'
+
+// Atau dengan nullish coalescing (alternatif modern)
+const nama = pengguna.nama ?? 'Tamu'
+```
+
+### 3. Validasi Formulir
+
+```js
+// Pesan validasi formulir kondisional
+const pesanError = isEmailValid ? '' : 'Silakan masukkan alamat email yang valid'
+```
+
+### 4. Mengubah Status
+
+```js
+// Mengubah status boolean
+const toggleStatus = () => {
+  setIsAktif((isAktif) => !isAktif)
+}
+
+// Menggunakan ternary untuk menetapkan nilai baru berdasarkan nilai saat ini
+const toggleTema = () => {
+  setTema((temaSaatIni) => (temaSaatIni === 'terang' ? 'gelap' : 'terang'))
+}
+```
+
+## Operator Ternary vs. Logika AND/OR
+
+Terkadang kamu bisa menggunakan operator logika sebagai alternatif untuk operator ternary:
+
+```js
+// Menggunakan ternary
+const pesan = isMasuk ? 'Selamat datang kembali!' : ''
+
+// Menggunakan logika AND (lebih singkat, tapi hati-hati)
+const pesan = isMasuk && 'Selamat datang kembali!'
+
+// Menggunakan logika OR untuk nilai default
+const namaPengguna = inputValue || 'Tamu'
+```
+
+## Operator Ternary Bersarang: Kapan Menggunakannya
+
+Meskipun kamu bisa menyarangkan operator ternary, ini umumnya tidak disarankan untuk keterbacaan:
+
+```js
+let keranjang = 'apel'
+let hasil =
+  keranjang === 'apel'
+    ? 'Keranjang ini berisi apel'
+    : keranjang === 'pisang'
+      ? 'Keranjang ini berisi pisang'
+      : 'Keranjang ini tidak berisi buah'
+```
+
+Untuk kondisi multiple, lebih baik menggunakan pernyataan if-else atau switch case:
+
+```js
+// Pendekatan yang lebih baik untuk kondisi multiple
+if (keranjang === 'apel') {
+  hasil = 'Keranjang ini berisi apel'
+} else if (keranjang === 'pisang') {
+  hasil = 'Keranjang ini berisi pisang'
+} else {
+  hasil = 'Keranjang ini tidak berisi buah'
+}
+```
+
+## Kesalahan Umum yang Perlu Dihindari
+
+1. **Mengembalikan Tipe Data Berbeda**: Hindari mengembalikan tipe data berbeda dari ekspresi ternary yang sama
+
+   ```js
+   // Praktik buruk
+   const hasil = isValid ? 'Valid' : false
+
+   // Praktik lebih baik
+   const hasil = isValid ? 'Valid' : 'Tidak Valid'
+   ```
+
+2. **Ternary yang Terlalu Bersarang**: Menjadi sulit dibaca dan dikelola
+
+   ```js
+   // Sulit dibaca dan dikelola
+   const pesan = isMasuk
+     ? isPremium
+       ? hasSaldo
+         ? 'Main game premium'
+         : 'Beli saldo'
+       : 'Upgrade akun'
+     : 'Login dulu'
+   ```
+
+3. **Efek Samping**: Ternary sebaiknya digunakan untuk nilai, bukan untuk mengeksekusi kode dengan efek samping
+
+   ```js
+   // Praktik buruk - efek samping
+   isMasuk ? simpanDataPengguna() : tampilkanFormLogin()
+
+   // Praktik lebih baik
+   if (isMasuk) {
+     simpanDataPengguna()
+   } else {
+     tampilkanFormLogin()
+   }
+   ```
+
+## Kapan Menggunakan Operator Ternary
+
+✅ Gunakan operator ternary ketika:
+
+- Kamu memiliki kondisi sederhana dengan dua hasil
+- Ekspresi secara alami cocok dalam satu baris
+- Kamu menetapkan nilai berdasarkan kondisi
+- Kamu mengembalikan nilai berbeda dalam fungsi
+- Kamu memerlukan rendering kondisional di JSX/React
+
+❌ Hindari operator ternary ketika:
+
+- Kamu memiliki beberapa kondisi untuk diperiksa
+- Logikanya kompleks
+- Ekspresi menjadi sulit dibaca
+- Kamu perlu mengeksekusi pernyataan dengan efek samping
+- Kamu bekerja dengan tipe data yang sangat berbeda
+
+## Alternatif Modern
+
+JavaScript sekarang menawarkan beberapa alternatif modern untuk kasus penggunaan tertentu:
+
+```js
+// Ternary tradisional untuk nilai default
+const nama = pengguna.nama ? pengguna.nama : 'Tamu'
+
+// Menggunakan operator nullish coalescing (??) - ES2020
+// Hanya menggunakan default jika nilai null atau undefined
+const nama = pengguna.nama ?? 'Tamu'
+
+// Menggunakan optional chaining dengan nullish coalescing
+const kota = pengguna?.alamat?.kota ?? 'Tidak Diketahui'
+```
+
+## Kesimpulan
+
+Operator ternary adalah alat yang ampuh untuk menulis pernyataan kondisional yang ringkas dalam JavaScript. Meskipun tidak seharusnya menggantikan semua pernyataan if-else, ternary sempurna untuk kondisi sederhana dan dapat membuat kode kamu lebih elegan bila digunakan dengan tepat.
+
+Ingat: kejelasan lebih penting daripada keringkasan. Jika operator ternary membuat kode kamu lebih sulit dipahami, lebih baik tetap menggunakan pernyataan if-else tradisional.
+
+**Thanks for Reading! ✌️**
