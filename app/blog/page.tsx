@@ -9,12 +9,15 @@ export const metadata = {
   description: "Read my blog.",
 };
 
-export default function Page({
+// Make the component async and await searchParams
+export default async function Page({
   searchParams,
 }: {
-  searchParams: { page?: string };
+  searchParams: Promise<{ page?: string }>;
 }) {
-  const currentPage = Number(searchParams.page) || 1;
+  // Await the searchParams Promise
+  const resolvedSearchParams = await searchParams;
+  const currentPage = Number(resolvedSearchParams.page) || 1;
 
   // Server-side: Get all English posts
   const allBlogs = getBlogPosts("en").sort((a, b) => {
