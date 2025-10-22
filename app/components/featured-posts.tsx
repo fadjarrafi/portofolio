@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { formatDate, getBlogPosts } from "@/app/blog/utils";
+import { ScrollAnimate } from "./scroll-animate";
 
 export function FeaturedBlogPosts() {
   // Always show only English posts on homepage
@@ -14,6 +15,11 @@ export function FeaturedBlogPosts() {
 
   return (
     <div>
+      <ScrollAnimate delay={0}>
+        <h2 className="text-2xl font-semibold tracking-tighter mb-8">
+          Featured Posts
+        </h2>
+      </ScrollAnimate>
       {featuredBlogs
         .sort((a, b) => {
           if (

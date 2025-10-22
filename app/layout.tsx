@@ -7,12 +7,11 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import Footer from "./components/footer";
 import { PageWrapper } from "./components/page-wrapper";
 import { baseUrl } from "./sitemap";
-import "katex/dist/katex.min.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: "Next.js Portfolio Starter",
+    default: "fadjarrafi | fullstack dev",
     template: "%s | Next.js Portfolio Starter",
   },
   description: "This is my portfolio.",
@@ -66,12 +65,12 @@ export default function RootLayout({
         ibmPlexMono.variable
       )}
     >
-      <body className="antialiased tracking-tight font-sans">
-        <main className="flex-auto min-w-0 flex flex-col">
+      <body className="antialiased max-w-xl mx-4 mt-8 lg:mx-auto">
+        <main className="flex-auto min-w-0 mt-6 flex flex-col px-2 md:px-0">
           <PageWrapper>{children}</PageWrapper>
+          {/* <Analytics /> */}
+          <SpeedInsights />
         </main>
-        <Analytics />
-        <SpeedInsights />
       </body>
     </html>
   );

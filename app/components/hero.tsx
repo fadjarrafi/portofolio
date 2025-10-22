@@ -12,10 +12,6 @@ export function Hero() {
         <p className="mb-4 text-xs lg:text-base opacity-0 animate-[fadeInUp_0.8s_ease-out_0.2s_forwards]">
           {`I'm a full-stack developer based in Indonesia, experienced in hospitality solutions that bridge technology with human experience.`}
         </p>
-
-        {/* <p className="mb-4 text-xs lg:text-base opacity-0 animate-[fadeInUp_0.8s_ease-out_0.2s_forwards]">
-          {`I've been building at PT. SaranaInsan MudaSelaras IPTV platforms, Android TV applications, and content management systems that serve 6+ hotel clients. I care about scalability, meaningful user interactions, and systems that work reliably under pressure.`}
-        </p> */}
       </div>
 
       {/* Right Section - Heatmap Visualization */}

@@ -30,14 +30,12 @@ export default async function Page({
   return (
     <>
       {/* Fixed Navbar */}
-      <div className="fixed top-0 left-0 z-50 p-6">
-        <Navbar />
-      </div>
-
       <PageWrapper>
-        <section className="min-h-screen py-24">
+        <Navbar />
+
+        <section className="min-h-screen">
           {/* Centered Content */}
-          <div className="max-w-4xl mx-auto px-6">
+          <div className="max-w-4xl mx-auto">
             <ScrollAnimate>
               <h1 className="font-semibold text-2xl mb-4 tracking-tighter">
                 My Thoughts

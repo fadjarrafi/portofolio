@@ -47,13 +47,11 @@ export default function ConceptsPage() {
 
   return (
     <PageWrapper>
-      <div className="min-h-screen bg-white dark:bg-[#181A18] text-black dark:text-white">
+      <div className="min-h-screen bg-white dark:bg-[#181A18] text-black dark:text-white py-8">
         {/* Fixed Navbar */}
-        <div className="fixed top-0 left-0 z-50 p-6">
-          <Navbar />
-        </div>
+        <Navbar />
 
-        <div className="max-w-4xl mx-auto px-6 pt-24 pb-16">
+        <div className="max-w-4xl mx-auto">
           {/* Header */}
           <ScrollAnimate>
             <div className="mb-12">
