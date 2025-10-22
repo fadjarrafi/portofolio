@@ -1,0 +1,64 @@
+[
+    {
+        "id": "recursion",
+        "term": "Recursion",
+        "domain": [
+            "Programming",
+            "Mathematics"
+        ],
+        "brief": "A function that calls itself to solve smaller instances of the same problem",
+        "related": [
+            "Iteration",
+            "Stack",
+            "Base Case",
+            "Fractals"
+        ],
+        "difficulty": "intermediate",
+        "lastUpdated": "2024-01-15"
+    },
+    {
+        "id": "abstraction",
+        "term": "Abstraction",
+        "domain": [
+            "Programming"
+        ],
+        "brief": "A way of hiding complicated details from the end user, and trying to simplify whatever task you're trying to do.",
+        "related": [
+            "OOP"
+        ],
+        "difficulty": "intermediate",
+        "lastUpdated": "2024-01-15"
+    },
+    {
+        "id": "closure",
+        "term": "Closure",
+        "domain": [
+            "Programming",
+            "JavaScript"
+        ],
+        "brief": "A function that retains access to variables from its outer scope even after the outer function has returned",
+        "related": [
+            "Scope",
+            "Higher-Order Functions",
+            "Lexical Environment"
+        ],
+        "difficulty": "intermediate",
+        "lastUpdated": "2024-01-10"
+    },
+    {
+        "id": "emergence",
+        "term": "Emergence",
+        "domain": [
+            "Systems Thinking",
+            "Philosophy"
+        ],
+        "brief": "Complex patterns and behaviors arising from simple interactions between components",
+        "related": [
+            "Complexity",
+            "Self-Organization",
+            "Collective Behavior"
+        ],
+        "difficulty": "advanced",
+        "lastUpdated": "2024-01-20"
+    }
+]

@@ -5,7 +5,16 @@ const navItems = {
     name: "home",
   },
   "/blog": {
-    name: "blog",
+    name: "thought",
+  },
+  "/concepts": {
+    name: "concept",
+  },
+  "/library": {
+    name: "library",
+  },
+  "/work": {
+    name: "work",
   },
 };
 

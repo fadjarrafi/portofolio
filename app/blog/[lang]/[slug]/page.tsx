@@ -2,7 +2,7 @@
 
 import { notFound } from "next/navigation";
 import { CustomMDX } from "app/components/mdx";
-import { formatDate, getBlogPost, getAllBlogPosts } from "app/blog/utils";
+import { formatDate, getBlogPost, getAllBlogPosts } from "@/app/blog/utils";
 import { baseUrl } from "app/sitemap";
 import { ScrollAnimate } from "app/components/scroll-animate";
 import { TableOfContents } from "@/app/components/table-of-content";
@@ -19,13 +19,14 @@ export async function generateStaticParams() {
   }));
 }
 
-export function generateMetadata({
+export async function generateMetadata({
   params,
 }: {
-  params: { lang: string; slug: string };
+  params: Promise<{ lang: string; slug: string }>;
 }) {
-  const lang = params.lang === "id" ? "id" : "en";
-  let post = getBlogPost(params.slug, lang);
+  const { lang: paramLang, slug } = await params;
+  const lang = paramLang === "id" ? "id" : "en";
+  let post = getBlogPost(slug, lang);
 
   if (!post) {
     return;
@@ -83,13 +84,14 @@ function extractHeadings(content: string) {
   return headings;
 }
 
-export default function Blog({
+export default async function Blog({
   params,
 }: {
-  params: { lang: string; slug: string };
+  params: Promise<{ lang: string; slug: string }>;
 }) {
-  const lang = params.lang === "id" ? "id" : "en";
-  let post = getBlogPost(params.slug, lang);
+  const { lang: paramLang, slug } = await params;
+  const lang = paramLang === "id" ? "id" : "en";
+  let post = getBlogPost(slug, lang);
 
   if (!post) {
     notFound();
@@ -111,7 +113,7 @@ export default function Blog({
       </div>
 
       <PageWrapper>
-        <section className="max-w-4xl mx-auto px-6 pt-24 pb-16">
+        <section className="max-w-6xl mx-auto px-6 pt-24 pb-16">
           <script
             type="application/ld+json"
             suppressHydrationWarning
@@ -138,7 +140,7 @@ export default function Blog({
           <ScrollAnimate>
             <Link
               href="/blog"
-              className="inline-flex items-center text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 mb-8"
+              className="inline-flex items-center text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 mb-8 py-2 px-2 -ml-2"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -169,10 +171,10 @@ export default function Blog({
             </div>
           </ScrollAnimate>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-8 relative">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2.5fr)_280px] gap-8 relative">
             {/* Main Content */}
             <ScrollAnimate delay={200}>
-              <article className="prose prose-neutral dark:prose-invert max-w-none prose-p:my-6 w-full leading-8">
+              <article className="prose prose-neutral dark:prose-invert prose-p:my-6 w-full leading-8 min-w-0">
                 <CustomMDX source={post.content} />
               </article>
             </ScrollAnimate>

@@ -7,6 +7,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import Footer from "./components/footer";
 import { PageWrapper } from "./components/page-wrapper";
 import { baseUrl } from "./sitemap";
+import "katex/dist/katex.min.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),

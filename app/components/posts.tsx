@@ -1,9 +1,7 @@
-// app/components/posts.tsx
-
 import Link from "next/link";
 import { formatDate, getBlogPosts } from "app/blog/utils";
 
-const POSTS_PER_PAGE = 7;
+const POSTS_PER_PAGE = 10;
 
 export function BlogPosts({ page = 1 }: { page?: number }) {
   // Always show only English posts on blog list

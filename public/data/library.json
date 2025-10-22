@@ -1,0 +1,85 @@
+[
+    {
+        "id": "the-pragmatic-programmer",
+        "title": "The Pragmatic Programmer",
+        "author": "Andrew Hunt & David Thomas",
+        "type": "book",
+        "topics": [
+            "computer",
+            "programming"
+        ],
+        "status": "reading",
+        "rating": 4,
+        "year": "1999",
+        "summary": " The Pragmatic Programmer cuts through the increasing specialization and technicalities of modern software development to examine the core process taking a requirement and producing working, maintainable code that delights its users."
+    },
+    {
+        "id": "re-dan-perempuan",
+        "title": "Re: dan Perempuan",
+        "author": "Maman Suherman",
+        "type": "book",
+        "topics": [
+            "fiction",
+            "romance",
+            "crime"
+        ],
+        "status": "completed",
+        "year": "2021",
+        "summary": "Re is a woman who works as a commercial sex worker, or more precisely, a lesbian sex worker. Re was forced to become a sex worker to pay off her debt to Mami Lani.",
+        "dateConsumed": "2024-01-15"
+    },
+    {
+        "id": "on-children",
+        "title": "On Children",
+        "author": "Wu Xiaole",
+        "type": "book",
+        "topics": [
+            "non-fiction",
+            "psychology",
+            "education"
+        ],
+        "status": "reading",
+        "year": "2014",
+        "summary": "Being a tutor gives Wu Xiaole the opportunity to observe her students' families; how parents raise, educate, and love their children.",
+        "dateConsumed": "2025-06-02"
+    },
+    {
+        "id": "thinking-in-systems",
+        "title": "Thinking in Systems",
+        "author": "Donella Meadows",
+        "type": "book",
+        "topics": [
+            "systems-thinking",
+            "complexity"
+        ],
+        "status": "reading",
+        "rating": 4,
+        "year": "2008",
+        "summary": "A primer on understanding and working with complex systems in various domains.",
+        "keyTakeaways": [
+            "Strange loops and self-reference are fundamental to consciousness",
+            "Connections between formal systems, art, and human thought",
+            "The relationship between meaning and form"
+        ]
+    },
+    {
+        "id": "attention-is-all-you-need",
+        "title": "Attention Is All You Need",
+        "author": "Vaswani et al.",
+        "type": "paper",
+        "topics": [
+            "machine-learning",
+            "nlp"
+        ],
+        "status": "completed",
+        "year": "2017",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "summary": "The paper that introduced the Transformer architecture, revolutionizing natural language processing.",
+        "keyTakeaways": [
+            "Self-attention mechanism eliminates need for recurrence",
+            "Parallel processing enables faster training",
+            "Foundation for modern LLMs"
+        ],
+        "dateConsumed": "2023-12-10"
+    }
+]

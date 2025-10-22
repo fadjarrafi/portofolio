@@ -1,0 +1,55 @@
+[
+    {
+        "role": "Full Stack Developer",
+        "company": "PT. SaranaInsan MudaSelaras",
+        "period": "Jan 2024 - Present",
+        "location": "Indonesia",
+        "description": "Spearheaded the development of a comprehensive Android application using Java for hotel services, room controls, and IPTV streaming. Designed and implemented a robust CMS using PHP and Laravel for real-time content management.",
+        "highlights": [
+            "Integrated APIs for seamless communication between the Android app, CMS, and backend",
+            "Maintained and optimized internal systems, focusing on network monitoring to ensure reliable service"
+        ],
+        "technologies": [
+            "Java",
+            "Android",
+            "PHP",
+            "Laravel",
+            "API Integration",
+            "Networking"
+        ]
+    },
+    {
+        "role": "Full Stack Developer",
+        "company": "Square Indonesia",
+        "period": "Jan 2023 - Present",
+        "location": "Indonesia",
+        "description": "Designed an intuitive GUI to streamline user interaction. Converted mockups into a functional landing page using HTML, Javascript, and TailwindCSS.",
+        "highlights": [
+            "Collaborated with UI designers to redesign the company profile page",
+            "Engaged with clients to optimize the website based on feedback"
+        ],
+        "technologies": [
+            "HTML",
+            "JavaScript",
+            "TailwindCSS",
+            "UI/UX"
+        ]
+    },
+    {
+        "role": "Web Programmer",
+        "company": "Kardusinfo Indonesia",
+        "period": "Apr 2021 - Nov 2022",
+        "location": "Indonesia",
+        "description": "Designed and implemented an efficient backend system using the Laravel framework. Contributed to database design and development with MySQL.",
+        "highlights": [
+            "Executed end-to-end REST API development, including integration, documentation, and testing using PostmanAPI"
+        ],
+        "technologies": [
+            "Laravel",
+            "PHP",
+            "MySQL",
+            "REST API",
+            "Postman"
+        ]
+    }
+]

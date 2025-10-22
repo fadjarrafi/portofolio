@@ -218,6 +218,34 @@ table {
   text-wrap: balance;
 }
 
+/* KaTeX custom styles */
+.katex {
+  font-size: 1.1em;
+}
+
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 1rem 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .katex {
+    color: inherit;
+  }
+  
+  .katex .mord,
+  .katex .mrel,
+  .katex .mop,
+  .katex .mbin,
+  .katex .mpunct,
+  .katex .minner,
+  .katex .mopen,
+  .katex .mclose {
+    color: inherit;
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

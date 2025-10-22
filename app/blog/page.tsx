@@ -1,5 +1,5 @@
-import { BlogPosts } from "app/components/posts";
-import { Warp } from "@paper-design/shaders-react";
+import { getBlogPosts } from "app/blog/utils";
+import { PostsSearch } from "app/components/posts-search";
 import { ScrollAnimate } from "app/components/scroll-animate";
 import { Navbar } from "app/components/nav";
 import { PageWrapper } from "app/components/page-wrapper";
@@ -16,6 +16,14 @@ export default function Page({
 }) {
   const currentPage = Number(searchParams.page) || 1;
 
+  // Server-side: Get all English posts
+  const allBlogs = getBlogPosts("en").sort((a, b) => {
+    if (new Date(a.metadata.publishedAt) > new Date(b.metadata.publishedAt)) {
+      return -1;
+    }
+    return 1;
+  });
+
   return (
     <>
       {/* Fixed Navbar */}
@@ -24,42 +32,23 @@ export default function Page({
       </div>
 
       <PageWrapper>
-        <section className="flex flex-col lg:flex-row min-h-screen">
-          {/* Left Section - Blog Posts */}
-          <div className="lg:w-1/2 flex flex-col py-8 lg:py-0 lg:pr-8 m-6 pt-20 lg:pt-24">
+        <section className="min-h-screen py-24">
+          {/* Centered Content */}
+          <div className="max-w-4xl mx-auto px-6">
             <ScrollAnimate>
-              <h1 className="font-semibold text-2xl mb-8 tracking-tighter">
-                My Writing
+              <h1 className="font-semibold text-2xl mb-4 tracking-tighter">
+                My Thoughts
               </h1>
+              <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-12">
+                Writing about development, systems thinking, and things I'm
+                learning
+              </p>
             </ScrollAnimate>
+
             <ScrollAnimate delay={100}>
-              <BlogPosts page={currentPage} />
+              <PostsSearch posts={allBlogs} currentPage={currentPage} />
             </ScrollAnimate>
           </div>
-
-          {/* Right Section - Warp Visualization (Fixed) */}
-          <ScrollAnimate
-            delay={200}
-            className="lg:w-1/2 flex items-center justify-center min-h-[400px] lg:min-h-screen lg:fixed lg:right-0 lg:top-0"
-          >
-            <div className="w-full h-full flex items-center justify-center">
-              <Warp
-                width={1280}
-                height={720}
-                colors={["#a7e58b", "#324471", "#0b190e"]}
-                proportion={0.64}
-                softness={1}
-                distortion={0.2}
-                swirl={0.86}
-                swirlIterations={7}
-                shape="edge"
-                shapeScale={0.6}
-                speed={10}
-                scale={0.9}
-                rotation={160}
-              />
-            </div>
-          </ScrollAnimate>
         </section>
       </PageWrapper>
     </>
