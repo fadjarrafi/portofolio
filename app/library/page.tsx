@@ -97,7 +97,7 @@ export default function LibraryPage() {
 
   return (
     <PageWrapper>
-      <div className="min-h-screen bg-white dark:bg-[#181A18] text-black dark:text-white py-8">
+      <div className="min-h-screen bg-white dark:bg-[#181A18] text-black dark:text-white">
         <Navbar />
 
         <div className="max-w-4xl mx-auto">

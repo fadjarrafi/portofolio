@@ -7,6 +7,9 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import remarkGfm from "remark-gfm";
 
+// Import KaTeX CSS in your layout or global CSS instead
+// This prevents it from being imported multiple times
+
 function Table({ data }) {
   let headers = data.headers.map((header, index) => (
     <th key={index}>{header}</th>
@@ -110,7 +113,16 @@ export function CustomMDX(props) {
       options={{
         mdxOptions: {
           remarkPlugins: [remarkMath, remarkGfm],
-          rehypePlugins: [rehypeKatex],
+          rehypePlugins: [
+            [
+              rehypeKatex,
+              {
+                strict: false,
+                trust: true,
+                output: "html", // Use HTML output instead of MathML for better performance
+              },
+            ],
+          ],
         },
       }}
     />

@@ -47,7 +47,7 @@ export default function ConceptsPage() {
 
   return (
     <PageWrapper>
-      <div className="min-h-screen bg-white dark:bg-[#181A18] text-black dark:text-white py-8">
+      <div className="min-h-screen bg-white dark:bg-[#181A18] text-black dark:text-white">
         {/* Fixed Navbar */}
         <Navbar />
 

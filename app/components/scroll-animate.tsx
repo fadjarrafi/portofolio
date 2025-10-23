@@ -15,13 +15,22 @@ export function ScrollAnimate({
 }: ScrollAnimateProps) {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
+    const element = ref.current;
+    if (!element) return;
+
+    // Use a single observer instance
+    observerRef.current = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entry.target);
+          // Use requestAnimationFrame to batch DOM updates
+          requestAnimationFrame(() => {
+            setIsVisible(true);
+          });
+          // Disconnect after triggering to free resources
+          observerRef.current?.disconnect();
         }
       },
       {
@@ -30,14 +39,10 @@ export function ScrollAnimate({
       }
     );
 
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
+    observerRef.current.observe(element);
 
     return () => {
-      if (ref.current) {
-        observer.unobserve(ref.current);
-      }
+      observerRef.current?.disconnect();
     };
   }, []);
 
@@ -47,7 +52,10 @@ export function ScrollAnimate({
       className={`transition-all duration-1000 ${
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
       } ${className}`}
-      style={{ transitionDelay: `${delay}ms` }}
+      style={{
+        transitionDelay: `${delay}ms`,
+        willChange: isVisible ? "auto" : "opacity, transform", // Performance hint
+      }}
     >
       {children}
     </div>

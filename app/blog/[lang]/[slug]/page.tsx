@@ -108,12 +108,10 @@ export default async function Blog({
   return (
     <>
       {/* Fixed Navbar */}
-      <div className="fixed top-0 left-0 z-50 p-6">
-        <Navbar />
-      </div>
+      <Navbar />
 
       <PageWrapper>
-        <section className="max-w-6xl mx-auto px-6 pt-24 pb-16">
+        <section className="max-w-6xl mx-auto px-6 pb-16">
           <script
             type="application/ld+json"
             suppressHydrationWarning
@@ -137,50 +135,44 @@ export default async function Blog({
             }}
           />
 
-          <ScrollAnimate>
-            <Link
-              href="/blog"
-              className="inline-flex items-center text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 mb-8 py-2 px-2 -ml-2"
+          <Link
+            href="/blog"
+            className="inline-flex items-center text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 mb-8 py-2 px-2 -ml-2"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="mr-2"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="mr-2"
-              >
-                <path d="m15 18-6-6 6-6" />
-              </svg>
-              Back
-            </Link>
-          </ScrollAnimate>
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+            Back
+          </Link>
 
-          <ScrollAnimate delay={100}>
-            <h1 className="title font-semibold text-2xl tracking-tighter">
-              {post.metadata.title}
-            </h1>
-            <div className="flex justify-between items-center mt-2 mb-8 text-sm">
-              <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                {formatDate(post.metadata.publishedAt)}
-              </p>
-            </div>
-          </ScrollAnimate>
+          <h1 className="title font-semibold text-2xl tracking-tighter">
+            {post.metadata.title}
+          </h1>
+          <div className="flex justify-between items-center mt-2 mb-8 text-sm">
+            <p className="text-sm text-neutral-600 dark:text-neutral-400">
+              {formatDate(post.metadata.publishedAt)}
+            </p>
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2.5fr)_280px] gap-8 relative">
             {/* Main Content */}
-            <ScrollAnimate delay={200}>
-              <article className="prose prose-neutral dark:prose-invert prose-p:my-6 w-full leading-8 min-w-0">
-                <CustomMDX source={post.content} />
-              </article>
-            </ScrollAnimate>
+            <article className="prose prose-neutral dark:prose-invert prose-p:my-6 w-full leading-8 min-w-0">
+              <CustomMDX source={post.content} />
+            </article>
 
             {/* Sticky Sidebar */}
-            <ScrollAnimate delay={300} className="order-first lg:order-last">
+            <div className="order-first lg:order-last">
               <aside className="lg:sticky lg:top-24 lg:self-start space-y-4">
                 {/* Translation Link - Only shown if translation exists */}
                 {hasTranslation && translationSlug && (
@@ -219,7 +211,7 @@ export default async function Blog({
                 {/* Table of Contents */}
                 {headings.length > 0 && <TableOfContents headings={headings} />}
               </aside>
-            </ScrollAnimate>
+            </div>
           </div>
         </section>
       </PageWrapper>

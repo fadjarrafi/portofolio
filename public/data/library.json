@@ -14,6 +14,18 @@
         "summary": " The Pragmatic Programmer cuts through the increasing specialization and technicalities of modern software development to examine the core process taking a requirement and producing working, maintainable code that delights its users."
     },
     {
+        "id": "the-subtle-art-of-not-giving-a-fuck",
+        "title": "The Subtle Art of Not Giving a Fuck",
+        "author": "Mark Manson",
+        "type": "book",
+        "topics": [
+            "nonfiction"
+        ],
+        "status": "reading",
+        "year": "2022",
+        "summary": "The Subtle Art of Not Giving a Fuck argues that individuals should seek to find meaning through what they find to be important and only engage in values that they can control."
+    },
+    {
         "id": "re-dan-perempuan",
         "title": "Re: dan Perempuan",
         "author": "Maman Suherman",
