@@ -1,23 +1,27 @@
-// app/blog/utils.ts
+// app/garden/utils.ts
+import 'server-only'
 
 import fs from 'fs'
 import path from 'path'
 import { cache } from 'react'
-export { formatDate } from './format'
 
 export type PostType = 'essay' | 'tutorial' | 'note' | 'reflection' | 'review'
+export type GrowthStage = 'seed' | 'sapling' | 'tree'
+
+// Export formatDate from separate file for client-side use
+export { formatDate } from './format'
 
 type Metadata = {
   title: string
   publishedAt: string
   summary: string
   image?: string
-  featured?: boolean
   lang?: 'en' | 'id'
   translationSlug?: string
   topics?: string[]
   type?: PostType
   updated?: string
+  status?: GrowthStage
   [key: string]: any
 }
 
@@ -34,13 +38,12 @@ function parseFrontmatter(fileContent: string) {
     let value = valueArr.join(': ').trim()
     value = value.replace(/^['"](.*)['"]$/, '$1')
     
-    // Handle arrays (e.g., topics: ["programming", "mathematics"])
     if (value.startsWith('[') && value.endsWith(']')) {
       const arrayItems = value
         .slice(1, -1)
         .split(',')
         .map(item => item.trim().replace(/^['"](.*)['"]$/, '$1'))
-        .filter(item => item.length > 0) // Remove empty items
+        .filter(item => item.length > 0)
       metadata[key.trim()] = arrayItems
     } else if (value === 'true') {
       metadata[key.trim()] = true
@@ -66,7 +69,6 @@ function readMDXFile(filePath: string) {
   return parseFrontmatter(rawContent)
 }
 
-// Calculate reading time in minutes
 function calculateReadingTime(content: string): number {
   const wordsPerMinute = 200
   const words = content.trim().split(/\s+/).length
@@ -81,12 +83,24 @@ function getMDXData(dir: string, lang: 'en' | 'id' = 'en') {
     let slug = path.basename(file, path.extname(file))
     let readingTime = calculateReadingTime(content)
 
+    // Auto-assign growth stage based on word count if not specified
+    let status: GrowthStage = metadata.status || 'tree'
+    if (!metadata.status) {
+      const wordCount = content.trim().split(/\s+/).length
+      if (wordCount < 300) {
+        status = 'seed'
+      } else if (wordCount < 1000) {
+        status = 'sapling'
+      }
+    }
+
     return {
       metadata: {
         ...metadata,
         lang: metadata.lang || lang,
         topics: metadata.topics || [],
         type: metadata.type || 'essay',
+        status,
       },
       slug,
       content,
@@ -95,32 +109,32 @@ function getMDXData(dir: string, lang: 'en' | 'id' = 'en') {
   })
 }
 
-// Get posts for a specific language (for blog list and featured posts)
-export const getBlogPosts = cache((lang: 'en' | 'id' = 'en') => {
-  const langDir = path.join(process.cwd(), 'app', 'blog', 'posts', lang)
+// Get garden thoughts for a specific language
+export const getGardenThoughts = cache((lang: 'en' | 'id' = 'en') => {
+  const langDir = path.join(process.cwd(), 'app', 'garden', 'thoughts', 'posts', lang)
   return getMDXData(langDir, lang)
 })
 
-// Get all posts from all languages (for static params generation)
-export const getAllBlogPosts = cache(() => {
-  const enPosts = getBlogPosts('en').map(post => ({ ...post, lang: 'en' as const }))
-  const idPosts = getBlogPosts('id').map(post => ({ ...post, lang: 'id' as const }))
-  return [...enPosts, ...idPosts]
+// Get all garden thoughts from all languages
+export const getAllGardenThoughts = cache(() => {
+  const enThoughts = getGardenThoughts('en').map(post => ({ ...post, lang: 'en' as const }))
+  const idThoughts = getGardenThoughts('id').map(post => ({ ...post, lang: 'id' as const }))
+  return [...enThoughts, ...idThoughts]
 })
 
-// Get a specific post by slug and language
-export const getBlogPost = cache((slug: string, lang: 'en' | 'id' = 'en') => {
-  const posts = getBlogPosts(lang)
-  return posts.find((post) => post.slug === slug)
+// Get a specific thought by slug and language
+export const getGardenThought = cache((slug: string, lang: 'en' | 'id' = 'en') => {
+  const thoughts = getGardenThoughts(lang)
+  return thoughts.find((thought) => thought.slug === slug)
 })
 
-// Get all unique topics across all posts
-export const getAllTopics = cache((lang: 'en' | 'id' = 'en') => {
-  const posts = getBlogPosts(lang)
+// Get all unique topics
+export const getAllGardenTopics = cache((lang: 'en' | 'id' = 'en') => {
+  const thoughts = getGardenThoughts(lang)
   const topicsSet = new Set<string>()
   
-  posts.forEach(post => {
-    const topics = post.metadata.topics
+  thoughts.forEach(thought => {
+    const topics = thought.metadata.topics
     if (topics && Array.isArray(topics)) {
       topics.forEach(topic => topicsSet.add(topic))
     }
@@ -130,59 +144,58 @@ export const getAllTopics = cache((lang: 'en' | 'id' = 'en') => {
 })
 
 // Get all unique post types
-export const getAllPostTypes = cache((lang: 'en' | 'id' = 'en') => {
-  const posts = getBlogPosts(lang)
+export const getAllGardenTypes = cache((lang: 'en' | 'id' = 'en') => {
+  const thoughts = getGardenThoughts(lang)
   const typesSet = new Set<PostType>()
   
-  posts.forEach(post => {
-    if (post.metadata.type) {
-      typesSet.add(post.metadata.type)
+  thoughts.forEach(thought => {
+    if (thought.metadata.type) {
+      typesSet.add(thought.metadata.type)
     }
   })
   
   return Array.from(typesSet).sort()
 })
 
-// Find related posts based on shared topics
-export const getRelatedPosts = cache((slug: string, lang: 'en' | 'id' = 'en', limit: number = 3) => {
-  const currentPost = getBlogPost(slug, lang)
-  if (!currentPost) return []
+// Find related thoughts based on shared topics
+export const getRelatedThoughts = cache((slug: string, lang: 'en' | 'id' = 'en', limit: number = 3) => {
+  const currentThought = getGardenThought(slug, lang)
+  if (!currentThought) return []
   
-  const currentTopics = currentPost.metadata.topics
+  const currentTopics = currentThought.metadata.topics
   if (!currentTopics || !Array.isArray(currentTopics) || currentTopics.length === 0) {
     return []
   }
   
-  const allPosts = getBlogPosts(lang)
+  const allThoughts = getGardenThoughts(lang)
   
-  // Calculate relevance score based on shared topics
-  const postsWithScores = allPosts
-    .filter(post => post.slug !== slug)
-    .map(post => {
-      const postTopics = post.metadata.topics
-      const sharedTopics = (postTopics && Array.isArray(postTopics))
-        ? postTopics.filter(topic => currentTopics.includes(topic))
+  const thoughtsWithScores = allThoughts
+    .filter(thought => thought.slug !== slug)
+    .map(thought => {
+      const thoughtTopics = thought.metadata.topics
+      const sharedTopics = (thoughtTopics && Array.isArray(thoughtTopics))
+        ? thoughtTopics.filter(topic => currentTopics.includes(topic))
         : []
       
       return {
-        ...post,
+        ...thought,
         relevanceScore: sharedTopics.length
       }
     })
-    .filter(post => post.relevanceScore > 0)
+    .filter(thought => thought.relevanceScore > 0)
     .sort((a, b) => b.relevanceScore - a.relevanceScore)
     .slice(0, limit)
   
-  return postsWithScores
+  return thoughtsWithScores
 })
 
 // Get topic statistics
-export const getTopicStats = cache((lang: 'en' | 'id' = 'en') => {
-  const posts = getBlogPosts(lang)
+export const getGardenTopicStats = cache((lang: 'en' | 'id' = 'en') => {
+  const thoughts = getGardenThoughts(lang)
   const stats: Record<string, number> = {}
   
-  posts.forEach(post => {
-    const topics = post.metadata.topics
+  thoughts.forEach(thought => {
+    const topics = thought.metadata.topics
     if (topics && Array.isArray(topics)) {
       topics.forEach(topic => {
         stats[topic] = (stats[topic] || 0) + 1

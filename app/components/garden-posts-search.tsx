@@ -1,14 +1,14 @@
-// app/components/posts-search.tsx
+// app/components/garden-posts-search.tsx
 "use client";
 
 import { useState } from "react";
 import Link from "next/link";
-import { formatDate } from "app/blog/format";
-import type { PostType } from "app/blog/utils";
+import { formatDate } from "@/app/garden/format";
+import type { PostType, GrowthStage } from "@/app/garden/utils";
 
 const POSTS_PER_PAGE = 10;
 
-interface BlogPost {
+interface GardenPost {
   slug: string;
   metadata: {
     title: string;
@@ -17,19 +17,19 @@ interface BlogPost {
     topics?: string[];
     type?: PostType;
     updated?: string;
+    status?: GrowthStage;
   };
   readingTime: number;
 }
 
-interface PostsSearchProps {
-  posts: BlogPost[];
+interface GardenPostsSearchProps {
+  posts: GardenPost[];
   currentPage: number;
   allTopics: string[];
   allTypes: PostType[];
   topicStats: Record<string, number>;
 }
 
-// Post type emoji mapping
 const typeEmojis: Record<PostType, string> = {
   essay: "📝",
   tutorial: "💻",
@@ -38,19 +38,33 @@ const typeEmojis: Record<PostType, string> = {
   review: "⭐",
 };
 
-export function PostsSearch({
+const stageEmojis: Record<GrowthStage, string> = {
+  seed: "🌱",
+  sapling: "🌿",
+  tree: "🌳",
+};
+
+const stageLabels: Record<GrowthStage, string> = {
+  seed: "Seed",
+  sapling: "Sapling",
+  tree: "Tree",
+};
+
+export function GardenPostsSearch({
   posts,
   currentPage,
   allTopics,
   allTypes,
   topicStats,
-}: PostsSearchProps) {
+}: GardenPostsSearchProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTopic, setSelectedTopic] = useState<string>("all");
   const [selectedType, setSelectedType] = useState<PostType | "all">("all");
+  const [selectedStage, setSelectedStage] = useState<GrowthStage | "all">(
+    "all"
+  );
 
-  // Filter posts based on search query, topic, and type
-  const filteredBlogs = posts.filter((post) => {
+  const filteredPosts = posts.filter((post) => {
     const matchesSearch =
       !searchQuery ||
       post.metadata.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -65,13 +79,22 @@ export function PostsSearch({
     const matchesType =
       selectedType === "all" || post.metadata.type === selectedType;
 
-    return matchesSearch && matchesTopic && matchesType;
+    const matchesStage =
+      selectedStage === "all" || post.metadata.status === selectedStage;
+
+    return matchesSearch && matchesTopic && matchesType && matchesStage;
   });
 
-  const totalPages = Math.ceil(filteredBlogs.length / POSTS_PER_PAGE);
+  const totalPages = Math.ceil(filteredPosts.length / POSTS_PER_PAGE);
   const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
   const endIndex = startIndex + POSTS_PER_PAGE;
-  const currentPosts = filteredBlogs.slice(startIndex, endIndex);
+  const currentPosts = filteredPosts.slice(startIndex, endIndex);
+
+  const stageCounts = {
+    seed: posts.filter((p) => p.metadata.status === "seed").length,
+    sapling: posts.filter((p) => p.metadata.status === "sapling").length,
+    tree: posts.filter((p) => p.metadata.status === "tree").length,
+  };
 
   return (
     <div>
@@ -79,7 +102,7 @@ export function PostsSearch({
       <div className="mb-6">
         <input
           type="text"
-          placeholder="Search posts..."
+          placeholder="Search garden thoughts..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full px-4 py-2 text-sm bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-400 dark:focus:ring-neutral-600"
@@ -88,6 +111,27 @@ export function PostsSearch({
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3 mb-8">
+        {/* Growth Stage Filter */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-neutral-600 dark:text-neutral-400">
+            Stage:
+          </span>
+          <select
+            value={selectedStage}
+            onChange={(e) =>
+              setSelectedStage(e.target.value as GrowthStage | "all")
+            }
+            className="text-xs px-3 py-1.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-400 dark:focus:ring-neutral-600"
+          >
+            <option value="all">All</option>
+            {(["seed", "sapling", "tree"] as GrowthStage[]).map((stage) => (
+              <option key={stage} value={stage}>
+                {stageEmojis[stage]} {stageLabels[stage]} ({stageCounts[stage]})
+              </option>
+            ))}
+          </select>
+        </div>
+
         {/* Type Filter */}
         <div className="flex items-center gap-2">
           <span className="text-xs text-neutral-600 dark:text-neutral-400">
@@ -141,8 +185,11 @@ export function PostsSearch({
         </div>
       </div>
 
-      {/* Active Filters Summary */}
-      {(searchQuery || selectedTopic !== "all" || selectedType !== "all") && (
+      {/* Active Filters */}
+      {(searchQuery ||
+        selectedTopic !== "all" ||
+        selectedType !== "all" ||
+        selectedStage !== "all") && (
         <div className="mb-6 pb-4 border-b border-neutral-200 dark:border-neutral-800">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs text-neutral-600 dark:text-neutral-400">
@@ -151,6 +198,12 @@ export function PostsSearch({
             {searchQuery && (
               <span className="text-xs px-2 py-1 bg-neutral-100 dark:bg-neutral-800 rounded">
                 Search: "{searchQuery}"
+              </span>
+            )}
+            {selectedStage !== "all" && (
+              <span className="text-xs px-2 py-1 bg-neutral-100 dark:bg-neutral-800 rounded">
+                Stage: {stageEmojis[selectedStage as GrowthStage]}{" "}
+                {selectedStage}
               </span>
             )}
             {selectedType !== "all" && (
@@ -168,6 +221,7 @@ export function PostsSearch({
                 setSearchQuery("");
                 setSelectedTopic("all");
                 setSelectedType("all");
+                setSelectedStage("all");
               }}
               className="text-xs text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 underline"
             >
@@ -182,13 +236,14 @@ export function PostsSearch({
         {currentPosts.length === 0 ? (
           <div className="py-12 text-center">
             <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-2">
-              No posts found
+              No thoughts found
             </p>
             <button
               onClick={() => {
                 setSearchQuery("");
                 setSelectedTopic("all");
                 setSelectedType("all");
+                setSelectedStage("all");
               }}
               className="text-sm text-neutral-900 dark:text-neutral-100 hover:underline"
             >
@@ -200,11 +255,15 @@ export function PostsSearch({
             <Link
               key={post.slug}
               className="block group"
-              href={`/blog/en/${post.slug}`}
+              href={`/garden/thoughts/en/${post.slug}`}
             >
               <article className="space-y-2">
-                {/* Title and Type */}
                 <div className="flex items-start gap-2">
+                  {post.metadata.status && (
+                    <span className="text-lg flex-shrink-0 mt-0.5">
+                      {stageEmojis[post.metadata.status]}
+                    </span>
+                  )}
                   {post.metadata.type && (
                     <span className="text-lg flex-shrink-0 mt-0.5">
                       {typeEmojis[post.metadata.type]}
@@ -215,23 +274,18 @@ export function PostsSearch({
                   </h2>
                 </div>
 
-                {/* Summary */}
                 {post.metadata.summary && (
                   <p className="text-sm text-neutral-600 dark:text-neutral-400 line-clamp-2">
                     {post.metadata.summary}
                   </p>
                 )}
 
-                {/* Metadata */}
                 <div className="flex flex-wrap items-center gap-3 text-xs text-neutral-600 dark:text-neutral-400">
                   <time dateTime={post.metadata.publishedAt}>
                     {formatDate(post.metadata.publishedAt, false)}
                   </time>
-
                   <span>·</span>
-
                   <span>{post.readingTime} min read</span>
-
                   {post.metadata.updated && (
                     <>
                       <span>·</span>
@@ -240,8 +294,6 @@ export function PostsSearch({
                       </span>
                     </>
                   )}
-
-                  {/* Topics */}
                   {post.metadata.topics &&
                     Array.isArray(post.metadata.topics) &&
                     post.metadata.topics.length > 0 && (
@@ -271,7 +323,7 @@ export function PostsSearch({
         <div className="flex items-center gap-4 mt-12">
           {currentPage > 1 ? (
             <Link
-              href={`/blog?page=${currentPage - 1}`}
+              href={`/garden/thoughts?page=${currentPage - 1}`}
               className="text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
             >
               ← Previous
@@ -287,7 +339,7 @@ export function PostsSearch({
               (pageNum) => (
                 <Link
                   key={pageNum}
-                  href={`/blog?page=${pageNum}`}
+                  href={`/garden/thoughts?page=${pageNum}`}
                   className={`w-8 h-8 text-sm flex items-center justify-center transition-colors ${
                     currentPage === pageNum
                       ? "text-neutral-900 dark:text-neutral-100 font-medium"
@@ -302,7 +354,7 @@ export function PostsSearch({
 
           {currentPage < totalPages ? (
             <Link
-              href={`/blog?page=${currentPage + 1}`}
+              href={`/garden/thoughts?page=${currentPage + 1}`}
               className="text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
             >
               Next →
@@ -319,9 +371,9 @@ export function PostsSearch({
       <div className="mt-8 pt-6 border-t border-neutral-200 dark:border-neutral-800">
         <div className="flex flex-wrap items-center gap-4 text-xs text-neutral-600 dark:text-neutral-400">
           <span>
-            Showing {currentPosts.length} of {filteredBlogs.length} posts
+            Showing {currentPosts.length} of {filteredPosts.length} thoughts
           </span>
-          {filteredBlogs.length !== posts.length && (
+          {filteredPosts.length !== posts.length && (
             <span>({posts.length} total)</span>
           )}
         </div>

@@ -1,64 +1,180 @@
 [
     {
-        "id": "recursion",
         "term": "Recursion",
         "domain": [
             "Programming",
             "Mathematics"
         ],
         "brief": "A function that calls itself to solve smaller instances of the same problem",
-        "related": [
-            "Iteration",
-            "Stack",
-            "Base Case",
-            "Fractals"
+        "slug": "recursion",
+        "extended": "Recursion is a powerful problem-solving technique where a function breaks down a problem into smaller, similar subproblems. Each recursive call works on a simpler version of the original problem until it reaches a base case—the simplest form that can be solved directly without further recursion. This approach is particularly elegant for problems with self-similar structure, such as traversing trees, calculating factorials, or processing nested data structures.",
+        "examples": [
+            "Calculating factorial: n! = n × (n-1)!",
+            "Traversing directory trees in a file system",
+            "Computing Fibonacci numbers: F(n) = F(n-1) + F(n-2)",
+            "Depth-first search in graphs"
         ],
-        "difficulty": "intermediate",
-        "lastUpdated": "2024-01-15"
+        "related": [
+            "iteration",
+            "base-case"
+        ]
     },
     {
-        "id": "abstraction",
-        "term": "Abstraction",
+        "term": "Base Case",
+        "domain": [
+            "Programming",
+            "Mathematics"
+        ],
+        "brief": "The simplest form of a recursive problem that can be solved directly",
+        "slug": "base-case",
+        "extended": "In recursive algorithms, the base case is the condition that stops the recursion. Without a proper base case, a recursive function would call itself indefinitely, leading to a stack overflow. The base case represents the simplest version of the problem where the answer is known or trivial to compute.",
+        "examples": [
+            "In factorial: if n = 0, return 1",
+            "In Fibonacci: if n ≤ 1, return n",
+            "In tree traversal: if node is null, return"
+        ],
+        "related": [
+            "recursion"
+        ]
+    },
+    {
+        "term": "Iteration",
         "domain": [
             "Programming"
         ],
-        "brief": "A way of hiding complicated details from the end user, and trying to simplify whatever task you're trying to do.",
-        "related": [
-            "OOP"
+        "brief": "Repeating a process using loops rather than recursive calls",
+        "slug": "iteration",
+        "extended": "Iteration is an alternative to recursion that uses explicit loops (for, while) to repeat operations. While recursion uses the call stack to maintain state, iteration uses loop variables. Iteration is often more memory-efficient but can be less elegant for problems with naturally recursive structure.",
+        "examples": [
+            "Using a for loop to calculate factorial",
+            "While loop to traverse a linked list",
+            "Iterating through array elements"
         ],
-        "difficulty": "intermediate",
-        "lastUpdated": "2024-01-15"
+        "related": [
+            "recursion"
+        ]
     },
     {
-        "id": "closure",
-        "term": "Closure",
-        "domain": [
-            "Programming",
-            "JavaScript"
-        ],
-        "brief": "A function that retains access to variables from its outer scope even after the outer function has returned",
-        "related": [
-            "Scope",
-            "Higher-Order Functions",
-            "Lexical Environment"
-        ],
-        "difficulty": "intermediate",
-        "lastUpdated": "2024-01-10"
-    },
-    {
-        "id": "emergence",
         "term": "Emergence",
+        "domain": [
+            "Systems Thinking",
+            "Complexity"
+        ],
+        "brief": "Complex patterns arising from simple interactions between parts of a system",
+        "slug": "emergence",
+        "extended": "Emergence describes how complex behaviors and patterns can arise from simple rules operating at a local level. The whole becomes more than the sum of its parts. Examples include consciousness emerging from neurons, traffic patterns emerging from individual driving decisions, or ant colonies exhibiting intelligent behavior despite individual ants following simple rules.",
+        "examples": [
+            "Flocking behavior of birds from simple rules",
+            "Conway's Game of Life creating complex patterns from simple cellular automaton rules",
+            "Market prices emerging from individual buy/sell decisions",
+            "Consciousness emerging from neural networks"
+        ],
+        "related": [
+            "systems-thinking",
+            "complexity"
+        ]
+    },
+    {
+        "term": "Systems Thinking",
+        "domain": [
+            "Philosophy",
+            "Problem Solving"
+        ],
+        "brief": "Understanding how parts of a system interact and influence each other over time",
+        "slug": "systems-thinking",
+        "extended": "Systems thinking is an approach to problem-solving that views problems as parts of an overall system, rather than isolated events. It emphasizes understanding relationships, feedback loops, delays, and unintended consequences. This holistic perspective helps identify leverage points where small changes can produce significant effects.",
+        "examples": [
+            "Understanding climate as interconnected feedback loops",
+            "Analyzing business problems considering all stakeholders",
+            "Debugging software by examining component interactions"
+        ],
+        "related": [
+            "emergence",
+            "second-order-thinking"
+        ]
+    },
+    {
+        "term": "Second-Order Thinking",
+        "domain": [
+            "Decision Making",
+            "Philosophy"
+        ],
+        "brief": "Considering not just immediate consequences but also the consequences of those consequences",
+        "slug": "second-order-thinking",
+        "extended": "Second-order thinking means thinking beyond the immediate and obvious. It involves asking 'And then what?' repeatedly to understand the full chain of consequences from a decision. While first-order thinking is fast and easy, second-order thinking requires more effort but leads to better long-term decisions by revealing non-obvious implications.",
+        "examples": [
+            "Not just 'Will this make money?' but 'What happens after we make money?'",
+            "Considering long-term environmental impact of short-term solutions",
+            "Understanding how solving one problem might create new problems"
+        ],
+        "related": [
+            "systems-thinking"
+        ]
+    },
+    {
+        "term": "Complexity",
         "domain": [
             "Systems Thinking",
             "Philosophy"
         ],
-        "brief": "Complex patterns and behaviors arising from simple interactions between components",
-        "related": [
-            "Complexity",
-            "Self-Organization",
-            "Collective Behavior"
+        "brief": "Systems with many interacting components that produce unpredictable, non-linear outcomes",
+        "slug": "complexity",
+        "extended": "Complexity arises when a system has many interconnected parts that interact in non-linear ways. Complex systems are different from merely complicated ones: they're unpredictable, adaptive, and exhibit emergent behaviors. Understanding complexity helps us work with uncertainty and avoid simplistic solutions to complex problems.",
+        "examples": [
+            "Weather systems (chaotic and complex)",
+            "Economic markets",
+            "Biological ecosystems",
+            "Social networks"
         ],
-        "difficulty": "advanced",
-        "lastUpdated": "2024-01-20"
+        "related": [
+            "emergence",
+            "systems-thinking"
+        ]
+    },
+    {
+        "term": "Mental Model",
+        "domain": [
+            "Cognition",
+            "Decision Making"
+        ],
+        "brief": "A simplified representation of how something works in the world",
+        "slug": "mental-model",
+        "extended": "Mental models are frameworks we use to understand and predict how things work. They're internal representations that help us make decisions, solve problems, and navigate complexity. Good mental models accurately reflect reality and help us think clearly. Building a latticework of mental models from different disciplines improves decision-making.",
+        "examples": [
+            "The map is not the territory",
+            "First principles thinking",
+            "Supply and demand",
+            "Compound interest"
+        ],
+        "related": [
+            "systems-thinking",
+            "second-order-thinking"
+        ]
+    },
+    {
+        "term": "Abstraction",
+        "domain": [
+            "Programming",
+            "Systems Thinking",
+            "Problem Solving"
+        ],
+        "brief": "Hiding complexity by exposing only essential features while concealing implementation details",
+        "slug": "abstraction",
+        "extended": "Abstraction is a fundamental principle in computer science and problem-solving that involves separating the interface from the implementation. It allows us to work at higher levels without worrying about underlying details. Good abstractions reduce cognitive load, enable code reuse, and make systems easier to reason about. However, all abstractions are leaky to some degree—sometimes the underlying complexity seeps through.",
+        "examples": [
+            "Functions: Use a function without knowing its internal implementation",
+            "APIs: Interact with a service without understanding its backend",
+            "Programming languages: Write high-level code without managing memory directly",
+            "Database queries: Use SQL without understanding storage engines",
+            "Operating systems: Run programs without managing hardware directly"
+        ],
+        "related": [
+            "mental-model",
+            "complexity",
+            "systems-thinking"
+        ],
+        "resources": [
+            "https://www.joelonsoftware.com/2002/11/11/the-law-of-leaky-abstractions/"
+        ]
     }
 ]

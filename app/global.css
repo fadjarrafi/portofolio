@@ -140,6 +140,18 @@ html {
   @apply list-decimal pl-6;
 }
 
+/* Blockquote styles */
+.prose blockquote {
+  @apply border-l-2 border-neutral-300 dark:border-neutral-700 pl-4 my-6 italic text-neutral-700 dark:text-neutral-300;
+  font-family: var(--font-sans);
+  font-style: italic;
+}
+
+.prose blockquote p {
+  @apply my-2;
+  font-family: var(--font-sans);
+}
+
 /* Table styles */
 .prose table {
   @apply w-full border-collapse my-6;

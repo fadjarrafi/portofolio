@@ -1,23 +1,21 @@
-// app/blog/[lang]/[slug]/page.tsx
+// app/garden/thoughts/[lang]/[slug]/page.tsx
 
 import { notFound } from "next/navigation";
-import { CustomMDX } from "app/components/mdx";
+import { CustomMDX } from "@/app/components/mdx";
 import {
   formatDate,
-  getBlogPost,
-  getAllBlogPosts,
-  getRelatedPosts,
-} from "@/app/blog/utils";
-import { baseUrl } from "app/sitemap";
-import { ScrollAnimate } from "app/components/scroll-animate";
+  getGardenThought,
+  getAllGardenThoughts,
+  getRelatedThoughts,
+} from "@/app/garden/utils";
+import { baseUrl } from "@/app/sitemap";
 import { TableOfContents } from "@/app/components/table-of-content";
-import { RelatedPosts } from "@/app/components/related-posts";
-import { Navbar } from "app/components/nav";
-import { PageWrapper } from "app/components/page-wrapper";
+import { GardenRelatedPosts } from "@/app/components/garden-related-posts";
+import { Navbar } from "@/app/components/nav";
+import { PageWrapper } from "@/app/components/page-wrapper";
 import Link from "next/link";
-import type { PostType } from "@/app/blog/utils";
+import type { PostType, GrowthStage } from "@/app/garden/utils";
 
-// Post type emoji mapping
 const typeEmojis: Record<PostType, string> = {
   essay: "📝",
   tutorial: "💻",
@@ -26,12 +24,18 @@ const typeEmojis: Record<PostType, string> = {
   review: "⭐",
 };
 
-export async function generateStaticParams() {
-  let allPosts = getAllBlogPosts();
+const stageEmojis: Record<GrowthStage, string> = {
+  seed: "🌱",
+  sapling: "🌿",
+  tree: "🌳",
+};
 
-  return allPosts.map((post) => ({
-    lang: post.metadata.lang || "en",
-    slug: post.slug,
+export async function generateStaticParams() {
+  let allThoughts = getAllGardenThoughts();
+
+  return allThoughts.map((thought) => ({
+    lang: thought.metadata.lang || "en",
+    slug: thought.slug,
   }));
 }
 
@@ -42,9 +46,9 @@ export async function generateMetadata({
 }) {
   const { lang: paramLang, slug } = await params;
   const lang = paramLang === "id" ? "id" : "en";
-  let post = getBlogPost(slug, lang);
+  let thought = getGardenThought(slug, lang);
 
-  if (!post) {
+  if (!thought) {
     return;
   }
 
@@ -53,7 +57,7 @@ export async function generateMetadata({
     publishedAt: publishedTime,
     summary: description,
     image,
-  } = post.metadata;
+  } = thought.metadata;
   let ogImage = image
     ? image
     : `${baseUrl}/og?title=${encodeURIComponent(title)}`;
@@ -66,7 +70,7 @@ export async function generateMetadata({
       description,
       type: "article",
       publishedTime,
-      url: `${baseUrl}/blog/${lang}/${post.slug}`,
+      url: `${baseUrl}/garden/thoughts/${lang}/${thought.slug}`,
       images: [
         {
           url: ogImage,
@@ -100,31 +104,29 @@ function extractHeadings(content: string) {
   return headings;
 }
 
-export default async function Blog({
+export default async function ThoughtPage({
   params,
 }: {
   params: Promise<{ lang: string; slug: string }>;
 }) {
   const { lang: paramLang, slug } = await params;
   const lang = paramLang === "id" ? "id" : "en";
-  let post = getBlogPost(slug, lang);
+  let thought = getGardenThought(slug, lang);
 
-  if (!post) {
+  if (!thought) {
     notFound();
   }
 
-  const headings = extractHeadings(post.content);
-  const relatedPosts = getRelatedPosts(slug, lang, 3);
+  const headings = extractHeadings(thought.content);
+  const relatedThoughts = getRelatedThoughts(slug, lang, 3);
 
-  // Check if translation exists
-  const translationSlug = post.metadata.translationSlug;
+  const translationSlug = thought.metadata.translationSlug;
   const targetLang = lang === "en" ? "id" : "en";
   const hasTranslation =
-    translationSlug && getBlogPost(translationSlug, targetLang);
+    translationSlug && getGardenThought(translationSlug, targetLang);
 
   return (
     <>
-      {/* Fixed Navbar */}
       <Navbar />
 
       <PageWrapper>
@@ -136,14 +138,14 @@ export default async function Blog({
               __html: JSON.stringify({
                 "@context": "https://schema.org",
                 "@type": "BlogPosting",
-                headline: post.metadata.title,
-                datePublished: post.metadata.publishedAt,
-                dateModified: post.metadata.publishedAt,
-                description: post.metadata.summary,
-                image: post.metadata.image
-                  ? `${baseUrl}${post.metadata.image}`
-                  : `/og?title=${encodeURIComponent(post.metadata.title)}`,
-                url: `${baseUrl}/blog/${lang}/${post.slug}`,
+                headline: thought.metadata.title,
+                datePublished: thought.metadata.publishedAt,
+                dateModified: thought.metadata.publishedAt,
+                description: thought.metadata.summary,
+                image: thought.metadata.image
+                  ? `${baseUrl}${thought.metadata.image}`
+                  : `/og?title=${encodeURIComponent(thought.metadata.title)}`,
+                url: `${baseUrl}/garden/thoughts/${lang}/${thought.slug}`,
                 author: {
                   "@type": "Person",
                   name: "My Portfolio",
@@ -153,7 +155,7 @@ export default async function Blog({
           />
 
           <Link
-            href="/blog"
+            href="/garden/thoughts"
             className="inline-flex items-center text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 mb-8 py-2 px-2 -ml-2"
           >
             <svg
@@ -170,52 +172,51 @@ export default async function Blog({
             >
               <path d="m15 18-6-6 6-6" />
             </svg>
-            Back
+            Back to Garden
           </Link>
 
           {/* Post Header */}
           <div className="mb-8">
-            {/* Title with Type Emoji */}
             <div className="flex items-start gap-3 mb-3">
-              {post.metadata.type && (
+              {thought.metadata.status && (
                 <span className="text-2xl flex-shrink-0 mt-1">
-                  {typeEmojis[post.metadata.type]}
+                  {stageEmojis[thought.metadata.status]}
+                </span>
+              )}
+              {thought.metadata.type && (
+                <span className="text-2xl flex-shrink-0 mt-1">
+                  {typeEmojis[thought.metadata.type]}
                 </span>
               )}
               <h1 className="title font-semibold text-2xl tracking-tighter">
-                {post.metadata.title}
+                {thought.metadata.title}
               </h1>
             </div>
 
-            {/* Metadata */}
             <div className="flex flex-wrap items-center gap-3 text-sm text-neutral-600 dark:text-neutral-400">
-              <time dateTime={post.metadata.publishedAt}>
-                {formatDate(post.metadata.publishedAt)}
+              <time dateTime={thought.metadata.publishedAt}>
+                {formatDate(thought.metadata.publishedAt)}
               </time>
-
               <span>·</span>
-
-              <span>{post.readingTime} min read</span>
-
-              {post.metadata.updated && (
+              <span>{thought.readingTime} min read</span>
+              {thought.metadata.updated && (
                 <>
                   <span>·</span>
                   <span className="text-green-600 dark:text-green-400">
-                    Updated {formatDate(post.metadata.updated)}
+                    Updated {formatDate(thought.metadata.updated)}
                   </span>
                 </>
               )}
             </div>
 
-            {/* Topics */}
-            {post.metadata.topics &&
-              Array.isArray(post.metadata.topics) &&
-              post.metadata.topics.length > 0 && (
+            {thought.metadata.topics &&
+              Array.isArray(thought.metadata.topics) &&
+              thought.metadata.topics.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-4">
-                  {post.metadata.topics.map((topic) => (
+                  {thought.metadata.topics.map((topic) => (
                     <Link
                       key={topic}
-                      href={`/blog?topic=${topic}`}
+                      href={`/garden/thoughts?topic=${topic}`}
                       className="px-3 py-1 text-xs bg-neutral-100 dark:bg-neutral-800 rounded-full text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
                     >
                       {topic}
@@ -226,24 +227,23 @@ export default async function Blog({
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2.5fr)_280px] gap-8 relative">
-            {/* Main Content */}
             <article className="prose prose-neutral dark:prose-invert prose-p:my-6 w-full leading-8 min-w-0">
-              <CustomMDX source={post.content} />
+              <CustomMDX source={thought.content} />
 
-              {/* Related Posts */}
-              {relatedPosts.length > 0 && (
-                <RelatedPosts posts={relatedPosts} currentLang={lang} />
+              {relatedThoughts.length > 0 && (
+                <GardenRelatedPosts
+                  posts={relatedThoughts}
+                  currentLang={lang}
+                />
               )}
             </article>
 
-            {/* Sticky Sidebar */}
             <div className="order-first lg:order-last">
               <aside className="lg:sticky lg:top-24 lg:self-start space-y-4">
-                {/* Translation Link - Only shown if translation exists */}
                 {hasTranslation && translationSlug && (
                   <div className="p-4 border border-neutral-200 dark:border-neutral-800 rounded-lg bg-neutral-50 dark:bg-neutral-900">
                     <Link
-                      href={`/blog/${targetLang}/${translationSlug}`}
+                      href={`/garden/thoughts/${targetLang}/${translationSlug}`}
                       className="flex items-center gap-2 text-sm font-mono text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
                     >
                       <svg
@@ -273,7 +273,6 @@ export default async function Blog({
                   </div>
                 )}
 
-                {/* Table of Contents */}
                 {headings.length > 0 && <TableOfContents headings={headings} />}
               </aside>
             </div>
