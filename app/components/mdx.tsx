@@ -54,6 +54,20 @@ function RoundedImage(props) {
   return <Image alt={props.alt} className="rounded-lg" {...props} />;
 }
 
+function YouTube({ id, title }: { id: string; title?: string }) {
+  return (
+    <div className="relative my-6 aspect-video w-full overflow-hidden rounded-lg">
+      <iframe
+        src={`https://www.youtube-nocookie.com/embed/${id}`}
+        title={title || "YouTube video"}
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        className="absolute inset-0 h-full w-full border-0"
+      />
+    </div>
+  );
+}
+
 function Code({ children, ...props }) {
   let codeHTML = highlight(children);
   return <code dangerouslySetInnerHTML={{ __html: codeHTML }} {...props} />;
@@ -103,6 +117,7 @@ let components = {
   a: CustomLink,
   code: Code,
   Table,
+  YouTube,
 };
 
 export function CustomMDX(props) {
