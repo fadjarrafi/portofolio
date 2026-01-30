@@ -1,4 +1,4 @@
-// app/blog/utils.ts
+// app/writing/utils.ts
 
 import fs from 'fs'
 import path from 'path'
@@ -97,7 +97,7 @@ function getMDXData(dir: string, lang: 'en' | 'id' = 'en') {
 
 // Get posts for a specific language (for blog list and featured posts)
 export const getBlogPosts = cache((lang: 'en' | 'id' = 'en') => {
-  const langDir = path.join(process.cwd(), 'app', 'blog', 'posts', lang)
+  const langDir = path.join(process.cwd(), 'app', 'writing', 'posts', lang)
   return getMDXData(langDir, lang)
 })
 

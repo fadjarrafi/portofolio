@@ -1,4 +1,4 @@
-// app/blog/format.ts
+// app/writing/format.ts
 
 export function formatDate(date: string, includeRelative = false) {
   let currentDate = new Date()

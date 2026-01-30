@@ -1,17 +1,17 @@
-// app/blog/page.tsx
+// app/writing/page.tsx
 import {
   getBlogPosts,
   getAllTopics,
   getAllPostTypes,
   getTopicStats,
-} from "app/blog/utils";
+} from "app/writing/utils";
 import { PostsSearch } from "app/components/posts-search";
 import { ScrollAnimate } from "app/components/scroll-animate";
 import { Navbar } from "app/components/nav";
 import { PageWrapper } from "app/components/page-wrapper";
 
 export const metadata = {
-  title: "Blog",
+  title: "Writing",
   description:
     "Writing about code, mathematics, philosophy, and things I'm learning.",
 };

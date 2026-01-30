@@ -20,7 +20,7 @@ interface Resource {
   topics: string[];
   status: "reading" | "completed" | "reference";
   rating?: number;
-  slug: string;
+  id: string;
   url?: string;
   date_consumed?: string;
 }
@@ -124,7 +124,7 @@ export default function LibraryPage() {
                       <div className="grid gap-4">
                         {reading.map((resource) => (
                           <ResourceCard
-                            key={resource.slug}
+                            key={resource.id}
                             resource={resource}
                           />
                         ))}
@@ -144,7 +144,7 @@ export default function LibraryPage() {
                       <div className="grid gap-4">
                         {completed.map((resource) => (
                           <ResourceCard
-                            key={resource.slug}
+                            key={resource.id}
                             resource={resource}
                           />
                         ))}
@@ -164,7 +164,7 @@ export default function LibraryPage() {
                       <div className="grid gap-4">
                         {reference.map((resource) => (
                           <ResourceCard
-                            key={resource.slug}
+                            key={resource.id}
                             resource={resource}
                           />
                         ))}

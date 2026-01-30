@@ -105,12 +105,12 @@ html {
 }
 
 .prose h1 {
-  @apply text-4xl font-medium tracking-tight mt-6 mb-2;
+  @apply text-3xl font-semibold tracking-tight mt-8 mb-4;
   font-family: var(--font-mono);
 }
 
 .prose h2 {
-  @apply text-xl font-medium tracking-tight mt-6 mb-2;
+  @apply text-2xl font-semibold tracking-tight mt-8 mb-3;
   font-family: var(--font-mono);
 }
 
@@ -120,7 +120,7 @@ html {
 }
 
 .prose h4 {
-  @apply text-lg font-medium tracking-tight mt-6 mb-2;
+  @apply text-lg font-medium tracking-tight mt-6 mb-2 text-neutral-700 dark:text-neutral-300;
   font-family: var(--font-mono);
 }
 

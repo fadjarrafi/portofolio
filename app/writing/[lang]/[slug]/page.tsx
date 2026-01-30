@@ -1,4 +1,4 @@
-// app/blog/[lang]/[slug]/page.tsx
+// app/writing/[lang]/[slug]/page.tsx
 
 import { notFound } from "next/navigation";
 import { CustomMDX } from "app/components/mdx";
@@ -7,7 +7,7 @@ import {
   getBlogPost,
   getAllBlogPosts,
   getRelatedPosts,
-} from "@/app/blog/utils";
+} from "@/app/writing/utils";
 import { baseUrl } from "app/sitemap";
 import { ScrollAnimate } from "app/components/scroll-animate";
 import { TableOfContents } from "@/app/components/table-of-content";
@@ -15,7 +15,7 @@ import { RelatedPosts } from "@/app/components/related-posts";
 import { Navbar } from "app/components/nav";
 import { PageWrapper } from "app/components/page-wrapper";
 import Link from "next/link";
-import type { PostType } from "@/app/blog/utils";
+import type { PostType } from "@/app/writing/utils";
 
 // Post type emoji mapping
 const typeEmojis: Record<PostType, string> = {
@@ -66,7 +66,7 @@ export async function generateMetadata({
       description,
       type: "article",
       publishedTime,
-      url: `${baseUrl}/blog/${lang}/${post.slug}`,
+      url: `${baseUrl}/writing/${lang}/${post.slug}`,
       images: [
         {
           url: ogImage,
@@ -143,7 +143,7 @@ export default async function Blog({
                 image: post.metadata.image
                   ? `${baseUrl}${post.metadata.image}`
                   : `/og?title=${encodeURIComponent(post.metadata.title)}`,
-                url: `${baseUrl}/blog/${lang}/${post.slug}`,
+                url: `${baseUrl}/writing/${lang}/${post.slug}`,
                 author: {
                   "@type": "Person",
                   name: "My Portfolio",
@@ -152,80 +152,83 @@ export default async function Blog({
             }}
           />
 
-          <Link
-            href="/blog"
-            className="inline-flex items-center text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 mb-8 py-2 px-2 -ml-2"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="mr-2"
+          <ScrollAnimate>
+            <Link
+              href="/writing"
+              className="inline-flex items-center text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 mb-8 py-2 px-2 -ml-2"
             >
-              <path d="m15 18-6-6 6-6" />
-            </svg>
-            Back
-          </Link>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="mr-2"
+              >
+                <path d="m15 18-6-6 6-6" />
+              </svg>
+              Back
+            </Link>
 
-          {/* Post Header */}
-          <div className="mb-8">
-            {/* Title with Type Emoji */}
-            <div className="flex items-start gap-3 mb-3">
-              {post.metadata.type && (
-                <span className="text-2xl flex-shrink-0 mt-1">
-                  {typeEmojis[post.metadata.type]}
-                </span>
-              )}
-              <h1 className="title font-semibold text-2xl tracking-tighter">
-                {post.metadata.title}
-              </h1>
-            </div>
-
-            {/* Metadata */}
-            <div className="flex flex-wrap items-center gap-3 text-sm text-neutral-600 dark:text-neutral-400">
-              <time dateTime={post.metadata.publishedAt}>
-                {formatDate(post.metadata.publishedAt)}
-              </time>
-
-              <span>·</span>
-
-              <span>{post.readingTime} min read</span>
-
-              {post.metadata.updated && (
-                <>
-                  <span>·</span>
-                  <span className="text-green-600 dark:text-green-400">
-                    Updated {formatDate(post.metadata.updated)}
+            {/* Post Header */}
+            <div className="mb-8">
+              {/* Title with Type Emoji */}
+              <div className="flex items-start gap-3 mb-3">
+                {post.metadata.type && (
+                  <span className="text-2xl flex-shrink-0 mt-1">
+                    {typeEmojis[post.metadata.type]}
                   </span>
-                </>
-              )}
+                )}
+                <h1 className="title font-semibold text-2xl tracking-tighter">
+                  {post.metadata.title}
+                </h1>
+              </div>
+
+              {/* Metadata */}
+              <div className="flex flex-wrap items-center gap-3 text-sm text-neutral-600 dark:text-neutral-400">
+                <time dateTime={post.metadata.publishedAt}>
+                  {formatDate(post.metadata.publishedAt)}
+                </time>
+
+                <span>·</span>
+
+                <span>{post.readingTime} min read</span>
+
+                {post.metadata.updated && (
+                  <>
+                    <span>·</span>
+                    <span className="text-green-600 dark:text-green-400">
+                      Updated {formatDate(post.metadata.updated)}
+                    </span>
+                  </>
+                )}
+              </div>
+
+              {/* Topics */}
+              {post.metadata.topics &&
+                Array.isArray(post.metadata.topics) &&
+                post.metadata.topics.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    {post.metadata.topics.map((topic) => (
+                      <Link
+                        key={topic}
+                        href={`/writing?topic=${topic}`}
+                        className="px-3 py-1 text-xs bg-neutral-100 dark:bg-neutral-800 rounded-full text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+                      >
+                        {topic}
+                      </Link>
+                    ))}
+                  </div>
+                )}
             </div>
+          </ScrollAnimate>
 
-            {/* Topics */}
-            {post.metadata.topics &&
-              Array.isArray(post.metadata.topics) &&
-              post.metadata.topics.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-4">
-                  {post.metadata.topics.map((topic) => (
-                    <Link
-                      key={topic}
-                      href={`/blog?topic=${topic}`}
-                      className="px-3 py-1 text-xs bg-neutral-100 dark:bg-neutral-800 rounded-full text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
-                    >
-                      {topic}
-                    </Link>
-                  ))}
-                </div>
-              )}
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2.5fr)_280px] gap-8 relative">
+          <ScrollAnimate delay={100}>
+            <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2.5fr)_280px] gap-8 relative">
             {/* Main Content */}
             <article className="prose prose-neutral dark:prose-invert prose-p:my-6 w-full leading-8 min-w-0">
               <CustomMDX source={post.content} />
@@ -243,7 +246,7 @@ export default async function Blog({
                 {hasTranslation && translationSlug && (
                   <div className="p-4 border border-neutral-200 dark:border-neutral-800 rounded-lg bg-neutral-50 dark:bg-neutral-900">
                     <Link
-                      href={`/blog/${targetLang}/${translationSlug}`}
+                      href={`/writing/${targetLang}/${translationSlug}`}
                       className="flex items-center gap-2 text-sm font-mono text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
                     >
                       <svg
@@ -277,7 +280,8 @@ export default async function Blog({
                 {headings.length > 0 && <TableOfContents headings={headings} />}
               </aside>
             </div>
-          </div>
+            </div>
+          </ScrollAnimate>
         </section>
       </PageWrapper>
     </>

@@ -3,8 +3,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { formatDate } from "app/blog/format";
-import type { PostType } from "app/blog/utils";
+import { formatDate } from "app/writing/format";
+import type { PostType } from "app/writing/utils";
 
 const POSTS_PER_PAGE = 10;
 
@@ -200,7 +200,7 @@ export function PostsSearch({
             <Link
               key={post.slug}
               className="block group"
-              href={`/blog/en/${post.slug}`}
+              href={`/writing/en/${post.slug}`}
             >
               <article className="space-y-2">
                 {/* Title and Type */}
@@ -271,7 +271,7 @@ export function PostsSearch({
         <div className="flex items-center gap-4 mt-12">
           {currentPage > 1 ? (
             <Link
-              href={`/blog?page=${currentPage - 1}`}
+              href={`/writing?page=${currentPage - 1}`}
               className="text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
             >
               ← Previous
@@ -287,7 +287,7 @@ export function PostsSearch({
               (pageNum) => (
                 <Link
                   key={pageNum}
-                  href={`/blog?page=${pageNum}`}
+                  href={`/writing?page=${pageNum}`}
                   className={`w-8 h-8 text-sm flex items-center justify-center transition-colors ${
                     currentPage === pageNum
                       ? "text-neutral-900 dark:text-neutral-100 font-medium"
@@ -302,7 +302,7 @@ export function PostsSearch({
 
           {currentPage < totalPages ? (
             <Link
-              href={`/blog?page=${currentPage + 1}`}
+              href={`/writing?page=${currentPage + 1}`}
               className="text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
             >
               Next →

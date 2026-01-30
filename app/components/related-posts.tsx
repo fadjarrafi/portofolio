@@ -1,7 +1,7 @@
 // app/components/related-posts.tsx
 import Link from "next/link";
-import { formatDate } from "app/blog/format";
-import type { PostType } from "app/blog/utils";
+import { formatDate } from "app/writing/format";
+import type { PostType } from "app/writing/utils";
 
 interface RelatedPost {
   slug: string;
@@ -42,7 +42,7 @@ export function RelatedPosts({ posts, currentLang }: RelatedPostsProps) {
         {posts.map((post) => (
           <Link
             key={post.slug}
-            href={`/blog/${currentLang}/${post.slug}`}
+            href={`/writing/${currentLang}/${post.slug}`}
             className="block group no-underline"
           >
             <article className="space-y-2">

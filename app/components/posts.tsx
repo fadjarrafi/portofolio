@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { formatDate, getBlogPosts } from "app/blog/utils";
+import { formatDate, getBlogPosts } from "app/writing/utils";
 
 const POSTS_PER_PAGE = 10;
 
@@ -24,7 +24,7 @@ export function BlogPosts({ page = 1 }: { page?: number }) {
           <Link
             key={post.slug}
             className="flex flex-col space-y-1 mb-4"
-            href={`/blog/en/${post.slug}`}
+            href={`/writing/en/${post.slug}`}
           >
             <div className="w-full flex flex-col md:flex-row space-x-0 md:space-x-2">
               <p className="text-neutral-600 dark:text-neutral-400 w-[100px] tabular-nums">
@@ -42,7 +42,7 @@ export function BlogPosts({ page = 1 }: { page?: number }) {
         <div className="flex items-center gap-4 mt-8">
           {page > 1 ? (
             <Link
-              href={`/blog?page=${page - 1}`}
+              href={`/writing?page=${page - 1}`}
               className="text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
             >
               ← Previous
@@ -58,7 +58,7 @@ export function BlogPosts({ page = 1 }: { page?: number }) {
               (pageNum) => (
                 <Link
                   key={pageNum}
-                  href={`/blog?page=${pageNum}`}
+                  href={`/writing?page=${pageNum}`}
                   className={`w-8 h-8 text-sm flex items-center justify-center transition-colors ${
                     page === pageNum
                       ? "text-neutral-900 dark:text-neutral-100 font-medium"
@@ -73,7 +73,7 @@ export function BlogPosts({ page = 1 }: { page?: number }) {
 
           {page < totalPages ? (
             <Link
-              href={`/blog?page=${page + 1}`}
+              href={`/writing?page=${page + 1}`}
               className="text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
             >
               Next →

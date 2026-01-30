@@ -9,6 +9,7 @@ import {
   getRelatedThoughts,
 } from "@/app/garden/utils";
 import { baseUrl } from "@/app/sitemap";
+import { ScrollAnimate } from "@/app/components/scroll-animate";
 import { TableOfContents } from "@/app/components/table-of-content";
 import { GardenRelatedPosts } from "@/app/components/garden-related-posts";
 import { Navbar } from "@/app/components/nav";
@@ -154,79 +155,82 @@ export default async function ThoughtPage({
             }}
           />
 
-          <Link
-            href="/garden/thoughts"
-            className="inline-flex items-center text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 mb-8 py-2 px-2 -ml-2"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="mr-2"
+          <ScrollAnimate>
+            <Link
+              href="/garden/thoughts"
+              className="inline-flex items-center text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 mb-8 py-2 px-2 -ml-2"
             >
-              <path d="m15 18-6-6 6-6" />
-            </svg>
-            Back to Garden
-          </Link>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="mr-2"
+              >
+                <path d="m15 18-6-6 6-6" />
+              </svg>
+              Back to Garden
+            </Link>
 
-          {/* Post Header */}
-          <div className="mb-8">
-            <div className="flex items-start gap-3 mb-3">
-              {thought.metadata.status && (
-                <span className="text-2xl flex-shrink-0 mt-1">
-                  {stageEmojis[thought.metadata.status]}
-                </span>
-              )}
-              {thought.metadata.type && (
-                <span className="text-2xl flex-shrink-0 mt-1">
-                  {typeEmojis[thought.metadata.type]}
-                </span>
-              )}
-              <h1 className="title font-semibold text-2xl tracking-tighter">
-                {thought.metadata.title}
-              </h1>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3 text-sm text-neutral-600 dark:text-neutral-400">
-              <time dateTime={thought.metadata.publishedAt}>
-                {formatDate(thought.metadata.publishedAt)}
-              </time>
-              <span>·</span>
-              <span>{thought.readingTime} min read</span>
-              {thought.metadata.updated && (
-                <>
-                  <span>·</span>
-                  <span className="text-green-600 dark:text-green-400">
-                    Updated {formatDate(thought.metadata.updated)}
+            {/* Post Header */}
+            <div className="mb-8">
+              <div className="flex items-start gap-3 mb-3">
+                {thought.metadata.status && (
+                  <span className="text-2xl flex-shrink-0 mt-1">
+                    {stageEmojis[thought.metadata.status]}
                   </span>
-                </>
-              )}
+                )}
+                {thought.metadata.type && (
+                  <span className="text-2xl flex-shrink-0 mt-1">
+                    {typeEmojis[thought.metadata.type]}
+                  </span>
+                )}
+                <h1 className="title font-semibold text-2xl tracking-tighter">
+                  {thought.metadata.title}
+                </h1>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3 text-sm text-neutral-600 dark:text-neutral-400">
+                <time dateTime={thought.metadata.publishedAt}>
+                  {formatDate(thought.metadata.publishedAt)}
+                </time>
+                <span>·</span>
+                <span>{thought.readingTime} min read</span>
+                {thought.metadata.updated && (
+                  <>
+                    <span>·</span>
+                    <span className="text-green-600 dark:text-green-400">
+                      Updated {formatDate(thought.metadata.updated)}
+                    </span>
+                  </>
+                )}
+              </div>
+
+              {thought.metadata.topics &&
+                Array.isArray(thought.metadata.topics) &&
+                thought.metadata.topics.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    {thought.metadata.topics.map((topic) => (
+                      <Link
+                        key={topic}
+                        href={`/garden/thoughts?topic=${topic}`}
+                        className="px-3 py-1 text-xs bg-neutral-100 dark:bg-neutral-800 rounded-full text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+                      >
+                        {topic}
+                      </Link>
+                    ))}
+                  </div>
+                )}
             </div>
+          </ScrollAnimate>
 
-            {thought.metadata.topics &&
-              Array.isArray(thought.metadata.topics) &&
-              thought.metadata.topics.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-4">
-                  {thought.metadata.topics.map((topic) => (
-                    <Link
-                      key={topic}
-                      href={`/garden/thoughts?topic=${topic}`}
-                      className="px-3 py-1 text-xs bg-neutral-100 dark:bg-neutral-800 rounded-full text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
-                    >
-                      {topic}
-                    </Link>
-                  ))}
-                </div>
-              )}
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2.5fr)_280px] gap-8 relative">
+          <ScrollAnimate delay={100}>
+            <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2.5fr)_280px] gap-8 relative">
             <article className="prose prose-neutral dark:prose-invert prose-p:my-6 w-full leading-8 min-w-0">
               <CustomMDX source={thought.content} />
 
@@ -276,7 +280,8 @@ export default async function ThoughtPage({
                 {headings.length > 0 && <TableOfContents headings={headings} />}
               </aside>
             </div>
-          </div>
+            </div>
+          </ScrollAnimate>
         </section>
       </PageWrapper>
     </>

@@ -10,7 +10,7 @@ const gardenItems = {
     description: "essays & reflections",
   },
   "/garden/concepts": {
-    name: "concepts",
+    name: "concepts", 
     description: "personal lexicon",
   },
   "/garden/library": {
