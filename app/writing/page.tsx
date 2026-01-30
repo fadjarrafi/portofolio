@@ -16,15 +16,7 @@ export const metadata = {
     "Writing about code, mathematics, philosophy, and things I'm learning.",
 };
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<{ page?: string }>;
-}) {
-  const resolvedSearchParams = await searchParams;
-  const currentPage = Number(resolvedSearchParams.page) || 1;
-
-  // Get all English posts
+export default async function Page() {
   const allBlogs = getBlogPosts("en").sort((a, b) => {
     if (new Date(a.metadata.publishedAt) > new Date(b.metadata.publishedAt)) {
       return -1;
@@ -32,48 +24,40 @@ export default async function Page({
     return 1;
   });
 
-  // Get unique topics and types
   const allTopics = getAllTopics("en");
   const allTypes = getAllPostTypes("en");
   const topicStats = getTopicStats("en");
 
   return (
-    <>
-      <PageWrapper>
-        <Navbar />
+    <PageWrapper>
+      <Navbar />
 
-        <section className="min-h-screen pb-16">
-          {/* Centered Content */}
-          <div className="max-w-4xl mx-auto">
-            <ScrollAnimate>
-              <h1 className="font-semibold text-2xl mb-2 tracking-tighter">
-                My Thoughts
-              </h1>
-              <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-8">
-                Writing about development, systems thinking, mathematics, and
-                things I'm learning
-              </p>
+      <section className="min-h-screen pb-16">
+        <div className="max-w-5xl mx-auto">
+          <ScrollAnimate>
+            <h1 className="font-semibold text-2xl mb-1 tracking-tighter">
+              My Thoughts
+            </h1>
+            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-8">
+              Writing about development, systems thinking, mathematics, and
+              things I'm learning
+            </p>
 
-              {/* Blog Stats */}
-              <div className="flex flex-wrap gap-4 mb-12 text-xs text-neutral-600 dark:text-neutral-400">
-                <span>{allBlogs.length} posts</span>
-                <span>·</span>
-                <span>{allTopics.length} topics</span>
-              </div>
-            </ScrollAnimate>
+            <p className="text-xs text-neutral-500 mb-6">
+              {allBlogs.length} posts — {allTopics.length} topics
+            </p>
+          </ScrollAnimate>
 
-            <ScrollAnimate delay={100}>
-              <PostsSearch
-                posts={allBlogs}
-                currentPage={currentPage}
-                allTopics={allTopics}
-                allTypes={allTypes}
-                topicStats={topicStats}
-              />
-            </ScrollAnimate>
-          </div>
-        </section>
-      </PageWrapper>
-    </>
+          <ScrollAnimate delay={100}>
+            <PostsSearch
+              posts={allBlogs}
+              allTopics={allTopics}
+              allTypes={allTypes}
+              topicStats={topicStats}
+            />
+          </ScrollAnimate>
+        </div>
+      </section>
+    </PageWrapper>
   );
 }

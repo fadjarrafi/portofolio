@@ -6,8 +6,6 @@ import Link from "next/link";
 import { formatDate } from "app/writing/format";
 import type { PostType } from "app/writing/utils";
 
-const POSTS_PER_PAGE = 10;
-
 interface BlogPost {
   slug: string;
   metadata: {
@@ -23,13 +21,11 @@ interface BlogPost {
 
 interface PostsSearchProps {
   posts: BlogPost[];
-  currentPage: number;
   allTopics: string[];
   allTypes: PostType[];
   topicStats: Record<string, number>;
 }
 
-// Post type emoji mapping
 const typeEmojis: Record<PostType, string> = {
   essay: "📝",
   tutorial: "💻",
@@ -40,7 +36,6 @@ const typeEmojis: Record<PostType, string> = {
 
 export function PostsSearch({
   posts,
-  currentPage,
   allTopics,
   allTypes,
   topicStats,
@@ -49,8 +44,16 @@ export function PostsSearch({
   const [selectedTopic, setSelectedTopic] = useState<string>("all");
   const [selectedType, setSelectedType] = useState<PostType | "all">("all");
 
-  // Filter posts based on search query, topic, and type
-  const filteredBlogs = posts.filter((post) => {
+  const hasActiveFilters =
+    searchQuery || selectedTopic !== "all" || selectedType !== "all";
+
+  const clearFilters = () => {
+    setSearchQuery("");
+    setSelectedTopic("all");
+    setSelectedType("all");
+  };
+
+  const filteredPosts = posts.filter((post) => {
     const matchesSearch =
       !searchQuery ||
       post.metadata.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -68,264 +71,129 @@ export function PostsSearch({
     return matchesSearch && matchesTopic && matchesType;
   });
 
-  const totalPages = Math.ceil(filteredBlogs.length / POSTS_PER_PAGE);
-  const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
-  const endIndex = startIndex + POSTS_PER_PAGE;
-  const currentPosts = filteredBlogs.slice(startIndex, endIndex);
-
   return (
     <div>
-      {/* Search Bar */}
-      <div className="mb-6">
+      {/* Search + Filters Row */}
+      <div className="flex flex-wrap items-center gap-3 mb-6">
         <input
           type="text"
-          placeholder="Search posts..."
+          placeholder="Search..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full px-4 py-2 text-sm bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-400 dark:focus:ring-neutral-600"
+          className="flex-1 min-w-[140px] px-3 py-1.5 text-sm bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-400 dark:focus:ring-neutral-600"
         />
-      </div>
-
-      {/* Filters */}
-      <div className="flex flex-wrap gap-3 mb-8">
-        {/* Type Filter */}
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-neutral-600 dark:text-neutral-400">
-            Type:
-          </span>
-          <select
-            value={selectedType}
-            onChange={(e) =>
-              setSelectedType(e.target.value as PostType | "all")
-            }
-            className="text-xs px-3 py-1.5 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-400 dark:focus:ring-neutral-600"
-          >
-            <option value="all">All</option>
-            {allTypes.map((type) => (
-              <option key={type} value={type}>
-                {typeEmojis[type]}{" "}
-                {type.charAt(0).toUpperCase() + type.slice(1)}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Topic Filter Pills */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs text-neutral-600 dark:text-neutral-400">
-            Topic:
-          </span>
-          <button
-            onClick={() => setSelectedTopic("all")}
-            className={`text-xs px-3 py-1.5 rounded-lg transition-colors ${
-              selectedTopic === "all"
-                ? "bg-neutral-900 dark:bg-neutral-100 text-white dark:text-black"
-                : "bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700"
-            }`}
-          >
-            All ({posts.length})
-          </button>
-          {allTopics.map((topic) => (
-            <button
-              key={topic}
-              onClick={() => setSelectedTopic(topic)}
-              className={`text-xs px-3 py-1.5 rounded-lg transition-colors ${
-                selectedTopic === topic
-                  ? "bg-neutral-900 dark:bg-neutral-100 text-white dark:text-black"
-                  : "bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700"
-              }`}
-            >
-              {topic} ({topicStats[topic] || 0})
-            </button>
+        <select
+          value={selectedType}
+          onChange={(e) =>
+            setSelectedType(e.target.value as PostType | "all")
+          }
+          className="text-xs px-3 py-2 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg focus:outline-none"
+        >
+          <option value="all">All types</option>
+          {allTypes.map((type) => (
+            <option key={type} value={type}>
+              {typeEmojis[type]} {type.charAt(0).toUpperCase() + type.slice(1)}
+            </option>
           ))}
-        </div>
-      </div>
-
-      {/* Active Filters Summary */}
-      {(searchQuery || selectedTopic !== "all" || selectedType !== "all") && (
-        <div className="mb-6 pb-4 border-b border-neutral-200 dark:border-neutral-800">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs text-neutral-600 dark:text-neutral-400">
-              Active filters:
-            </span>
-            {searchQuery && (
-              <span className="text-xs px-2 py-1 bg-neutral-100 dark:bg-neutral-800 rounded">
-                Search: "{searchQuery}"
-              </span>
-            )}
-            {selectedType !== "all" && (
-              <span className="text-xs px-2 py-1 bg-neutral-100 dark:bg-neutral-800 rounded">
-                Type: {typeEmojis[selectedType as PostType]} {selectedType}
-              </span>
-            )}
-            {selectedTopic !== "all" && (
-              <span className="text-xs px-2 py-1 bg-neutral-100 dark:bg-neutral-800 rounded">
-                Topic: {selectedTopic}
-              </span>
-            )}
-            <button
-              onClick={() => {
-                setSearchQuery("");
-                setSelectedTopic("all");
-                setSelectedType("all");
-              }}
-              className="text-xs text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 underline"
-            >
-              Clear all
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Posts List */}
-      <div className="space-y-6">
-        {currentPosts.length === 0 ? (
-          <div className="py-12 text-center">
-            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-2">
-              No posts found
-            </p>
-            <button
-              onClick={() => {
-                setSearchQuery("");
-                setSelectedTopic("all");
-                setSelectedType("all");
-              }}
-              className="text-sm text-neutral-900 dark:text-neutral-100 hover:underline"
-            >
-              Clear filters
-            </button>
-          </div>
-        ) : (
-          currentPosts.map((post) => (
-            <Link
-              key={post.slug}
-              className="block group"
-              href={`/writing/en/${post.slug}`}
-            >
-              <article className="space-y-2">
-                {/* Title and Type */}
-                <div className="flex items-start gap-2">
-                  {post.metadata.type && (
-                    <span className="text-lg flex-shrink-0 mt-0.5">
-                      {typeEmojis[post.metadata.type]}
-                    </span>
-                  )}
-                  <h2 className="text-neutral-900 dark:text-neutral-100 font-medium group-hover:text-neutral-600 dark:group-hover:text-neutral-400 transition-colors">
-                    {post.metadata.title}
-                  </h2>
-                </div>
-
-                {/* Summary */}
-                {post.metadata.summary && (
-                  <p className="text-sm text-neutral-600 dark:text-neutral-400 line-clamp-2">
-                    {post.metadata.summary}
-                  </p>
-                )}
-
-                {/* Metadata */}
-                <div className="flex flex-wrap items-center gap-3 text-xs text-neutral-600 dark:text-neutral-400">
-                  <time dateTime={post.metadata.publishedAt}>
-                    {formatDate(post.metadata.publishedAt, false)}
-                  </time>
-
-                  <span>·</span>
-
-                  <span>{post.readingTime} min read</span>
-
-                  {post.metadata.updated && (
-                    <>
-                      <span>·</span>
-                      <span className="text-green-600 dark:text-green-400">
-                        Updated {formatDate(post.metadata.updated, false)}
-                      </span>
-                    </>
-                  )}
-
-                  {/* Topics */}
-                  {post.metadata.topics &&
-                    Array.isArray(post.metadata.topics) &&
-                    post.metadata.topics.length > 0 && (
-                      <>
-                        <span>·</span>
-                        <div className="flex gap-1.5 flex-wrap">
-                          {post.metadata.topics.map((topic) => (
-                            <span
-                              key={topic}
-                              className="px-2 py-0.5 bg-neutral-100 dark:bg-neutral-800 rounded text-neutral-700 dark:text-neutral-300"
-                            >
-                              {topic}
-                            </span>
-                          ))}
-                        </div>
-                      </>
-                    )}
-                </div>
-              </article>
-            </Link>
-          ))
+        </select>
+        <select
+          value={selectedTopic}
+          onChange={(e) => setSelectedTopic(e.target.value)}
+          className="text-xs px-3 py-2 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg focus:outline-none"
+        >
+          <option value="all">All topics</option>
+          {allTopics.map((topic) => (
+            <option key={topic} value={topic}>
+              {topic} ({topicStats[topic] || 0})
+            </option>
+          ))}
+        </select>
+        {hasActiveFilters && (
+          <button
+            onClick={clearFilters}
+            className="text-xs text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+          >
+            Clear
+          </button>
         )}
       </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center gap-4 mt-12">
-          {currentPage > 1 ? (
-            <Link
-              href={`/writing?page=${currentPage - 1}`}
-              className="text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
-            >
-              ← Previous
-            </Link>
-          ) : (
-            <span className="text-sm text-neutral-600 dark:text-neutral-400 opacity-30 cursor-not-allowed">
-              ← Previous
-            </span>
-          )}
-
-          <div className="flex items-center gap-2">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-              (pageNum) => (
-                <Link
-                  key={pageNum}
-                  href={`/writing?page=${pageNum}`}
-                  className={`w-8 h-8 text-sm flex items-center justify-center transition-colors ${
-                    currentPage === pageNum
-                      ? "text-neutral-900 dark:text-neutral-100 font-medium"
-                      : "text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
-                  }`}
-                >
-                  {pageNum}
-                </Link>
-              )
-            )}
-          </div>
-
-          {currentPage < totalPages ? (
-            <Link
-              href={`/writing?page=${currentPage + 1}`}
-              className="text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
-            >
-              Next →
-            </Link>
-          ) : (
-            <span className="text-sm text-neutral-600 dark:text-neutral-400 opacity-30 cursor-not-allowed">
-              Next →
-            </span>
-          )}
-        </div>
+      {/* Result count */}
+      {hasActiveFilters && (
+        <p className="text-xs text-neutral-500 mb-4">
+          {filteredPosts.length} of {posts.length} posts
+        </p>
       )}
 
-      {/* Stats Footer */}
-      <div className="mt-8 pt-6 border-t border-neutral-200 dark:border-neutral-800">
-        <div className="flex flex-wrap items-center gap-4 text-xs text-neutral-600 dark:text-neutral-400">
-          <span>
-            Showing {currentPosts.length} of {filteredBlogs.length} posts
-          </span>
-          {filteredBlogs.length !== posts.length && (
-            <span>({posts.length} total)</span>
-          )}
+      {/* Posts Grid */}
+      {filteredPosts.length === 0 ? (
+        <div className="py-16 text-center">
+          <p className="text-sm text-neutral-500 mb-2">No posts found</p>
+          <button
+            onClick={clearFilters}
+            className="text-sm text-neutral-900 dark:text-neutral-100 hover:underline"
+          >
+            Clear filters
+          </button>
         </div>
-      </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredPosts.map((post) => (
+            <Link
+              key={post.slug}
+              href={`/writing/en/${post.slug}`}
+              className="group block p-4 rounded-lg border border-neutral-200 dark:border-neutral-800 hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors"
+            >
+              <div className="flex items-center gap-1.5 mb-2">
+                {post.metadata.type && (
+                  <span className="text-sm">
+                    {typeEmojis[post.metadata.type]}
+                  </span>
+                )}
+                <span className="text-xs text-neutral-400">
+                  {post.readingTime}m
+                </span>
+              </div>
+              <h2 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 group-hover:text-neutral-600 dark:group-hover:text-neutral-400 transition-colors mb-1.5 line-clamp-2">
+                {post.metadata.title}
+              </h2>
+              {post.metadata.summary && (
+                <p className="text-xs text-neutral-500 line-clamp-2 mb-3">
+                  {post.metadata.summary}
+                </p>
+              )}
+              <div className="mt-auto flex items-center justify-between text-xs text-neutral-400">
+                <time dateTime={post.metadata.publishedAt}>
+                  {formatDate(post.metadata.publishedAt, false)}
+                </time>
+                {post.metadata.updated && (
+                  <span className="text-green-600 dark:text-green-400">
+                    updated
+                  </span>
+                )}
+              </div>
+              {post.metadata.topics &&
+                post.metadata.topics.length > 0 && (
+                  <div className="flex gap-1 flex-wrap mt-2">
+                    {post.metadata.topics.slice(0, 2).map((topic) => (
+                      <span
+                        key={topic}
+                        className="text-[10px] px-1.5 py-0.5 bg-neutral-100 dark:bg-neutral-800 rounded text-neutral-500"
+                      >
+                        {topic}
+                      </span>
+                    ))}
+                    {post.metadata.topics.length > 2 && (
+                      <span className="text-[10px] px-1.5 py-0.5 text-neutral-400">
+                        +{post.metadata.topics.length - 2}
+                      </span>
+                    )}
+                  </div>
+                )}
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
