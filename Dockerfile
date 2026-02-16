@@ -17,6 +17,8 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Build the application
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 RUN corepack enable pnpm && pnpm build
 
 # Production image, copy all the files and run next
@@ -25,8 +27,8 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
 
 # Copy built application
 COPY --from=builder /app/public ./public

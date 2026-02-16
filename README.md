@@ -1,42 +1,40 @@
-# Portfolio Blog Starter
+# Portfolio
 
-This is a porfolio site template complete with a blog. Includes:
+Personal portfolio and blog site built with Next.js 16, featuring bilingual content (English/Indonesian), a writing section for articles, and a digital garden for shorter thoughts.
 
-- MDX and Markdown support
-- Optimized for SEO (sitemap, robots, JSON-LD schema)
-- RSS Feed
-- Dynamic OG images
-- Syntax highlighting
-- Tailwind v4
-- Vercel Speed Insights / Web Analytics
-- Geist font
+## Tech Stack
 
-## Demo
+- **Framework:** Next.js 16 (App Router, standalone output)
+- **Styling:** Tailwind CSS v4
+- **Content:** MDX with `next-mdx-remote/rsc`
+- **Math:** LaTeX support via `remark-math` + `rehype-katex`
+- **Syntax Highlighting:** `sugar-high`
+- **Analytics:** Vercel Analytics + Speed Insights
 
-https://portfolio-blog-starter.vercel.app
-
-## How to Use
-
-You can choose from one of the following two methods to use this repository:
-
-### One-Click Deploy
-
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=vercel-examples):
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vercel/examples/tree/main/solutions/blog&project-name=blog&repository-name=blog)
-
-### Clone and Deploy
-
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [pnpm](https://pnpm.io/installation) to bootstrap the example:
+## Getting Started
 
 ```bash
-pnpm create next-app --example https://github.com/vercel/examples/tree/main/solutions/blog blog
-```
-
-Then, run Next.js in development mode:
-
-```bash
+pnpm install
 pnpm dev
 ```
 
-Deploy it to the cloud with [Vercel](https://vercel.com/templates) ([Documentation](https://nextjs.org/docs/app/building-your-application/deploying)).
+## Building for Production
+
+```bash
+pnpm build
+pnpm start
+```
+
+## Docker
+
+```bash
+docker build -t portfolio .
+docker run -p 3000:3000 portfolio
+```
+
+## Content
+
+- **Writing** — full articles in `app/writing/posts/{en,id}/`
+- **Digital Garden** — shorter thoughts in `app/garden/thoughts/posts/{en,id}/`
+
+Posts are MDX files with YAML frontmatter. The digital garden uses growth stages (seed/sapling/tree) based on word count.
