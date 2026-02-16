@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl:*)",
+      "Bash(wc:*)",
+      "Bash(npx next build:*)"
+    ]
+  }
+}
