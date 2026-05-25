@@ -1,10 +1,10 @@
 import { getBlogPosts } from 'app/writing/utils'
 
-export const baseUrl = 'https://portfolio-blog-starter.vercel.app'
+export const baseUrl = 'https://fadjarrafi.xyz'
 
 export default async function sitemap() {
   let blogs = getBlogPosts().map((post) => ({
-    url: `${baseUrl}/writing/${post.slug}`,
+    url: `${baseUrl}/writing/en/${post.slug}`,
     lastModified: post.metadata.publishedAt,
   }))
 
