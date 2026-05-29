@@ -1,0 +1,90 @@
+---
+title: 'Activation Function in Bi-Directional LSTM'
+publishedAt: '2023-12-13'
+featured: true
+topics: ['deep learning']
+type: 'note' 
+lang: 'id'
+translationSlug: 'activation-function-in-deep-learning'
+---
+
+
+## Pendahuluan
+
+Ini adalah tesis sarjana saya, bagian dari program penelitian kolaboratif dengan dosen saya. Pada saat itu, fakultas ilmu komputer di universitas saya meluncurkan inisiatif penelitian kolaboratif untuk mendorong mahasiswa melakukan dan mengembangkan penelitian yang akan diterapkan sebagai materi tesis.
+
+Ada beberapa tema yang bisa dipilih, tetapi [Pemrosesan Bahasa Alami (NLP)](https://id.wikipedia.org/wiki/Pengolahan_bahasa_alami) menarik perhatian saya dan tampak seperti topik yang menarik.
+
+> Pemrosesan bahasa alami (NLP) adalah cabang dari kecerdasan buatan (AI) yang memungkinkan komputer memahami, menghasilkan, dan memanipulasi bahasa manusia.
+
+## Masalah
+
+Setelah melakukan penelitian selama beberapa minggu dan membaca beberapa referensi publikasi ilmiah serta arahan dari pembimbing saya, saya memutuskan untuk menyelidiki efek dari fungsi aktivasi dalam Bi-LSTM untuk Pengenalan Emosi Berbasis Teks. Mengapa [BiLSTM](https://www.baeldung.com/cs/bidirectional-vs-unidirectional-lstm)? Model BiLSTM populer digunakan dalam pemrosesan teks seperti klasifikasi teks, analisis sentimen, dan juga penerjemahan mesin.
+
+![Arsitektur BiLSTM](https://www.baeldung.com/wp-content/uploads/sites/4/2022/01/bilstm-1.png)
+
+Berdasarkan hal ini, pertanyaan utama dalam penelitian saya adalah:
+
+> Apa dampak dari fungsi aktivasi terhadap model BiLSTM?
+
+## Merancang Penelitian
+
+Sebagai tanggapan terhadap pertanyaan tersebut, pembimbing saya dan saya mengembangkan alur penelitian yang terdiri dari studi literatur, pembangunan model BiLSTM, evaluasi kinerja model, dan perbandingan tingkat akurasi model.
+
+Pada lapisan BiLSTM dari model arsitektur yang saya buat, saya akan membandingkan penerapan tiga fungsi aktivasi: [Sigmoid](https://builtin.com/machine-learning/sigmoid-activation-function), [Hyperbolic Tangent (TanH)](https://www.analyticsvidhya.com/blog/2021/04/activation-functions-and-their-derivatives-a-quick-complete-guide/#h-linear-activation-functions), dan [Penalized TanH](https://arxiv.org/pdf/1602.05980.pdf).
+
+{/* <div className="flex justify-center">
+  <img src="/static/images/curve-activation-function.png" alt="Kurva Fungsi Aktivasi" width="700" />
+</div> */}
+
+Arsitektur untuk klasifikasi emosi berbasis teks mencakup input teks, Embedded Layer, Deep Network (Bi-LSTM), Dense Layer, Output Layer (Softmax), dan Kelas Emosi.
+
+{/* <div className="flex justify-center">
+  <img src="/static/images/architecture-models.png" alt="Model Arsitektur" />
+</div> */}
+
+Selama penelitian, saya menggunakan dataset akses terbuka dari [Emotion Classification on Indonesian Twitter Dataset](https://github.com/meisaputri21/Indonesian-Twitter-Emotion-Dataset). Dataset ini mencakup 5 label emosi sebagai panduan untuk pengenalan, yaitu: `marah`, `bahagia`, `sedih`, `takut`, dan `cinta`.
+
+Baiklah, saya telah memiliki model arsitektur dan fungsi aktivasi. Sekarang saatnya menyesuaikan parameter pada lapisan jaringan mendalam untuk meningkatkan model arsitektur, suatu proses yang dikenal sebagai [optimasi hiperparameter](https://en.wikipedia.org/wiki/Hyperparameter_optimization). Saya menggunakan metode yang disebut [Random Search](https://www.jmlr.org/papers/volume13/bergstra12a/bergstra12a.pdf) untuk menemukan hiperparameter optimal, yang mencakup: jumlah jaringan dalam lapisan tersembunyi, jumlah lapisan tersembunyi, optimizer, dan learning rate.
+
+Selain itu, saya menggunakan [Algoritma Optimasi Adam](https://machinelearningmastery.com/adam-optimization-algorithm-for-deep-learning/) dengan learning rate 0.001 dan menambahkan [Recurrent Dropout](https://paperswithcode.cm/method/recurrent-dropout) pada setiap lapisan tersembunyi untuk menghindari lonjakan bobot dalam arsitektur model saya. Sebelum pelatihan model, early stopping diterapkan dengan parameter delta 0.1 dan patience 7.
+
+## Hasil
+
+Setelah saya membuat 3 model untuk setiap fungsi aktivasi dengan hiperparameter yang sama, saya menjalankan pelatihan model dengan konfigurasi: 50 epoch dan batch size 256. Untuk mengevaluasi model, saya menggunakan [Confusion Matrix](https://towardsdatascience.com/understanding-confusion-matrix-a9ad42dcfd62) untuk membandingkan 5 label emosi dengan mengacu pada akurasi.
+
+| Lapisan         | Bentuk Output   | Parameter |
+| --------------- | --------------- | --------- |
+| Embedding_1     | (None, 50, 400) | 7817600   |
+| Bidirectional_3 | (None, 50, 358) | 830560    |
+| Dense           | (None, 5)       | 325       |
+
+Hasil pelatihan menunjukkan bahwa tanh memiliki akurasi uji tertinggi dibandingkan dengan sigmoid dan penalized tanh. Sementara itu, sigmoid memiliki akurasi terendah pada data uji. Penalized tanh berada di antara sigmoid dan tanh dengan selisih 2,12% dari tanh. Berikut perbandingan akurasi model uji pada dataset:
+
+|           | Sigmoid | TanH   | Penalized TanH |
+| --------- | ------- | ------ | -------------- |
+| Uji (10%) | 56.88%  | 62.03% | 59.91%         |
+
+Pada model dengan fungsi aktivasi penalized tanh, akurasi pelatihan tidak meningkat setelah epoch ke-6 menggunakan data validasi. Sementara itu, pada model dengan fungsi aktivasi tanh, akurasi pelatihan menurun pada epoch ke-6. Fungsi aktivasi sigmoid mengalami penurunan akurasi pada epoch ke-9.
+
+{/* <div className="flex justify-center">
+  <img src="/static/images/result-activation-function.png" alt="Model Arsitektur" />
+</div> */}
+
+Penurunan akurasi pada fungsi aktivasi sigmoid disebabkan oleh nilai output sigmoid yang tidak terfokus pada nilai 0. Faktor ini menyebabkan nilai yang masuk ke neuron selalu positif dan gradien pada bobot selalu positif atau negatif, yang mengakibatkan perubahan yang tidak teratur. Berikut perbandingan antara nilai benar dan salah dalam Confusion Matrix untuk setiap emosi:
+
+| Emosi   | Sigmoid | TanH | Penalized TanH |
+| ------- | ------- | ---- | -------------- |
+| Cinta   | 88%     | 75%  | 77%            |
+| Marah   | 36%     | 59%  | 42%            |
+| Sedih   | 71%     | 64%  | 74%            |
+| Bahagia | 74%     | 79%  | 62%            |
+| Takut   | 25%     | 38%  | 43%            |
+
+## Kesimpulan
+
+Penelitian saya menunjukkan bahwa penggunaan fungsi aktivasi yang berbeda, seperti sigmoid, tanh, dan penalized tanh pada lapisan tersembunyi BiLSTM, secara tidak langsung memengaruhi tingkat akurasi model yang digunakan untuk pengenalan emosi berbasis teks. Hasil akurasi untuk masing-masing fungsi aktivasi adalah sigmoid (56,88%), tanh (62,03%), dan penalized tanh (59,91%).
+
+Namun, penelitian ini masih membuka banyak peluang untuk penelitian di masa depan. Model BiLSTM yang digunakan masih menunjukkan overfitting saat pelatihan. Oleh karena itu, model arsitektur dapat ditingkatkan lebih optimal. Dalam pendekatan pembelajaran mendalam, terlepas dari optimalisasi model, jumlah dataset sangat memengaruhi tingkat akurasi yang dihasilkan. Misalnya, penggunaan dataset yang lebih besar dengan jumlah label yang seimbang dapat meningkatkan kinerja model.
+
+**Thanks for Reading✌️**

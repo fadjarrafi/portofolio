@@ -1,0 +1,44 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Nav from '../../components/Nav.astro';
+import PostsSearch from '../../components/PostsSearch.astro';
+import { calculateReadingTime } from '../../utils/posts';
+
+const allPosts = await getCollection('blog', ({ id }) => id.startsWith('en/'));
+const sorted = allPosts.sort((a, b) =>
+  new Date(b.data.publishedAt).getTime() - new Date(a.data.publishedAt).getTime()
+);
+
+const posts = sorted.map((post) => ({
+  ...post,
+  readingTime: calculateReadingTime(post.body ?? ''),
+}));
+
+const allTopics = [...new Set(posts.flatMap((p) => p.data.topics ?? []))].sort();
+const allTypes = [...new Set(posts.map((p) => p.data.type).filter(Boolean))].sort() as any[];
+const topicStats: Record<string, number> = {};
+posts.forEach((p) => (p.data.topics ?? []).forEach((t) => { topicStats[t] = (topicStats[t] ?? 0) + 1; }));
+---
+
+<BaseLayout title="Writing" description="Writing about code, mathematics, philosophy, and things I'm learning.">
+  <Nav />
+
+  <section class="min-h-screen pb-16">
+    <div class="max-w-5xl mx-auto">
+      <div class="scroll-animate">
+        <h1 class="font-semibold text-2xl mb-1 tracking-tighter">My Thoughts</h1>
+        <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-8">
+          Writing about development, systems thinking, mathematics, and things I'm learning
+        </p>
+        <p class="text-xs text-neutral-500 mb-6">
+          {posts.length} posts — {allTopics.length} topics
+        </p>
+      </div>
+
+      <div class="scroll-animate" data-delay="100">
+        <PostsSearch posts={posts} allTopics={allTopics} allTypes={allTypes} topicStats={topicStats} />
+      </div>
+    </div>
+  </section>
+</BaseLayout>

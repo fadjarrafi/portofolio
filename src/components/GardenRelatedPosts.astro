@@ -1,0 +1,75 @@
+---
+import { formatDate } from '../utils/format';
+import type { PostType, GrowthStage } from '../utils/posts';
+
+interface RelatedThought {
+  slug: string;
+  data: {
+    title: string;
+    publishedAt: string;
+    summary?: string;
+    topics?: string[];
+    type?: PostType;
+    status?: GrowthStage;
+  };
+  readingTime: number;
+}
+
+interface Props {
+  posts: RelatedThought[];
+  currentLang: 'en' | 'id';
+}
+
+const typeEmojis: Record<PostType, string> = {
+  essay: '📝', tutorial: '💻', note: '📚', reflection: '🤔', review: '⭐',
+};
+const stageEmojis: Record<GrowthStage, string> = {
+  seed: '🌱', sapling: '🌿', tree: '🌳',
+};
+
+const { posts, currentLang } = Astro.props;
+if (posts.length === 0) return;
+---
+
+<aside class="mt-16 pt-8 border-t border-neutral-200 dark:border-neutral-800">
+  <h2 class="text-lg font-semibold mb-6 tracking-tight">Related Thoughts</h2>
+  <div class="space-y-6">
+    {posts.map((post) => (
+      <a href={`/garden/thoughts/${currentLang}/${post.slug.split('/').pop()}`} class="block group no-underline">
+        <article class="space-y-2">
+          <div class="flex items-start gap-2">
+            {post.data.status && (
+              <span class="text-base flex-shrink-0 mt-6">{stageEmojis[post.data.status]}</span>
+            )}
+            {post.data.type && (
+              <span class="text-base flex-shrink-0 mt-6">{typeEmojis[post.data.type]}</span>
+            )}
+            <h3 class="text-neutral-900 dark:text-neutral-100 font-medium group-hover:text-neutral-600 dark:group-hover:text-neutral-400 transition-colors">
+              {post.data.title}
+            </h3>
+          </div>
+          {post.data.summary && (
+            <p class="text-sm text-neutral-600 dark:text-neutral-400">{post.data.summary}</p>
+          )}
+          <div class="flex flex-wrap items-center gap-2 text-xs text-neutral-600 dark:text-neutral-400">
+            <time datetime={post.data.publishedAt}>{formatDate(post.data.publishedAt, false)}</time>
+            <span>·</span>
+            <span>{post.readingTime} min</span>
+            {post.data.topics && post.data.topics.length > 0 && (
+              <>
+                <span>·</span>
+                <div class="flex gap-1.5 flex-wrap">
+                  {post.data.topics.slice(0, 3).map((topic) => (
+                    <span class="px-1.5 py-0.5 bg-neutral-100 dark:bg-neutral-800 rounded text-neutral-700 dark:text-neutral-300">
+                      {topic}
+                    </span>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </article>
+      </a>
+    ))}
+  </div>
+</aside>

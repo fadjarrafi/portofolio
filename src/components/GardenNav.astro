@@ -1,0 +1,23 @@
+---
+const gardenItems = [
+  { path: '/garden/thoughts', name: 'thoughts', description: 'essays & reflections' },
+  { path: '/garden/concepts', name: 'concepts', description: 'personal lexicon' },
+  { path: '/garden/library', name: 'library', description: 'reading notes' },
+];
+---
+
+<nav class="mb-12 pb-6 border-b border-neutral-200 dark:border-neutral-800">
+  <div class="flex flex-col gap-1">
+    <h2 class="text-xs text-neutral-600 dark:text-neutral-400 mb-3">Digital Garden</h2>
+    <div class="flex flex-wrap gap-4">
+      {gardenItems.map(({ path, name, description }) => (
+        <a href={path} class="group flex flex-col">
+          <span class="text-sm font-medium text-neutral-900 dark:text-neutral-100 group-hover:text-neutral-600 dark:group-hover:text-neutral-400 transition-colors">
+            {name}
+          </span>
+          <span class="text-xs text-neutral-500 dark:text-neutral-500">{description}</span>
+        </a>
+      ))}
+    </div>
+  </div>
+</nav>

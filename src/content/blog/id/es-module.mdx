@@ -1,0 +1,191 @@
+---
+title: 'Sistem ES module dalam JavaScript Modern'
+publishedAt: '2025-04-20'
+featured: false
+topics: ['javascript']
+type: 'tutorial' 
+lang: 'id'
+translationSlug: 'es-module'
+---
+
+ES Module (ESM) adalah sistem modularisasi standar yang diperkenalkan dalam ECMAScript 2015 (ES6). Sistem ini memberikan standar untuk mengorganisir dan membagi kode JavaScript menjadi komponen yang _reusable_
+
+## Apa itu ES Module?
+
+ES Module adalah cara standar untuk membagi kode JavaScript menjadi bagian-bagian terpisah yang dapat saling terhubung. Sebelum adanya ES Modules, developer JavaScript menggunakan berbagai pendekatan non-standar seperti:
+
+- Pattern IIFE (Immediately Invoked Function Expression)
+- CommonJS (digunakan di Node.js)
+- AMD (Asynchronous Module Definition, populer dengan RequireJS)
+- UMD (Universal Module Definition)
+
+## Mengapa ES Module Penting?
+
+1. **Standarisasi**: Ini adalah sistem modularisasi resmi JavaScript yang didukung secara native oleh browser modern
+2. **Pengorganisasian Kode**: Memisahkan kode ke file-file yang berbeda secara logis
+3. **Reusabilitas**: Membuat komponen dapat digunakan kembali
+4. **Tree Shaking**: Framework modern dapat menghilangkan kode yang tidak digunakan
+5. **Lazy Loading**: Module dapat dimuat hanya ketika dibutuhkan
+
+## Sintaks Dasar ES Module
+
+### Export
+
+Untuk membuat kode tersedia bagi file lain, kita menggunakan keyword `export`.
+
+```javascript
+// utils.js
+// Export named
+export function sum(a, b) {
+  return a + b
+}
+
+export const PI = 3.14159
+
+// Export default
+export default function greet(name) {
+  return `Hello, ${name}!`
+}
+```
+
+Ada dua jenis export:
+
+- **Named exports**: Dapat memiliki banyak per file
+- **Default export**: Hanya boleh satu per file
+
+### Import
+
+Untuk menggunakan kode dari module lain, kita menggunakan keyword `import`.
+
+```javascript
+// app.js
+// Import default export
+import greet from './utils.js'
+
+// Import named exports
+import { sum, PI } from './utils.js'
+
+// Import dengan alias
+import { sum as addNumbers } from './utils.js'
+
+// Import semua named exports
+import * as Utils from './utils.js'
+
+console.log(greet('World')) // "Hello, World!"
+console.log(sum(2, 3)) // 5
+console.log(PI) // 3.14159
+console.log(addNumbers(4, 5)) // 9
+console.log(Utils.PI) // 3.14159
+```
+
+## Perbedaan Dengan CommonJS
+
+Jika kamu familiar dengan CommonJS (digunakan di Node.js), ada beberapa perbedaan penting:
+
+```javascript
+// CommonJS
+const { sum } = require('./utils.js')
+module.exports = { myFunction }
+
+// ES Module
+import { sum } from './utils.js'
+export const myFunction = () => {}
+```
+
+Perbedaan utama:
+
+1. ES Module menggunakan sintaks `import`/`export` yang statis dan dianalisis saat waktu kompilasi
+2. CommonJS menggunakan `require()`/`module.exports` yang dinamis dan dieksekusi saat runtime
+3. ES Module mendukung "tree shaking" karena struktur import-nya statis
+4. ES Module secara default bersifat asinkron, sementara CommonJS sinkron
+
+## Menggunakan ES Module di Browser
+
+Untuk menggunakan ES Module langsung di browser, tambahkan atribut `type="module"` pada script:
+
+```html
+<script type="module">
+  import { sum } from './utils.js'
+  console.log(sum(1, 2))
+</script>
+
+<!-- Atau import dari file terpisah -->
+<script type="module" src="app.js"></script>
+```
+
+Penting untuk diingat:
+
+- File ES Module di-serve dengan CORS
+- Harus di-serve dari server web (tidak bisa dari `file://` protocol)
+- Secara otomatis berjalan dalam mode strict
+- Dieksekusi secara asinkron
+
+## Import Dinamis
+
+ES Module juga mendukung import dinamis untuk memuat module hanya ketika dibutuhkan:
+
+```javascript
+button.addEventListener('click', async () => {
+  // Module dimuat hanya saat tombol diklik
+  const { renderChart } = await import('./chart.js')
+  renderChart(data)
+})
+```
+
+Ini sangat berguna untuk:
+
+- Lazy loading
+- Code splitting
+- Pengurangan waktu pemuatan awal
+
+## ES Module dan Framework Modern
+
+Jika kamu berencana untuk belajar React, Vue, atau framework modern lainnya, pemahaman tentang ES Module sangat penting karena:
+
+```javascript
+// React Component menggunakan ES Module
+import React from 'react';
+import { useState } from 'react';
+import Header from './components/Header';
+
+export default function App() {
+  const [count, setCount] = useState(0);
+  return (/* ... */);
+}
+```
+
+```javascript
+// Vue Component menggunakan ES Module
+import { ref } from 'vue'
+import Header from './components/Header.vue'
+
+export default {
+  components: { Header },
+  setup() {
+    const count = ref(0)
+    return { count }
+  },
+}
+```
+
+Framework modern menggunakan sistem build seperti [Webpack](https://webpack.js.org/), [Rollup](https://rollupjs.org/), atau [Vite](https://vite.dev/) yang memanfaatkan ES Module untuk:
+
+1. **Tree shaking**: Menghilangkan kode yang tidak digunakan
+2. **Code splitting**: Memecah aplikasi menjadi bundle terpisah
+3. **Hot Module Replacement**: Memperbarui modul tanpa reload penuh
+
+## Best Practices
+
+1. **Gunakan satu module per file** dengan nama file yang menggambarkan isinya
+2. **Pilih antara named export atau default export** secara konsisten
+3. **Hindari side effects** dalam module (operasi yang mengubah state global)
+4. **Pilih path yang jelas** dengan ekstensi file `.js` untuk kejelasan
+5. **Pertimbangkan performa** dengan teknik code splitting dan lazy loading
+
+## Kesimpulan
+
+ES Module system adalah elemen penting dalam ekosistem JavaScript modern. Dengan memahami cara kerjanya, kamu memiliki fondasi yang kuat untuk mempelajari framework front-end seperti React dan Vue.
+
+Konsep modularisasi ini bukan hanya tentang sintaks `import`/`export`, tetapi tentang cara mengorganisir kode secara logis, meningkatkan maintainability, dan mengoptimalkan performa aplikasi web modern.
+
+**Thanks for Reading! ✌️**

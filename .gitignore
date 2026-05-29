@@ -12,6 +12,10 @@
 /.next/
 /out/
 
+# astro
+/dist/
+/.astro/
+
 # production
 /build
 
@@ -19,6 +23,7 @@
 .DS_Store
 *.pem
 .vscode
+*.log
 
 # debug
 npm-debug.log*
@@ -28,6 +33,7 @@ yarn-error.log*
 
 # env files
 .env
+.env.*
 
 # vercel
 .vercel

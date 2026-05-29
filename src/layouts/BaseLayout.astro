@@ -1,0 +1,105 @@
+---
+import '../styles/global.css';
+import 'katex/dist/katex.min.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  publishedAt?: string;
+  type?: 'website' | 'article';
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description = 'This is my portfolio.',
+  ogImage,
+  publishedAt,
+  type = 'website',
+  noindex = false,
+} = Astro.props;
+
+const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://fadjarrafi.com';
+const pageTitle = title ? `${title} | fadjarrafi` : 'fadjarrafi | fullstack dev';
+const resolvedOg = ogImage ?? `${siteUrl}/og-default.png`;
+const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
+---
+
+<!doctype html>
+<html
+  lang="en"
+  style="--font-outfit: 'Outfit', sans-serif; --font-ibm-plex-mono: 'IBM Plex Mono', monospace;"
+  class="text-black bg-white dark:text-white dark:bg-[#181A18]"
+>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="canonical" href={canonicalUrl} />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex,nofollow" />}
+
+    <!-- Open Graph -->
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={resolvedOg} />
+    {publishedAt && <meta property="article:published_time" content={publishedAt} />}
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={resolvedOg} />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Outfit:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Google Analytics -->
+    {import.meta.env.PUBLIC_GA_ID && (
+      <>
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${import.meta.env.PUBLIC_GA_ID}`}></script>
+        <script define:vars={{ gaId: import.meta.env.PUBLIC_GA_ID }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', gaId);
+        </script>
+      </>
+    )}
+  </head>
+  <body class="antialiased max-w-4xl mx-4 mt-8 lg:mx-auto">
+    <main class="flex-auto min-w-0 mt-6 flex flex-col px-2 md:px-0">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
+
+<script>
+  // Scroll animate: observe .scroll-animate elements and add .visible class
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const el = entry.target as HTMLElement;
+          const delay = el.dataset.delay ? parseInt(el.dataset.delay) : 0;
+          setTimeout(() => el.classList.add('visible'), delay);
+          observer.unobserve(el);
+        }
+      });
+    },
+    { threshold: 0, rootMargin: '0px 0px -50px 0px' }
+  );
+
+  document.querySelectorAll('.scroll-animate').forEach((el) => observer.observe(el));
+</script>

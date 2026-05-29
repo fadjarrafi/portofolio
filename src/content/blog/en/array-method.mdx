@@ -1,0 +1,147 @@
+---
+title: 'Array Manipulation in Javascript'
+publishedAt: '2025-01-05'
+featured: false
+topics: ['javascript']
+type: 'tutorial' 
+lang: 'en'
+translationSlug: 'array-method'
+---
+
+Arrays are a very important data type that exists in every programming language. JavaScript has methods that make it easy for us to manipulate and process arrays. There are many methods in JavaScript that are commonly used to manipulate arrays such as `map`, `filter`, `reduce`, `find`, `findIndex`, `push`, `pop`, `shift`, `unshift`, `slice`, `splice`, `forEach`, `some`, and `every`. Let's discuss them one by one.
+
+## Map Method
+
+If we want to change every element we have in an array, we can use `map()`. This method will produce a new array with elements that have been changed according to what we want. For example, we have an array containing several numbers and we want to multiply each element in the array by 2. This method will be very useful if we want to change all elements in our array without changing the size of our array.
+
+```javascript
+const numbers = [1, 2, 3, 4]
+const doubled = numbers.map((num) => num * 2)
+// Result: [2, 4, 6, 8]
+```
+
+In addition, this `map()` method will be very useful if we want to extract certain data. For example, we have `id` and `name` objects in an array.
+
+```javascript
+const users = [
+  { id: 1, name: 'John' },
+  { id: 2, name: 'Jane' },
+  { id: 3, name: 'Doe' },
+]
+const userIds = users.map((user) => user.id)
+// Result: userIds: [1, 2, 3]
+```
+
+## Filter Method
+
+The `filter()` method is used if we want to produce a new array containing elements that meet certain criteria. Each element will be processed through a callback function that will return a true or false value, which will determine whether the element is worthy of being included in the new array.
+
+```javascript
+const ages = [15, 25, 35, 12, 40]
+const adults = ages.filter((age) => age >= 18)
+// Result: [25, 35, 40]
+```
+
+In the example above, we want to print a new age array that has elements with ages equal to or above 18. So we apply the condition `age >= 18`.
+
+## Reduce Method
+
+The `reduce()` method allows us to combine all array elements into a single value. The flexibility of this method makes it useful for various purposes, from summing numbers to creating complex data structures. The accumulator value will be processed along with each array element to produce the final output.
+
+```javascript
+const prices = [10, 20, 30]
+
+const total = prices.reduce((sum, price) => sum + price, 0)
+
+// Result: 60
+```
+
+In the example above, the initial value of the accumulator is 0, then each element in the array is added to the accumulator to produce a total of 60.
+
+## Find and FindIndex Methods
+
+Here are methods that help find specific elements in an array:
+
+- `find()` returns the first matching element, very useful for finding unique items.
+
+- `findIndex()` returns the position (index) of the first matching element, useful when we need to know the location of an element in the array.
+
+```javascript
+const users = [
+  { id: 1, name: 'John' },
+
+  { id: 2, name: 'Jane' },
+]
+
+const john = users.find((user) => user.name === 'John')
+
+const johnIndex = users.findIndex((user) => user.name === 'John')
+```
+
+## Push, Pop, Shift, and Unshift
+
+These methods modify the original array by adding or removing elements from one of its ends. Very important for stack and queue operations in JavaScript:
+
+```javascript
+const fruits = ['apple']
+
+fruits.push('banana') // Add to the end: ['apple', 'banana']
+
+fruits.pop() // Remove from the end: ['apple']
+
+fruits.unshift('orange') // Add to the beginning: ['orange', 'apple']
+
+fruits.shift() // Remove from the beginning: ['apple']
+```
+
+## Slice and Splice
+
+Two powerful methods for manipulating array sections with different purposes:
+
+```javascript
+// Slice: Extract a portion of an array without modifying it
+
+const numbers = [1, 2, 3, 4, 5]
+
+const subset = numbers.slice(1, 3) // [2, 3]
+
+// Splice: Modify an array by removing/replacing elements
+
+const letters = ['a', 'b', 'c']
+
+letters.splice(1, 1, 'x') // Replace 'b' with 'x'
+```
+
+## ForEach Method
+
+This method allows us to run code for each array element without creating a new array. Ideal for operations that don't require return values, such as logging information or updating external variables.
+
+```javascript
+const items = ['book', 'pen', 'desk']
+
+items.forEach((item, index) => {
+  console.log(`Item ${index + 1}: ${item}`)
+})
+```
+
+## Some and Every Methods
+
+Methods for testing array elements using boolean conditions:
+
+- `some()`: Checks if at least one element meets the given condition
+
+- `every()`: Checks if all elements meet the given condition
+
+```javascript
+const scores = [75, 80, 95]
+
+const hasPassingScore = scores.some((score) => score >= 90) // true
+
+const allPassed = scores.every((score) => score >= 70) // true
+```
+
+## Conclusion
+
+Understanding array methods is very important for efficient JavaScript development. These methods not only provide clear and easy-to-understand solutions for various programming tasks, but also help you write more maintainable and optimally performing code. By mastering these various methods, you will be better prepared to face complex data manipulation challenges in your JavaScript projects.
+
+**Thanks for Reading✌️**

@@ -1,0 +1,78 @@
+---
+title: 'Debouncing in Javascript'
+publishedAt: '2025-10-21'
+featured: true
+topics: ['javascript']
+type: 'tutorial' 
+lang: 'en'
+translationSlug: 'debouncing'
+---
+
+If we want to improve the performance of our application or make the UX of our application smoother, we can use a technique called debouncing.
+
+## What is Debouncing
+
+In general, this technique works by delaying the execution of a function/code within a certain time frame so that there is no new activity in a certain period.
+
+This technique is commonly used to improve the performance of the applications we build and can even be used to save costs when we call a service through an API.
+
+Debouncing is commonly used when we deal with user input. When the user types, no action runs to prevent the UI from becoming laggy. And when the user stops typing, our code starts processing the input such as filtering results.
+
+In addition, with this technique we can reduce service cost burdens by reducing the number of third-party API requests.
+
+## Debouncing Example
+
+Here's an example function for debouncing
+
+```js
+function debounce(func, delay) {
+    let timeoutId;
+    return function(...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(this, args), delay);
+    };
+}
+```
+
+Every time the `debounce()` function is called, the timer from the previous call is cleared with `clearTimeout()` and a new timer is created with the specified delay. Later, the original function will only be executed when there are no new calls within the delay period.
+
+Let's create a simple example of using the `debounce()` function above for searching, we'll name it `searchAPI()`.
+
+```js
+
+async function searchAPI(query) {
+    try {
+        const response = await fetch(`/api/search?q=${query}`);
+        const results = await response.json();
+        displayResults(results);
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+```
+
+If we call the searchAPI() function without using debouncing, requests will be returned in realtime to the event/component.
+
+```js
+// Without debouncing - API is called every keystroke
+document.getElementById('search').addEventListener('input', (e) => {
+    searchAPI(e.target.value);
+});
+
+// Input Search #1: "a"
+// Input Search #2: "app"
+// Input Search #3: "appl"
+// Input Search #4: "apple"
+```
+
+This will make the returned component laggy and not smooth. Using debouncing will make the UX better.
+
+```js
+// With debouncing - API is called after user stops typing
+document.getElementById('search').addEventListener('input', 
+    debounce((e) => searchAPI(e.target.value), 300)
+);
+
+// Input Search #1: "apple"
+```

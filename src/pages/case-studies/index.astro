@@ -1,0 +1,62 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Nav from '../../components/Nav.astro';
+import { formatDate } from '../../utils/format';
+
+const allStudies = await getCollection('case-studies');
+const studies = allStudies.sort(
+  (a, b) => new Date(b.data.publishedAt).getTime() - new Date(a.data.publishedAt).getTime()
+);
+---
+
+<BaseLayout title="Case Studies" description="Projects I've worked on and the stories behind them.">
+  <Nav />
+
+  <section class="min-h-screen pb-16">
+    <div class="max-w-4xl mx-auto">
+      <div class="scroll-animate">
+        <h1 class="font-semibold text-2xl mb-2 tracking-tighter">Case Studies</h1>
+        <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-8">Projects I've worked on and the stories behind them</p>
+        <div class="flex flex-wrap gap-4 mb-12 text-xs text-neutral-600 dark:text-neutral-400">
+          <span>{studies.length} projects</span>
+        </div>
+      </div>
+
+      <div class="scroll-animate" data-delay="100">
+        {studies.length === 0 ? (
+          <p class="text-sm text-neutral-600 dark:text-neutral-400">No case studies yet.</p>
+        ) : (
+          <div class="grid gap-8">
+            {studies.map((study) => (
+              <a href={`/case-studies/${study.id.replace(/\.mdx?$/, '')}`} class="group block">
+                <article class="border border-neutral-200 dark:border-neutral-800 rounded-lg overflow-hidden hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors">
+                  <div class="p-6">
+                    <h2 class="font-medium text-lg text-neutral-900 dark:text-neutral-100 mb-2 group-hover:text-neutral-600 dark:group-hover:text-neutral-400 transition-colors">
+                      {study.data.title}
+                    </h2>
+                    <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-4 line-clamp-2">{study.data.summary}</p>
+                    <div class="flex flex-wrap items-center gap-3 text-xs text-neutral-500">
+                      <time datetime={study.data.publishedAt}>{formatDate(study.data.publishedAt)}</time>
+                      {study.data.client && <><span>·</span><span>{study.data.client}</span></>}
+                      {study.data.role && <><span>·</span><span>{study.data.role}</span></>}
+                    </div>
+                    {study.data.topics && study.data.topics.length > 0 && (
+                      <div class="flex flex-wrap gap-2 mt-4">
+                        {study.data.topics.map((topic) => (
+                          <span class="px-2 py-1 text-xs bg-neutral-100 dark:bg-neutral-800 rounded text-neutral-700 dark:text-neutral-300">
+                            {topic}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </article>
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

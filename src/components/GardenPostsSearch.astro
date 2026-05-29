@@ -1,0 +1,188 @@
+---
+import { formatDate } from '../utils/format';
+import type { PostType, GrowthStage } from '../utils/posts';
+
+interface Post {
+  slug: string;
+  data: {
+    title: string;
+    publishedAt: string;
+    summary?: string;
+    topics?: string[];
+    type?: PostType;
+    updated?: string;
+    status?: GrowthStage;
+  };
+  readingTime: number;
+}
+
+interface Props {
+  posts: Post[];
+  allTopics: string[];
+  allTypes: PostType[];
+  topicStats: Record<string, number>;
+}
+
+const typeEmojis: Record<PostType, string> = {
+  essay: '📝', tutorial: '💻', note: '📚', reflection: '🤔', review: '⭐',
+};
+const stageEmojis: Record<GrowthStage, string> = { seed: '🌱', sapling: '🌿', tree: '🌳' };
+
+const { posts, allTopics, allTypes, topicStats } = Astro.props;
+
+const serialized = JSON.stringify(posts.map((p) => ({
+  slug: p.slug.split('/').pop(),
+  title: p.data.title,
+  summary: p.data.summary ?? '',
+  topics: p.data.topics ?? [],
+  type: p.data.type ?? '',
+  updated: p.data.updated ?? '',
+  status: p.data.status ?? '',
+  publishedAt: p.data.publishedAt,
+  readingTime: p.readingTime,
+})));
+---
+
+<div id="garden-search-root">
+  <div class="flex flex-wrap items-center gap-3 mb-6">
+    <input
+      type="text"
+      id="gs-search"
+      placeholder="Search..."
+      class="flex-1 min-w-[140px] px-3 py-1.5 text-sm bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-400 dark:focus:ring-neutral-600"
+    />
+    <select id="gs-stage" class="text-xs px-3 py-2 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg focus:outline-none">
+      <option value="all">All stages</option>
+      <option value="seed">🌱 Seed</option>
+      <option value="sapling">🌿 Sapling</option>
+      <option value="tree">🌳 Tree</option>
+    </select>
+    <select id="gs-type" class="text-xs px-3 py-2 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg focus:outline-none">
+      <option value="all">All types</option>
+      {allTypes.map((type) => (
+        <option value={type}>{typeEmojis[type]} {type.charAt(0).toUpperCase() + type.slice(1)}</option>
+      ))}
+    </select>
+    <select id="gs-topic" class="text-xs px-3 py-2 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg focus:outline-none">
+      <option value="all">All topics</option>
+      {allTopics.map((topic) => (
+        <option value={topic}>{topic} ({topicStats[topic] ?? 0})</option>
+      ))}
+    </select>
+    <button id="gs-clear" class="hidden text-xs text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">Clear</button>
+  </div>
+
+  <p id="gs-count" class="hidden text-xs text-neutral-500 mb-4"></p>
+  <div id="gs-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+  <div id="gs-empty" class="hidden py-16 text-center">
+    <p class="text-sm text-neutral-500 mb-2">No thoughts found</p>
+    <button id="gs-clear2" class="text-sm text-neutral-900 dark:text-neutral-100 hover:underline">Clear filters</button>
+  </div>
+</div>
+
+<template id="gs-card-template">
+  <a class="group block p-4 rounded-lg border border-neutral-200 dark:border-neutral-800 hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors">
+    <div class="flex items-center gap-1.5 mb-2">
+      <span class="text-sm post-stage-emoji"></span>
+      <span class="text-sm post-type-emoji"></span>
+      <span class="text-xs text-neutral-400 post-reading-time"></span>
+    </div>
+    <h2 class="text-sm font-medium text-neutral-900 dark:text-neutral-100 group-hover:text-neutral-600 dark:group-hover:text-neutral-400 transition-colors mb-1.5 line-clamp-2 post-title"></h2>
+    <p class="text-xs text-neutral-500 line-clamp-2 mb-3 post-summary"></p>
+    <div class="mt-auto flex items-center justify-between text-xs text-neutral-400">
+      <time class="post-date"></time>
+      <span class="hidden text-green-600 dark:text-green-400 post-updated">updated</span>
+    </div>
+    <div class="flex gap-1 flex-wrap mt-2 post-topics"></div>
+  </a>
+</template>
+
+<script define:vars={{ serialized }}>
+  const posts = JSON.parse(serialized);
+  const typeEmojis = { essay: '📝', tutorial: '💻', note: '📚', reflection: '🤔', review: '⭐' };
+  const stageEmojis = { seed: '🌱', sapling: '🌿', tree: '🌳' };
+
+  const searchEl = document.getElementById('gs-search');
+  const stageEl = document.getElementById('gs-stage');
+  const typeEl = document.getElementById('gs-type');
+  const topicEl = document.getElementById('gs-topic');
+  const clearEl = document.getElementById('gs-clear');
+  const clearEl2 = document.getElementById('gs-clear2');
+  const grid = document.getElementById('gs-grid');
+  const emptyEl = document.getElementById('gs-empty');
+  const countEl = document.getElementById('gs-count');
+  const template = document.getElementById('gs-card-template');
+
+  function formatDate(dateStr) {
+    const d = new Date(dateStr.includes('T') ? dateStr : `${dateStr}T00:00:00`);
+    return d.toLocaleString('en-us', { month: 'long', day: 'numeric', year: 'numeric' });
+  }
+
+  function render() {
+    const q = searchEl.value.toLowerCase();
+    const stage = stageEl.value;
+    const type = typeEl.value;
+    const topic = topicEl.value;
+    const active = q || stage !== 'all' || type !== 'all' || topic !== 'all';
+
+    const filtered = posts.filter((p) => {
+      if (q && !p.title.toLowerCase().includes(q) && !p.summary.toLowerCase().includes(q)) return false;
+      if (stage !== 'all' && p.status !== stage) return false;
+      if (type !== 'all' && p.type !== type) return false;
+      if (topic !== 'all' && !p.topics.includes(topic)) return false;
+      return true;
+    });
+
+    clearEl.classList.toggle('hidden', !active);
+    countEl.classList.toggle('hidden', !active);
+    if (active) countEl.textContent = `${filtered.length} of ${posts.length} thoughts`;
+    grid.innerHTML = '';
+    emptyEl.classList.toggle('hidden', filtered.length > 0);
+
+    filtered.forEach((p) => {
+      const card = template.content.cloneNode(true);
+      const a = card.querySelector('a');
+      a.href = `/garden/thoughts/en/${p.slug}`;
+      card.querySelector('.post-stage-emoji').textContent = stageEmojis[p.status] || '';
+      card.querySelector('.post-type-emoji').textContent = typeEmojis[p.type] || '';
+      card.querySelector('.post-reading-time').textContent = `${p.readingTime}m`;
+      card.querySelector('.post-title').textContent = p.title;
+      card.querySelector('.post-summary').textContent = p.summary;
+      const time = card.querySelector('.post-date');
+      time.textContent = formatDate(p.publishedAt);
+      time.setAttribute('datetime', p.publishedAt);
+      if (p.updated) card.querySelector('.post-updated').classList.remove('hidden');
+      const topicsEl = card.querySelector('.post-topics');
+      p.topics.slice(0, 2).forEach((t) => {
+        const span = document.createElement('span');
+        span.className = 'text-[10px] px-1.5 py-0.5 bg-neutral-100 dark:bg-neutral-800 rounded text-neutral-500';
+        span.textContent = t;
+        topicsEl.appendChild(span);
+      });
+      if (p.topics.length > 2) {
+        const span = document.createElement('span');
+        span.className = 'text-[10px] px-1.5 py-0.5 text-neutral-400';
+        span.textContent = `+${p.topics.length - 2}`;
+        topicsEl.appendChild(span);
+      }
+      grid.appendChild(card);
+    });
+  }
+
+  function clearFilters() {
+    searchEl.value = '';
+    stageEl.value = 'all';
+    typeEl.value = 'all';
+    topicEl.value = 'all';
+    render();
+  }
+
+  searchEl.addEventListener('input', render);
+  stageEl.addEventListener('change', render);
+  typeEl.addEventListener('change', render);
+  topicEl.addEventListener('change', render);
+  clearEl.addEventListener('click', clearFilters);
+  clearEl2.addEventListener('click', clearFilters);
+
+  render();
+</script>

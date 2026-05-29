@@ -1,0 +1,74 @@
+---
+interface Heading {
+  text: string;
+  slug: string;
+}
+interface Props {
+  headings: Heading[];
+}
+const { headings } = Astro.props;
+if (headings.length === 0) return;
+---
+
+<div class="p-4 border border-neutral-200 dark:border-neutral-800 rounded-lg bg-neutral-50 dark:bg-neutral-900" id="toc">
+  <h2 class="font-semibold mb-3 text-neutral-900 dark:text-neutral-100 text-sm">
+    Table of Contents
+  </h2>
+  <nav>
+    <ul class="space-y-2 font-mono">
+      {headings.map((heading) => (
+        <li>
+          <a
+            href={`#${heading.slug}`}
+            data-toc-link={heading.slug}
+            class="text-sm block transition-all duration-200 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 pl-3"
+          >
+            {heading.text}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+</div>
+
+<script>
+  const links = document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]');
+
+  const setActive = (id: string) => {
+    links.forEach((link) => {
+      const isActive = link.dataset.tocLink === id;
+      link.className = `text-sm block transition-all duration-200 pl-3 ${
+        isActive
+          ? 'text-neutral-900 dark:text-neutral-100 font-medium border-l-2 border-neutral-900 dark:border-neutral-100 -ml-[2px]'
+          : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
+      }`;
+    });
+  };
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) setActive(entry.target.id);
+      });
+    },
+    { rootMargin: '-100px 0px -66% 0px', threshold: 0 }
+  );
+
+  links.forEach((link) => {
+    const el = document.getElementById(link.dataset.tocLink!);
+    if (el) observer.observe(el);
+  });
+
+  document.addEventListener('click', (e) => {
+    const anchor = (e.target as HTMLElement).closest<HTMLAnchorElement>('a[href^="#"]');
+    if (!anchor) return;
+    e.preventDefault();
+    const id = anchor.getAttribute('href')!.substring(1);
+    const target = document.getElementById(id);
+    if (!target) return;
+    const offset = target.getBoundingClientRect().top + window.pageYOffset - 96;
+    window.scrollTo({ top: offset, behavior: 'smooth' });
+    window.history.pushState(null, '', `#${id}`);
+    setActive(id);
+  });
+</script>
