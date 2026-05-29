@@ -6,7 +6,6 @@ import remarkMath from 'remark-math';
 import remarkGfm from 'remark-gfm';
 import rehypeKatex from 'rehype-katex';
 import rehypeSlug from 'rehype-slug';
-import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 
 export default defineConfig({
   site: 'https://fadjarrafi.com',
@@ -16,7 +15,6 @@ export default defineConfig({
       remarkPlugins: [remarkMath, remarkGfm],
       rehypePlugins: [
         rehypeSlug,
-        [rehypeAutolinkHeadings, { behavior: 'wrap' }],
         [rehypeKatex, { strict: false, trust: true, output: 'html' }],
       ],
     }),

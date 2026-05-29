@@ -1,5 +1,19 @@
 [
     {
+        "id": "anna-karenina",
+        "title": "Anna Karenina",
+        "author": "Leo Tolstoy",
+        "type": "book",
+        "topics": [
+            "fiction",
+            "classic",
+            "romance"
+        ],
+        "status": "reading",
+        "year": "1878",
+        "summary": "A story of tragic love and societal pressure in 19th-century Russia, following the aristocrat Anna Karenina as she abandons her husband and son for Count Vronsky, and the parallel story of the landowner Levin searching for meaning and happiness."
+    },
+    {
         "id": "the-pragmatic-programmer",
         "title": "The Pragmatic Programmer",
         "author": "Andrew Hunt & David Thomas",

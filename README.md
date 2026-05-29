@@ -1,15 +1,16 @@
 # Portfolio
 
-Personal portfolio and blog site built with Next.js 16, featuring bilingual content (English/Indonesian), a writing section for full articles, and a digital garden for shorter thoughts.
+Personal portfolio and blog site built with Astro 5, featuring bilingual content (English/Indonesian), a writing section for full articles, and a digital garden for shorter thoughts.
 
 ## Tech Stack
 
-- **Framework:** Next.js 16 (App Router, standalone output)
-- **Styling:** Tailwind CSS v4
-- **Content:** MDX with `next-mdx-remote/rsc`
+- **Framework:** Astro 5 (static output, zero JS by default)
+- **Styling:** Tailwind CSS v3 + `@tailwindcss/typography`
+- **Content:** MDX via `@astrojs/mdx` with Zod schema validation
 - **Math:** LaTeX support via `remark-math` + `rehype-katex`
 - **Syntax Highlighting:** `sugar-high`
-- **Analytics:** Vercel Analytics + Speed Insights
+- **Analytics:** Google Analytics 4 (via `PUBLIC_GA_ID` env var)
+- **Server:** nginx (Docker)
 
 ## Getting Started
 
@@ -18,22 +19,22 @@ pnpm install
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the site.
+Open [http://localhost:4321](http://localhost:4321) to view the site.
 
 ## Production Build
 
 ```bash
 pnpm build
-pnpm start
+pnpm preview
 ```
 
 ## Docker
 
-Build and run the container:
+Build and run the container (served by nginx on port 80):
 
 ```bash
 docker build -t portfolio .
-docker run --name portfolio -d -p 3000:3000 portfolio
+docker run --name portfolio -d -p 80:80 portfolio
 ```
 
 To rebuild after a code change:
@@ -41,35 +42,48 @@ To rebuild after a code change:
 ```bash
 docker rm -f portfolio
 docker build -t portfolio .
-docker run --name portfolio -d -p 3000:3000 portfolio
+docker run --name portfolio -d -p 80:80 portfolio
 ```
 
 ## Project Structure
 
 ```
-app/
-├── components/         # Shared React components
-├── writing/            # Blog articles
-│   ├── posts/
+src/
+├── components/         # Astro components (Nav, Footer, search, TOC, etc.)
+├── content/            # MDX content collections
+│   ├── blog/
 │   │   ├── en/         # English articles (.mdx)
 │   │   └── id/         # Indonesian articles (.mdx)
-│   └── utils.ts        # Post fetching and parsing
-├── garden/             # Digital garden
-│   ├── thoughts/       # Short-form essays
-│   │   └── posts/
-│   │       ├── en/
-│   │       └── id/
-│   ├── concepts/       # Glossarium entries
-│   └── library/        # Reading notes & resources
-├── case-studies/       # Portfolio case studies (.mdx)
-└── og/                 # Open Graph image generation
+│   ├── thoughts/       # Digital garden posts
+│   │   ├── en/
+│   │   └── id/
+│   └── case-studies/   # Portfolio case studies (.mdx)
+├── layouts/
+│   └── BaseLayout.astro  # HTML shell, SEO meta, fonts, GA4
+├── pages/              # File-based routing
+│   ├── index.astro
+│   ├── writing/
+│   ├── garden/
+│   ├── case-studies/
+│   ├── rss.xml.ts
+│   └── robots.txt.ts
+├── styles/
+│   └── global.css      # Tailwind directives + prose styles
+└── utils/
+    ├── posts.ts        # readingTime, growthStage, relatedPosts
+    └── format.ts       # formatDate
+public/
+└── data/               # Static JSON read at build time
+    ├── experiences.json
+    ├── concepts.json
+    └── library.json
 ```
 
 ## Adding Content
 
 ### Writing (Articles)
 
-Create a `.mdx` file in `app/writing/posts/{en,id}/`:
+Create a `.mdx` file in `src/content/blog/{en,id}/`:
 
 ```yaml
 ---
@@ -92,7 +106,7 @@ translationSlug: 'your-article-slug'
 
 ### Digital Garden (Thoughts)
 
-Create a `.mdx` file in `app/garden/thoughts/posts/{en,id}/`:
+Create a `.mdx` file in `src/content/thoughts/{en,id}/`:
 
 ```yaml
 ---
@@ -108,7 +122,7 @@ lang: 'en'
 
 | Field | Description |
 |---|---|
-| `status` | Growth stage: `seed` (<300 words), `sapling` (300–800 words), `tree` (>800 words) |
+| `status` | Growth stage: `seed` (<300 words), `sapling` (300–800 words), `tree` (>800 words) — auto-derived from word count if omitted |
 | `topics` | Used for related thought recommendations |
 
-Both content types are served at bilingual routes — e.g. `/en/cors-what-it-is` and `/id/cors-what-it-is`.
+Both content types are served at bilingual routes — e.g. `/writing/en/cors-what-it-is` and `/writing/id/cors-what-it-is`.

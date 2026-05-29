@@ -4,12 +4,15 @@ import { resolve } from 'path';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Nav from '../../../components/Nav.astro';
 import GardenNav from '../../../components/GardenNav.astro';
+import ConceptsSearch from '../../../components/ConceptsSearch.astro';
 
 let concepts: any[] = [];
 try {
   const data = readFileSync(resolve('public/data/concepts.json'), 'utf-8');
   concepts = JSON.parse(data);
 } catch {}
+
+const allDomains = [...new Set(concepts.flatMap((c: any) => c.domain ?? []))].sort();
 ---
 
 <BaseLayout title="Concepts" description="Personal lexicon — terms I've defined for myself.">
@@ -23,9 +26,13 @@ try {
       <div class="scroll-animate" data-delay="50">
         <GardenNav />
       </div>
-      {concepts.length === 0 && (
+      {concepts.length === 0 ? (
         <div class="scroll-animate" data-delay="100">
           <p class="text-sm text-neutral-500">No concepts yet.</p>
+        </div>
+      ) : (
+        <div class="scroll-animate" data-delay="100">
+          <ConceptsSearch concepts={concepts} allDomains={allDomains} />
         </div>
       )}
     </div>
