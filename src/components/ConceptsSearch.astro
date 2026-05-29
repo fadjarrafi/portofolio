@@ -38,30 +38,39 @@ const serialized = JSON.stringify(concepts);
   </div>
 
   <p id="cs-count" class="hidden text-xs text-neutral-500 mb-4"></p>
-  <div id="cs-grid" class="grid gap-4"></div>
+  <div id="cs-list" class="divide-y divide-neutral-200 dark:divide-neutral-800 border border-neutral-200 dark:border-neutral-800 rounded-lg overflow-hidden"></div>
   <div id="cs-empty" class="hidden py-16 text-center">
     <p class="text-sm text-neutral-500 mb-2">No concepts found</p>
     <button id="cs-clear2" class="text-sm text-neutral-900 dark:text-neutral-100 hover:underline">Clear filters</button>
   </div>
 </div>
 
-<template id="cs-card-template">
-  <div class="border border-neutral-200 dark:border-neutral-800 rounded-lg p-5">
-    <div class="flex flex-wrap items-start justify-between gap-2 mb-2">
-      <h2 class="font-semibold text-lg tracking-tight concept-term"></h2>
-      <div class="flex flex-wrap gap-1 concept-domains"></div>
+<template id="cs-item-template">
+  <details class="group">
+    <summary class="flex items-center justify-between gap-4 px-5 py-4 cursor-pointer list-none hover:bg-neutral-50 dark:hover:bg-neutral-900/60 transition-colors">
+      <div class="flex flex-wrap items-center gap-3 min-w-0">
+        <span class="font-medium text-sm text-neutral-900 dark:text-neutral-100 concept-term"></span>
+        <span class="text-xs text-neutral-500 dark:text-neutral-400 truncate concept-brief"></span>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <div class="flex flex-wrap gap-1 concept-domains"></div>
+        <svg class="w-4 h-4 text-neutral-400 transition-transform duration-200 group-open:rotate-180 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+    </summary>
+    <div class="px-5 pb-5 pt-1 border-t border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/30">
+      <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-4 concept-extended hidden"></p>
+      <div class="concept-examples hidden mb-4">
+        <p class="text-xs font-medium text-neutral-500 uppercase tracking-wider mb-2">Examples</p>
+        <ul class="concept-examples-list space-y-1"></ul>
+      </div>
+      <div class="concept-related hidden items-center flex-wrap gap-1.5">
+        <span class="text-xs text-neutral-400">Related:</span>
+        <span class="concept-related-items flex flex-wrap gap-1"></span>
+      </div>
     </div>
-    <p class="text-sm text-neutral-700 dark:text-neutral-300 mb-3 concept-brief"></p>
-    <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-3 concept-extended hidden"></p>
-    <div class="concept-examples hidden mb-3">
-      <p class="text-xs font-medium text-neutral-500 uppercase tracking-wider mb-1">Examples</p>
-      <ul class="concept-examples-list list-disc list-inside space-y-0.5"></ul>
-    </div>
-    <div class="concept-related hidden flex-wrap gap-1 mt-2 items-center">
-      <span class="text-xs text-neutral-500">Related:</span>
-      <span class="concept-related-items"></span>
-    </div>
-  </div>
+  </details>
 </template>
 
 <script define:vars={{ serialized }}>
@@ -71,10 +80,10 @@ const serialized = JSON.stringify(concepts);
   const domainEl = document.getElementById('cs-domain');
   const clearEl = document.getElementById('cs-clear');
   const clearEl2 = document.getElementById('cs-clear2');
-  const grid = document.getElementById('cs-grid');
+  const list = document.getElementById('cs-list');
   const emptyEl = document.getElementById('cs-empty');
   const countEl = document.getElementById('cs-count');
-  const template = document.getElementById('cs-card-template');
+  const template = document.getElementById('cs-item-template');
 
   function render() {
     const q = searchEl.value.toLowerCase();
@@ -90,15 +99,17 @@ const serialized = JSON.stringify(concepts);
     clearEl.classList.toggle('hidden', !active);
     countEl.classList.toggle('hidden', !active);
     if (active) countEl.textContent = `${filtered.length} of ${concepts.length} concepts`;
-    grid.innerHTML = '';
+    list.innerHTML = '';
     emptyEl.classList.toggle('hidden', filtered.length > 0);
+    list.classList.toggle('hidden', filtered.length === 0);
 
     filtered.forEach((c) => {
-      const card = template.content.cloneNode(true);
+      const item = template.content.cloneNode(true);
 
-      card.querySelector('.concept-term').textContent = c.term;
+      item.querySelector('.concept-term').textContent = c.term;
+      item.querySelector('.concept-brief').textContent = c.brief;
 
-      const domainsEl = card.querySelector('.concept-domains');
+      const domainsEl = item.querySelector('.concept-domains');
       (c.domain || []).forEach((d) => {
         const span = document.createElement('span');
         span.className = 'text-xs px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400';
@@ -106,40 +117,41 @@ const serialized = JSON.stringify(concepts);
         domainsEl.appendChild(span);
       });
 
-      card.querySelector('.concept-brief').textContent = c.brief;
-
       if (c.extended) {
-        const ext = card.querySelector('.concept-extended');
+        const ext = item.querySelector('.concept-extended');
         ext.textContent = c.extended;
         ext.classList.remove('hidden');
       }
 
       if (c.examples?.length > 0) {
-        const exWrap = card.querySelector('.concept-examples');
+        const exWrap = item.querySelector('.concept-examples');
         exWrap.classList.remove('hidden');
-        const ul = card.querySelector('.concept-examples-list');
+        const ul = item.querySelector('.concept-examples-list');
         c.examples.forEach((ex) => {
           const li = document.createElement('li');
-          li.className = 'text-sm text-neutral-600 dark:text-neutral-400';
+          li.className = 'text-sm text-neutral-600 dark:text-neutral-400 flex gap-2 before:content-["–"] before:text-neutral-300 dark:before:text-neutral-600 before:shrink-0';
           li.textContent = ex;
           ul.appendChild(li);
         });
       }
 
       if (c.related?.length > 0) {
-        const relWrap = card.querySelector('.concept-related');
+        const relWrap = item.querySelector('.concept-related');
         relWrap.classList.remove('hidden');
         relWrap.style.display = 'flex';
-        const relItems = card.querySelector('.concept-related-items');
-        c.related.forEach((r, i) => {
+        const relItems = item.querySelector('.concept-related-items');
+        c.related.forEach((r) => {
           const span = document.createElement('span');
-          span.className = 'text-xs text-neutral-500 underline underline-offset-2';
-          span.textContent = i < c.related.length - 1 ? r + ', ' : r;
+          span.className = 'text-xs px-2 py-0.5 rounded-full border border-neutral-200 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400';
+          span.textContent = r;
           relItems.appendChild(span);
         });
       }
 
-      grid.appendChild(card);
+      // auto-open when search matches so user sees the result
+      if (q) item.querySelector('details').open = true;
+
+      list.appendChild(item);
     });
   }
 
@@ -156,3 +168,7 @@ const serialized = JSON.stringify(concepts);
 
   render();
 </script>
+
+<style>
+  details > summary::-webkit-details-marker { display: none; }
+</style>

@@ -176,5 +176,146 @@
         "resources": [
             "https://www.joelonsoftware.com/2002/11/11/the-law-of-leaky-abstractions/"
         ]
+    },
+    {
+        "term": "Monorepo",
+        "domain": [
+            "Programming",
+            "Architecture"
+        ],
+        "brief": "A single repository containing multiple projects or packages that are developed and versioned together",
+        "slug": "monorepo",
+        "extended": "A monorepo stores all related projects — frontend apps, backend services, shared libraries, and tooling — in one version-controlled repository. Unlike polyrepo (one repo per project), a monorepo makes it easy to share code, enforce consistent tooling, and make atomic cross-project changes in a single commit. Tools like Nx, Turborepo, and pnpm workspaces are commonly used to manage builds and dependencies efficiently at scale.",
+        "examples": [
+            "Google keeps most of its internal code in a single giant monorepo",
+            "A Next.js frontend, Express API, and shared types library in one repo with pnpm workspaces",
+            "React, Jest, and Create React App were developed together in the facebook/react monorepo"
+        ],
+        "related": [
+            "microservice",
+            "abstraction"
+        ]
+    },
+    {
+        "term": "Backend for Frontend (BFF)",
+        "domain": [
+            "Architecture",
+            "Programming"
+        ],
+        "brief": "A dedicated backend layer built specifically to serve the needs of one frontend client",
+        "slug": "bff",
+        "extended": "The BFF pattern introduces a thin server-side layer between a frontend (web, mobile, etc.) and the downstream microservices or APIs it depends on. Instead of having every client talk directly to every service, each client gets its own BFF that aggregates, transforms, and shapes data for that client's exact needs. This avoids over-fetching, reduces coupling between frontend and backend teams, and lets each BFF evolve independently.",
+        "examples": [
+            "A mobile BFF that merges product and inventory API responses into a single optimized payload",
+            "A web BFF that handles authentication cookies and server-side rendering data fetching",
+            "Next.js API routes acting as a BFF between the React frontend and external microservices"
+        ],
+        "related": [
+            "microservice",
+            "abstraction"
+        ]
+    },
+    {
+        "term": "Microservice",
+        "domain": [
+            "Architecture",
+            "Programming"
+        ],
+        "brief": "An architectural style where an application is composed of small, independently deployable services each responsible for a single business capability",
+        "slug": "microservice",
+        "extended": "Microservices decompose a monolithic application into loosely coupled services that communicate over a network (typically HTTP/REST or message queues). Each service owns its data, can be deployed independently, and can be written in the language best suited to its job. This enables teams to scale, deploy, and iterate on individual services without affecting the whole system — at the cost of increased operational complexity around service discovery, distributed tracing, and inter-service communication.",
+        "examples": [
+            "An e-commerce platform split into separate services for orders, payments, inventory, and notifications",
+            "Netflix running hundreds of microservices each owned by a small team",
+            "A user-auth service, a notification service, and a billing service each with their own database"
+        ],
+        "related": [
+            "monorepo",
+            "bff",
+            "abstraction",
+            "complexity"
+        ]
+    },
+    {
+        "term": "ORM (Object-Relational Mapping)",
+        "domain": [
+            "Programming",
+            "Database"
+        ],
+        "brief": "A technique that lets you query and manipulate a database using an object-oriented paradigm instead of raw SQL",
+        "slug": "orm",
+        "extended": "An ORM maps database tables to classes and rows to objects, letting developers work with the database using the same language and style as the rest of their application code. It handles query generation, type coercion, and often migrations. The trade-off is that ORMs can obscure what SQL is actually being executed, sometimes generating inefficient queries — making it important to understand the underlying database even when using one.",
+        "examples": [
+            "Prisma and Drizzle in TypeScript/Node.js ecosystems",
+            "SQLAlchemy in Python",
+            "ActiveRecord in Ruby on Rails",
+            "Hibernate in Java"
+        ],
+        "related": [
+            "abstraction"
+        ]
+    },
+    {
+        "term": "Reliability",
+        "domain": [
+            "Architecture",
+            "Systems Thinking"
+        ],
+        "brief": "A system's ability to continue working correctly even when things go wrong",
+        "slug": "reliability",
+        "extended": "Kleppmann defines reliability as the system continuing to work correctly — performing the correct function at the desired level of performance — even in the face of adversity. Faults (one component deviating from its spec) are different from failures (the whole system stops). Reliable systems are fault-tolerant: they anticipate faults and prevent them from causing failures. This is achieved through redundancy, graceful degradation, and thorough testing including chaos engineering.",
+        "examples": [
+            "A database that replicates data across multiple nodes so one node dying doesn't cause data loss",
+            "Netflix Chaos Monkey deliberately killing production instances to test fault tolerance",
+            "Hardware RAID arrays continuing to serve reads even when one disk fails"
+        ],
+        "related": [
+            "scalability",
+            "maintainability",
+            "complexity"
+        ]
+    },
+    {
+        "term": "Scalability",
+        "domain": [
+            "Architecture",
+            "Systems Thinking"
+        ],
+        "brief": "A system's ability to cope with increased load without degrading performance",
+        "slug": "scalability",
+        "extended": "Scalability is not a one-dimensional label — it means having strategies for coping with growth. Kleppmann emphasizes describing load with precise load parameters (e.g. requests/sec, cache hit rate, ratio of reads to writes) before reasoning about performance. Two approaches exist: vertical scaling (more powerful machines) and horizontal scaling (distributing load across more machines). Understanding your system's bottlenecks — whether CPU, memory, I/O, or network — determines which approach is appropriate.",
+        "examples": [
+            "Twitter's fan-out challenge: posting a tweet must update millions of followers' timelines",
+            "Percentile response times (p95, p99) as a better load metric than averages",
+            "Stateless services that can be horizontally scaled behind a load balancer",
+            "Read replicas to scale read-heavy workloads without touching the primary database"
+        ],
+        "related": [
+            "reliability",
+            "maintainability",
+            "microservice"
+        ]
+    },
+    {
+        "term": "Maintainability",
+        "domain": [
+            "Architecture",
+            "Programming"
+        ],
+        "brief": "Designing systems so that people can work on them productively over time",
+        "slug": "maintainability",
+        "extended": "Kleppmann breaks maintainability into three principles: Operability (making it easy for ops teams to keep the system running), Simplicity (reducing accidental complexity so new engineers can understand the system), and Evolvability (making it easy to make changes as requirements evolve — also known as extensibility or plasticity). Most software cost is not in initial development but in ongoing maintenance: fixing bugs, adapting to new platforms, adding features, and paying down technical debt.",
+        "examples": [
+            "Good observability — metrics, logs, distributed tracing — makes a system operable",
+            "Abstracting away accidental complexity behind clean interfaces to achieve simplicity",
+            "Schema migrations that allow evolving a data model without breaking existing readers",
+            "Avoiding tight coupling between services so one can change independently"
+        ],
+        "related": [
+            "reliability",
+            "scalability",
+            "abstraction",
+            "complexity"
+        ]
     }
 ]
