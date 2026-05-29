@@ -1,0 +1,174 @@
+---
+interface Concept {
+  term: string;
+  domain: string[];
+  brief: string;
+  slug: string;
+  extended?: string;
+  examples?: string[];
+  related?: string[];
+  resources?: string[];
+}
+
+interface Props {
+  concepts: Concept[];
+  allDomains: string[];
+}
+
+const { concepts, allDomains } = Astro.props;
+
+const serialized = JSON.stringify(concepts);
+---
+
+<div id="concepts-root">
+  <div class="flex flex-wrap items-center gap-3 mb-6">
+    <input
+      type="text"
+      id="cs-search"
+      placeholder="Search concepts..."
+      class="flex-1 min-w-[140px] px-3 py-1.5 text-sm bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-400 dark:focus:ring-neutral-600"
+    />
+    <select id="cs-domain" class="text-xs px-3 py-2 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg focus:outline-none">
+      <option value="all">All domains</option>
+      {allDomains.map((d) => (
+        <option value={d}>{d}</option>
+      ))}
+    </select>
+    <button id="cs-clear" class="hidden text-xs text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">Clear</button>
+  </div>
+
+  <p id="cs-count" class="hidden text-xs text-neutral-500 mb-4"></p>
+  <div id="cs-list" class="divide-y divide-neutral-200 dark:divide-neutral-800 border border-neutral-200 dark:border-neutral-800 rounded-lg overflow-hidden"></div>
+  <div id="cs-empty" class="hidden py-16 text-center">
+    <p class="text-sm text-neutral-500 mb-2">No concepts found</p>
+    <button id="cs-clear2" class="text-sm text-neutral-900 dark:text-neutral-100 hover:underline">Clear filters</button>
+  </div>
+</div>
+
+<template id="cs-item-template">
+  <details class="group">
+    <summary class="flex items-center justify-between gap-4 px-5 py-4 cursor-pointer list-none hover:bg-neutral-50 dark:hover:bg-neutral-900/60 transition-colors">
+      <div class="flex flex-wrap items-center gap-3 min-w-0">
+        <span class="font-medium text-sm text-neutral-900 dark:text-neutral-100 concept-term"></span>
+        <span class="text-xs text-neutral-500 dark:text-neutral-400 truncate concept-brief"></span>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <div class="flex flex-wrap gap-1 concept-domains"></div>
+        <svg class="w-4 h-4 text-neutral-400 transition-transform duration-200 group-open:rotate-180 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+    </summary>
+    <div class="px-5 pb-5 pt-1 border-t border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/30">
+      <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-4 concept-extended hidden"></p>
+      <div class="concept-examples hidden mb-4">
+        <p class="text-xs font-medium text-neutral-500 uppercase tracking-wider mb-2">Examples</p>
+        <ul class="concept-examples-list space-y-1"></ul>
+      </div>
+      <div class="concept-related hidden items-center flex-wrap gap-1.5">
+        <span class="text-xs text-neutral-400">Related:</span>
+        <span class="concept-related-items flex flex-wrap gap-1"></span>
+      </div>
+    </div>
+  </details>
+</template>
+
+<script define:vars={{ serialized }}>
+  const concepts = JSON.parse(serialized);
+
+  const searchEl = document.getElementById('cs-search');
+  const domainEl = document.getElementById('cs-domain');
+  const clearEl = document.getElementById('cs-clear');
+  const clearEl2 = document.getElementById('cs-clear2');
+  const list = document.getElementById('cs-list');
+  const emptyEl = document.getElementById('cs-empty');
+  const countEl = document.getElementById('cs-count');
+  const template = document.getElementById('cs-item-template');
+
+  function render() {
+    const q = searchEl.value.toLowerCase();
+    const domain = domainEl.value;
+    const active = q || domain !== 'all';
+
+    const filtered = concepts.filter((c) => {
+      if (q && !c.term.toLowerCase().includes(q) && !c.brief.toLowerCase().includes(q) && !(c.extended || '').toLowerCase().includes(q)) return false;
+      if (domain !== 'all' && !(c.domain || []).includes(domain)) return false;
+      return true;
+    });
+
+    clearEl.classList.toggle('hidden', !active);
+    countEl.classList.toggle('hidden', !active);
+    if (active) countEl.textContent = `${filtered.length} of ${concepts.length} concepts`;
+    list.innerHTML = '';
+    emptyEl.classList.toggle('hidden', filtered.length > 0);
+    list.classList.toggle('hidden', filtered.length === 0);
+
+    filtered.forEach((c) => {
+      const item = template.content.cloneNode(true);
+
+      item.querySelector('.concept-term').textContent = c.term;
+      item.querySelector('.concept-brief').textContent = c.brief;
+
+      const domainsEl = item.querySelector('.concept-domains');
+      (c.domain || []).forEach((d) => {
+        const span = document.createElement('span');
+        span.className = 'text-xs px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400';
+        span.textContent = d;
+        domainsEl.appendChild(span);
+      });
+
+      if (c.extended) {
+        const ext = item.querySelector('.concept-extended');
+        ext.textContent = c.extended;
+        ext.classList.remove('hidden');
+      }
+
+      if (c.examples?.length > 0) {
+        const exWrap = item.querySelector('.concept-examples');
+        exWrap.classList.remove('hidden');
+        const ul = item.querySelector('.concept-examples-list');
+        c.examples.forEach((ex) => {
+          const li = document.createElement('li');
+          li.className = 'text-sm text-neutral-600 dark:text-neutral-400 flex gap-2 before:content-["–"] before:text-neutral-300 dark:before:text-neutral-600 before:shrink-0';
+          li.textContent = ex;
+          ul.appendChild(li);
+        });
+      }
+
+      if (c.related?.length > 0) {
+        const relWrap = item.querySelector('.concept-related');
+        relWrap.classList.remove('hidden');
+        relWrap.style.display = 'flex';
+        const relItems = item.querySelector('.concept-related-items');
+        c.related.forEach((r) => {
+          const span = document.createElement('span');
+          span.className = 'text-xs px-2 py-0.5 rounded-full border border-neutral-200 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400';
+          span.textContent = r;
+          relItems.appendChild(span);
+        });
+      }
+
+      // auto-open when search matches so user sees the result
+      if (q) item.querySelector('details').open = true;
+
+      list.appendChild(item);
+    });
+  }
+
+  function clearFilters() {
+    searchEl.value = '';
+    domainEl.value = 'all';
+    render();
+  }
+
+  searchEl.addEventListener('input', render);
+  domainEl.addEventListener('change', render);
+  clearEl.addEventListener('click', clearFilters);
+  clearEl2.addEventListener('click', clearFilters);
+
+  render();
+</script>
+
+<style>
+  details > summary::-webkit-details-marker { display: none; }
+</style>

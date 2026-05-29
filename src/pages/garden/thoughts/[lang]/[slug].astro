@@ -1,0 +1,160 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import Nav from '../../../../components/Nav.astro';
+import TableOfContents from '../../../../components/TableOfContents.astro';
+import GardenRelatedPosts from '../../../../components/GardenRelatedPosts.astro';
+import { formatDate } from '../../../../utils/format';
+import { calculateReadingTime, getGrowthStage, getRelatedPosts } from '../../../../utils/posts';
+import type { PostType, GrowthStage } from '../../../../utils/posts';
+import YouTube from '../../../../components/YouTube.astro';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('thoughts');
+  return entries.map((entry) => {
+    const parts = entry.id.split('/');
+    const lang = parts[0] as 'en' | 'id';
+    const slug = parts[1].replace(/\.mdx?$/, '');
+    return { params: { lang, slug }, props: { entry } };
+  });
+}
+
+const { lang, slug } = Astro.params;
+const { entry } = Astro.props;
+
+const { Content, headings } = await entry.render();
+const readingTime = calculateReadingTime(entry.body ?? '');
+const status = getGrowthStage(entry.body ?? '', entry.data.status);
+
+const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://fadjarrafi.com';
+const ogImage = entry.data.image ?? `${siteUrl}/og-default.png`;
+
+const tocHeadings = headings
+  .filter((h) => h.depth === 2)
+  .map((h) => ({ text: h.text, slug: h.slug }));
+
+const allLangThoughts = await getCollection('thoughts', ({ id }) => id.startsWith(`${lang}/`));
+const relatedEntries = getRelatedPosts(allLangThoughts, entry.id);
+const related = relatedEntries.map((r) => ({
+  ...r,
+  readingTime: calculateReadingTime(r.body ?? ''),
+  data: { ...r.data, status: getGrowthStage(r.body ?? '', r.data.status) },
+}));
+
+const targetLang = lang === 'en' ? 'id' : 'en';
+const translationSlug = entry.data.translationSlug;
+let hasTranslation = false;
+if (translationSlug) {
+  const allOtherLang = await getCollection('thoughts', ({ id }) => id.startsWith(`${targetLang}/`));
+  hasTranslation = allOtherLang.some((p) => p.id.split('/')[1]?.replace(/\.mdx?$/, '') === translationSlug);
+}
+
+const typeEmojis: Record<PostType, string> = {
+  essay: '📝', tutorial: '💻', note: '📚', reflection: '🤔', review: '⭐',
+};
+const stageEmojis: Record<GrowthStage, string> = { seed: '🌱', sapling: '🌿', tree: '🌳' };
+
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: entry.data.title,
+  datePublished: entry.data.publishedAt,
+  dateModified: entry.data.updated ?? entry.data.publishedAt,
+  description: entry.data.summary,
+  image: ogImage,
+  url: `${siteUrl}/garden/thoughts/${lang}/${slug}`,
+  author: { '@type': 'Person', name: 'Fadjar Rafi' },
+});
+---
+
+<BaseLayout
+  title={entry.data.title}
+  description={entry.data.summary}
+  ogImage={ogImage}
+  publishedAt={entry.data.publishedAt}
+  type="article"
+>
+  <Nav />
+
+  <section class="max-w-6xl mx-auto px-6 pb-16">
+    <script type="application/ld+json" set:html={jsonLd} />
+
+    <div class="scroll-animate">
+      <a
+        href="/garden/thoughts"
+        class="inline-flex items-center text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 mb-8 py-2 px-2 -ml-2"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
+          <path d="m15 18-6-6 6-6" />
+        </svg>
+        Back to Garden
+      </a>
+
+      <div class="mb-8">
+        <div class="flex items-start gap-3 mb-3">
+          <span class="text-2xl flex-shrink-0 mt-1">{stageEmojis[status]}</span>
+          {entry.data.type && (
+            <span class="text-2xl flex-shrink-0 mt-1">{typeEmojis[entry.data.type]}</span>
+          )}
+          <h1 class="title font-semibold text-2xl tracking-tighter">{entry.data.title}</h1>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 text-sm text-neutral-600 dark:text-neutral-400">
+          <time datetime={entry.data.publishedAt}>{formatDate(entry.data.publishedAt)}</time>
+          <span>·</span>
+          <span>{readingTime} min read</span>
+          {entry.data.updated && (
+            <>
+              <span>·</span>
+              <span class="text-green-600 dark:text-green-400">Updated {formatDate(entry.data.updated)}</span>
+            </>
+          )}
+        </div>
+
+        {entry.data.topics && entry.data.topics.length > 0 && (
+          <div class="flex flex-wrap gap-2 mt-4">
+            {entry.data.topics.map((topic) => (
+              <a
+                href={`/garden/thoughts?topic=${topic}`}
+                class="px-3 py-1 text-xs bg-neutral-100 dark:bg-neutral-800 rounded-full text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+              >
+                {topic}
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+
+    <div class="scroll-animate" data-delay="100">
+      <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,2.5fr)_280px] gap-8 relative">
+        <article class="prose prose-neutral dark:prose-invert prose-p:my-6 w-full leading-8 min-w-0">
+          <Content components={{ YouTube }} />
+          <GardenRelatedPosts posts={related} currentLang={lang as 'en' | 'id'} />
+        </article>
+
+        <div class="order-first lg:order-last">
+          <aside class="lg:sticky lg:top-24 lg:self-start space-y-4">
+            {hasTranslation && translationSlug && (
+              <div class="p-4 border border-neutral-200 dark:border-neutral-800 rounded-lg bg-neutral-50 dark:bg-neutral-900">
+                <a
+                  href={`/garden/thoughts/${targetLang}/${translationSlug}`}
+                  class="flex items-center gap-2 text-sm font-mono text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m5 8 6 6" /><path d="m4 14 6-6 2-3" /><path d="M2 5h12" /><path d="M7 2h1" />
+                    <path d="m22 22-5-10-5 10" /><path d="M14 18h6" />
+                  </svg>
+                  <span class="font-medium">
+                    {lang === 'en' ? 'Baca dalam Bahasa Indonesia' : 'Read in English'}
+                  </span>
+                </a>
+              </div>
+            )}
+            {tocHeadings.length > 0 && <TableOfContents headings={tocHeadings} />}
+          </aside>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
