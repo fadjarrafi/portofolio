@@ -1,8 +1,8 @@
 FROM node:22-alpine AS builder
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml ./
-RUN corepack enable pnpm && pnpm install --ignore-scripts
+COPY package.json pnpm-workspace.yaml ./
+RUN corepack enable pnpm && pnpm install --ignore-scripts --no-frozen-lockfile
 
 COPY . .
 ENV NODE_ENV=production
