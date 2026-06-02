@@ -1,3 +1,2 @@
-allowBuilds:
-  '@vercel/speed-insights': true
-  sharp: true
+onlyBuiltDependencies:
+  - "@resvg/resvg-js"

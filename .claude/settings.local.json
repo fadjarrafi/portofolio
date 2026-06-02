@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl:*)",
+      "Bash(wc:*)",
+      "Bash(npx next build:*)",
+      "Bash(Get-ChildItem -Path \"D:\\\\web\\\\Github\\\\portofolio\" -Force)",
+      "Bash(Select-Object Name, FullName)"
+    ]
+  }
+}

@@ -12,6 +12,10 @@
 /.next/
 /out/
 
+# astro
+/dist/
+/.astro/
+
 # production
 /build
 
@@ -20,6 +24,7 @@
 CLAUDE.md
 *.pem
 .vscode
+*.log
 
 # debug
 npm-debug.log*
@@ -29,6 +34,7 @@ yarn-error.log*
 
 # env files
 .env
+.env.*
 
 # vercel
 .vercel

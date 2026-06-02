@@ -1,0 +1,53 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Nav from '../../../components/Nav.astro';
+import GardenNav from '../../../components/GardenNav.astro';
+import GardenPostsSearch from '../../../components/GardenPostsSearch.astro';
+import { calculateReadingTime, getGrowthStage } from '../../../utils/posts';
+import type { PostType } from '../../../utils/posts';
+
+const allThoughts = await getCollection('thoughts', ({ id }) => id.startsWith('en/'));
+const posts = allThoughts
+  .sort((a, b) => new Date(b.data.publishedAt).getTime() - new Date(a.data.publishedAt).getTime())
+  .map((p) => ({
+    ...p,
+    readingTime: calculateReadingTime(p.body ?? ''),
+    data: { ...p.data, status: getGrowthStage(p.body ?? '', p.data.status) },
+  }));
+
+const seeds = posts.filter((p) => p.data.status === 'seed').length;
+const saplings = posts.filter((p) => p.data.status === 'sapling').length;
+const trees = posts.filter((p) => p.data.status === 'tree').length;
+
+const allTopics = [...new Set(posts.flatMap((p) => p.data.topics ?? []))].sort();
+const allTypes = [...new Set(posts.map((p) => p.data.type).filter(Boolean))].sort() as PostType[];
+const topicStats: Record<string, number> = {};
+posts.forEach((p) => (p.data.topics ?? []).forEach((t) => { topicStats[t] = (topicStats[t] ?? 0) + 1; }));
+---
+
+<BaseLayout title="Thoughts - Digital Garden" description="Evolving ideas, explorations, and observations at different stages of growth.">
+  <Nav />
+
+  <section class="min-h-screen pb-16">
+    <div class="max-w-5xl mx-auto">
+      <div class="scroll-animate">
+        <h1 class="font-semibold text-2xl mb-1 tracking-tighter">Garden Thoughts</h1>
+        <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-8">
+          Evolving ideas, explorations, and observations at different stages of growth.
+        </p>
+        <p class="text-xs text-neutral-500 mb-6">
+          {posts.length} thoughts — {seeds} seeds, {saplings} saplings, {trees} trees
+        </p>
+      </div>
+
+      <div class="scroll-animate" data-delay="50">
+        <GardenNav />
+      </div>
+
+      <div class="scroll-animate" data-delay="100">
+        <GardenPostsSearch posts={posts} allTopics={allTopics} allTypes={allTypes} topicStats={topicStats} />
+      </div>
+    </div>
+  </section>
+</BaseLayout>

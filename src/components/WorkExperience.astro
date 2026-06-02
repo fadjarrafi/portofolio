@@ -1,0 +1,35 @@
+---
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
+
+interface Experience {
+  role: string;
+  company: string;
+  period: string;
+  location: string;
+  description: string;
+  highlights?: string[];
+  technologies: string[];
+}
+
+let experiences: Experience[] = [];
+try {
+  const data = readFileSync(resolve('public/data/experiences.json'), 'utf-8');
+  experiences = JSON.parse(data);
+} catch {}
+---
+
+<section>
+  <div class="scroll-animate" data-delay="0">
+    <h2 class="text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-6">Experience</h2>
+  </div>
+  <div class="space-y-10">
+    {experiences.map((exp, index) => (
+      <div class="scroll-animate" data-delay={100 * (index + 1)}>
+        <p class="text-xs text-neutral-400 dark:text-neutral-500 tabular-nums mb-1">{exp.period}</p>
+        <h3 class="text-base font-medium mb-2">{exp.role}, {exp.company}</h3>
+        <p class="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">{exp.description}</p>
+      </div>
+    ))}
+  </div>
+</section>

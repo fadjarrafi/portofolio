@@ -31,4 +31,8 @@ dist
 
 # Documentation
 README.md
-*.md
+CLAUDE.md
+
+# Docker
+Dockerfile
+.dockerignore
