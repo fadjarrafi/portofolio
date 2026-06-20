@@ -1,0 +1,77 @@
+---
+// Click-to-zoom lightbox for images inside rendered article content (.prose).
+// Pure vanilla JS, no runtime shipped beyond this small script.
+---
+
+<div
+  id="lightbox"
+  class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4 opacity-0 transition-opacity duration-200"
+  aria-hidden="true"
+>
+  <button
+    id="lightbox-close"
+    type="button"
+    aria-label="Close image"
+    class="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 6 6 18" /><path d="m6 6 12 12" />
+    </svg>
+  </button>
+
+  <img
+    id="lightbox-img"
+    src=""
+    alt=""
+    class="max-h-[90vh] max-w-[90vw] rounded-lg object-contain shadow-2xl scale-95 transition-transform duration-200"
+  />
+</div>
+
+<script>
+  const lightbox = document.getElementById('lightbox') as HTMLElement | null;
+  const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement | null;
+  const closeBtn = document.getElementById('lightbox-close');
+
+  if (lightbox && lightboxImg) {
+    const open = (src: string, alt: string) => {
+      lightboxImg.src = src;
+      lightboxImg.alt = alt;
+      lightbox.classList.remove('hidden');
+      lightbox.classList.add('flex');
+      lightbox.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      // next frame to allow transition
+      requestAnimationFrame(() => {
+        lightbox.classList.remove('opacity-0');
+        lightboxImg.classList.remove('scale-95');
+      });
+    };
+
+    const close = () => {
+      lightbox.classList.add('opacity-0');
+      lightboxImg.classList.add('scale-95');
+      lightbox.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      setTimeout(() => {
+        lightbox.classList.add('hidden');
+        lightbox.classList.remove('flex');
+        lightboxImg.src = '';
+      }, 200);
+    };
+
+    // Wire up every image inside rendered article content.
+    document.querySelectorAll<HTMLImageElement>('article.prose img').forEach((img) => {
+      img.style.cursor = 'zoom-in';
+      img.addEventListener('click', () => open(img.currentSrc || img.src, img.alt));
+    });
+
+    closeBtn?.addEventListener('click', close);
+    // Click on backdrop (but not the image) closes.
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) close();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !lightbox.classList.contains('hidden')) close();
+    });
+  }
+</script>
