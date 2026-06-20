@@ -1,5 +1,45 @@
 [
     {
+        "term": "Stateless",
+        "domain": [
+            "Programming",
+            "Web"
+        ],
+        "brief": "A system or function that does not depend on or retain any memory between operations — each call is fully self-contained",
+        "slug": "stateless",
+        "extended": "Statelessness appears in two related contexts. In functional programming, a stateless (pure) function produces output based solely on its inputs — it has no side effects and does not rely on any external mutable state, making it predictable and easy to test. In web and distributed systems, a stateless service treats each request as independent: no session data is stored between requests. REST APIs embody this principle — every HTTP request must carry all the information needed to process it, including authentication credentials.",
+        "examples": [
+            "Pure function: add(a, b) => a + b always returns the same result for the same inputs",
+            "HTTP GET request: each request is self-contained with URL, headers, and auth token",
+            "REST API endpoint: no server-side session — auth token is sent with every request",
+            "Array transformations with map, filter, reduce — the input array is never mutated"
+        ],
+        "related": [
+            "abstraction"
+        ]
+    },
+    {
+        "term": "Stateful",
+        "domain": [
+            "Programming",
+            "Web"
+        ],
+        "brief": "A system or component that retains information across multiple operations or requests — past interactions influence future behavior",
+        "slug": "stateful",
+        "extended": "Stateful systems track context over time. In programming, a stateful object or component holds internal state that can be read and modified — its behavior depends not just on the current input but on its history. In web and distributed systems, a stateful service maintains session or connection data between requests, so the server 'remembers' who you are. Statefulness adds power and expressiveness but also introduces complexity: the system becomes harder to test, scale, and reason about, because outcomes depend on when and in what order operations happen.",
+        "examples": [
+            "A counter object that stores and increments its own value",
+            "React component using useState — re-renders reflect accumulated state changes",
+            "HTTP session/cookie: server remembers a logged-in user across requests",
+            "WebSocket connection: server maintains persistent, two-way channel per client",
+            "Database transaction: multiple operations share state until commit or rollback"
+        ],
+        "related": [
+            "stateless",
+            "abstraction"
+        ]
+    },
+    {
         "term": "Recursion",
         "domain": [
             "Programming",
