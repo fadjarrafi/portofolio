@@ -1,0 +1,67 @@
+---
+title: 'Event Loop di Javascript'
+publishedAt: '2025-04-20'
+featured: false
+topics: ['javascript']
+type: 'tutorial' 
+lang: 'id'
+translationSlug: 'event-loop'
+---
+
+## Apa itu event loop di javascript?
+
+Untuk memahami event loop, pertama-tama kita perlu tahu bahwa javascript bersifat single thread. Artinya, kode dijalankan satu instruksi demi satu instruksi secara berurutan, dan hanya satu instruksi yang bisa diproses dalam satu waktu.
+
+Di sinilah event loop berperan: ia memungkinkan kita menjalankan operasi seakan-akan berjalan bersamaan, tanpa menghentikan instruksi lain yang sedang antre.
+
+<div className="flex justify-center">
+  <img src="/static/images/event-loop.png" alt="Event Loop di Javascript" width="700" />
+</div>
+
+## Contoh Fitur Web API yang Memakan Waktu Lama:
+
+1. **Fetch API / XMLHttpRequest**: Permintaan jaringan untuk mengambil data dari server bisa berlangsung dari ratusan milidetik hingga beberapa detik, bergantung pada kecepatan koneksi dan besarnya data. Misalnya, `fetch('https://api.example.com/data')` yang menarik dataset berukuran besar.
+2. **File API / FileReader**: Membaca berkas berukuran besar yang diunggah pengguna bisa berlangsung lama. Misalnya, `fileReader.readAsDataURL(largeImageFile)` untuk gambar berukuran besar.
+3. **IndexedDB Operations**: Operasi basis data di browser untuk menyimpan atau menarik data dalam jumlah banyak. Misalnya, `indexedDB.getAll()` pada basis data dengan ribuan entri.
+4. **Media Processing**: Proses dekode dan render berkas audio/video berukuran besar. Misalnya, `video.play()` untuk video HD atau 4K.
+5. **Geolocation API**: Menentukan lokasi pengguna bisa memakan waktu cukup lama, terutama pada perangkat dengan GPS yang lambat. Misalnya, `navigator.geolocation.getCurrentPosition()`.
+
+Lalu kenapa event loop sepenting itu? Saat kita memanggil fitur Web API yang butuh waktu lama, tanpa penanganan khusus seluruh aplikasi akan terhenti menunggu prosesnya selesai. Untuk mencegah hal itu, JavaScript memindahkan operasi-operasi berat tersebut ke lingkungan terpisah, yaitu Web APIs.
+
+Bayangkan aplikasi web Anda menjalankan `fetch` untuk mengunduh dataset 10MB dari server. Tanpa Event Loop, seluruh UI akan "membeku" selama proses berlangsung. Pengguna tidak bisa menggulir, mengeklik tombol, atau berinteraksi sama sekali sampai data selesai diunduh, dan ini jelas merusak pengalaman pada aplikasi yang menuntut interaksi.
+
+Dengan Event Loop, ketika `fetch` dijalankan, JavaScript menyerahkannya ke Web APIs lalu melanjutkan eksekusi kode berikutnya. Pengguna tetap bisa berinteraksi dengan UI, dan begitu data selesai diunduh, callback yang terkait akan masuk ke Callback Queue untuk diproses oleh Event Loop saat Call Stack sudah kosong.
+
+Inilah alasan JavaScript disebut "non-blocking": operasi yang lambat tidak mengunci thread utama. Event Loop menjaga aplikasi tetap responsif meski ada tugas berat yang berjalan di latar belakang, sehingga menjadi bagian penting dalam arsitektur JavaScript modern.
+
+Event Loop bertanggung jawab untuk:
+
+1. mengatur eksekusi kode
+2. mengumpulkan dan memproses event
+3. menjalankan tugas yang ada dalam antrian
+
+Jenis-jenis task:
+1. **Synchronous Tasks** -> dieksekusi langsung di Call Stack
+2. **Microtasks** -> tugas asinkron berprioritas tinggi
+3. **Macrotasks** -> tugas asinkron berprioritas rendah
+
+Komponen Event Loop:
+
+- Call Stack
+- Web APIs
+- Task Queue
+- Microtask Queue
+- Event Loop
+
+## Proses Urutan Kerja Event Loop:
+
+1. **Execute all synchronous tasks on the call stack.**
+2. **Process all microtasks in the microtask queue.**
+3. **Process the first task in the macrotask queue.**
+4. **Repeat.**
+
+2. **Eksekusi Kode Sinkron**: Kode JavaScript masuk ke Call Stack dan dijalankan satu per satu. Fungsi dipanggil → masuk stack → dieksekusi → keluar dari stack.
+3. **Delegasi Operasi Asinkron**: Saat menemui operasi asinkron (setTimeout, fetch, event listener), JavaScript menyerahkannya ke Web APIs sehingga prosesnya berjalan di luar Call Stack.
+4. **Penanganan Callback**: Setelah operasi asinkron rampung, callback-nya ditempatkan di queue — callback Promise ke Microtask Queue, callback lainnya ke Callback Queue.
+5. **Siklus Event Loop**: Event Loop terus memeriksa apakah Call Stack sudah kosong. Begitu kosong, ia memeriksa queue sesuai prioritas: pertama Microtask Queue (semua microtask diproses sampai habis), lalu Callback Queue (satu callback per siklus). Callback yang diambil dipindahkan ke Call Stack untuk dijalankan.
+6. **Proses Berulang**: Siklus ini terus berputar selama masih ada kode yang harus dijalankan, sehingga JavaScript bisa menangani operasi asinkron tanpa mengunci thread utama.
