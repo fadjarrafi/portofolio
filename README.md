@@ -30,11 +30,11 @@ pnpm preview
 
 ## Docker
 
-Build and run the container (served by nginx on port 80):
+The container runs nginx on port 80 internally. Map it to whatever host port your VPS uses (e.g. `3000`):
 
 ```bash
 docker build -t portfolio .
-docker run --name portfolio -d -p 80:80 portfolio
+docker run --name portfolio -d -p 3000:80 portfolio
 ```
 
 To rebuild after a code change:
@@ -42,8 +42,10 @@ To rebuild after a code change:
 ```bash
 docker rm -f portfolio
 docker build -t portfolio .
-docker run --name portfolio -d -p 80:80 portfolio
+docker run --name portfolio -d -p 3000:80 portfolio
 ```
+
+> **Note:** The lockfile (`pnpm-lock.yaml`) is intentionally excluded from the Docker build context to avoid pnpm 11's supply-chain age policy blocking freshly-published packages. Restore it once the policy is no longer an issue by adding `pnpm-lock.yaml` back to the `COPY` line and using `--frozen-lockfile`.
 
 ## Project Structure
 

@@ -5,7 +5,9 @@ COPY package.json pnpm-workspace.yaml ./
 RUN corepack enable pnpm && pnpm install --ignore-scripts --no-frozen-lockfile
 
 COPY . .
+ARG PUBLIC_GA_ID=""
 ENV NODE_ENV=production
+ENV PUBLIC_GA_ID=$PUBLIC_GA_ID
 RUN pnpm build
 
 FROM nginx:alpine AS runner

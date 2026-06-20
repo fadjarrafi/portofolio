@@ -5,7 +5,8 @@
       "Bash(wc:*)",
       "Bash(npx next build:*)",
       "Bash(Get-ChildItem -Path \"D:\\\\web\\\\Github\\\\portofolio\" -Force)",
-      "Bash(Select-Object Name, FullName)"
+      "Bash(Select-Object Name, FullName)",
+      "Bash(pnpm --version)"
     ]
   }
 }
