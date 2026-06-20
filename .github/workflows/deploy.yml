@@ -64,7 +64,7 @@ jobs:
           docker pull "${IMAGE}:latest"
           docker rm -f portfolio || true
           docker run --name portfolio -d --restart unless-stopped \
-            -p 3000:3000 "${IMAGE}:latest"
+            -p 3000:80 "${IMAGE}:latest"
           docker image prune -f
         env:
           IMAGE: ${{ env.IMAGE }}
