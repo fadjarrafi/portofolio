@@ -1,9 +1,9 @@
 ---
 title: 'Event Loop di Javascript'
-publishedAt: '2025-04-20'
+publishedAt: '2026-06-20'
 featured: false
 topics: ['javascript']
-type: 'tutorial' 
+type: 'tutorial'
 lang: 'id'
 translationSlug: 'event-loop'
 ---
@@ -41,27 +41,31 @@ Event Loop bertanggung jawab untuk:
 3. menjalankan tugas yang ada dalam antrian
 
 Jenis-jenis task:
-1. **Synchronous Tasks** -> dieksekusi langsung di Call Stack
-2. **Microtasks** -> tugas asinkron berprioritas tinggi
-3. **Macrotasks** -> tugas asinkron berprioritas rendah
+1. **Synchronous Tasks** → dieksekusi langsung di Call Stack
+2. **Microtasks** → tugas asinkron berprioritas tinggi
+3. **Macrotasks** → tugas asinkron berprioritas rendah
 
 Komponen Event Loop:
 
 - Call Stack
 - Web APIs
-- Task Queue
+- Callback Queue
 - Microtask Queue
 - Event Loop
 
-## Proses Urutan Kerja Event Loop:
+## Cara Kerja Event Loop, Langkah demi Langkah
 
-1. **Execute all synchronous tasks on the call stack.**
-2. **Process all microtasks in the microtask queue.**
-3. **Process the first task in the macrotask queue.**
-4. **Repeat.**
+Secara garis besar, siklusnya berulang seperti ini:
 
-2. **Eksekusi Kode Sinkron**: Kode JavaScript masuk ke Call Stack dan dijalankan satu per satu. Fungsi dipanggil → masuk stack → dieksekusi → keluar dari stack.
-3. **Delegasi Operasi Asinkron**: Saat menemui operasi asinkron (setTimeout, fetch, event listener), JavaScript menyerahkannya ke Web APIs sehingga prosesnya berjalan di luar Call Stack.
-4. **Penanganan Callback**: Setelah operasi asinkron rampung, callback-nya ditempatkan di queue — callback Promise ke Microtask Queue, callback lainnya ke Callback Queue.
-5. **Siklus Event Loop**: Event Loop terus memeriksa apakah Call Stack sudah kosong. Begitu kosong, ia memeriksa queue sesuai prioritas: pertama Microtask Queue (semua microtask diproses sampai habis), lalu Callback Queue (satu callback per siklus). Callback yang diambil dipindahkan ke Call Stack untuk dijalankan.
-6. **Proses Berulang**: Siklus ini terus berputar selama masih ada kode yang harus dijalankan, sehingga JavaScript bisa menangani operasi asinkron tanpa mengunci thread utama.
+1. **Eksekusi semua kode sinkron di Call Stack.**
+2. **Proses setiap microtask di Microtask Queue sampai habis.**
+3. **Proses satu tugas dari Callback Queue.**
+4. **Ulangi.**
+
+Lebih rincinya:
+
+1. **Eksekusi kode sinkron**: Kode JavaScript masuk ke Call Stack dan dijalankan satu per satu. Fungsi dipanggil → masuk stack → dieksekusi → keluar dari stack.
+2. **Delegasi operasi asinkron**: Saat menemui operasi asinkron (`setTimeout`, `fetch`, event listener), JavaScript menyerahkannya ke Web APIs sehingga prosesnya berjalan di luar Call Stack.
+3. **Penanganan callback**: Setelah operasi asinkron rampung, callback-nya ditempatkan di queue — callback Promise ke Microtask Queue, callback lainnya ke Callback Queue.
+4. **Siklus Event Loop**: Event Loop terus memeriksa apakah Call Stack sudah kosong. Begitu kosong, ia memeriksa queue sesuai prioritas: pertama Microtask Queue (semua microtask diproses sampai habis), lalu Callback Queue (satu callback per siklus). Callback yang diambil dipindahkan ke Call Stack untuk dijalankan.
+5. **Proses berulang**: Siklus ini terus berputar selama masih ada kode yang harus dijalankan, sehingga JavaScript bisa menangani operasi asinkron tanpa mengunci thread utama.
