@@ -9,8 +9,10 @@
             "classic",
             "romance"
         ],
-        "status": "reading",
+        "status": "completed",
         "year": "1878",
+        "isbn": "9780143035008",
+        "goodreads": "https://www.goodreads.com/book/show/15823480-anna-karenina",
         "summary": "A story of tragic love and societal pressure in 19th-century Russia, following the aristocrat Anna Karenina as she abandons her husband and son for Count Vronsky, and the parallel story of the landowner Levin searching for meaning and happiness."
     },
     {
@@ -25,6 +27,8 @@
         "status": "reading",
         "rating": 4,
         "year": "1999",
+        "isbn": "9780201616224",
+        "goodreads": "https://www.goodreads.com/book/show/4099.The_Pragmatic_Programmer",
         "summary": " The Pragmatic Programmer cuts through the increasing specialization and technicalities of modern software development to examine the core process taking a requirement and producing working, maintainable code that delights its users."
     },
     {
@@ -37,6 +41,8 @@
         ],
         "status": "reading",
         "year": "2022",
+        "isbn": "9780062457714",
+        "goodreads": "https://www.goodreads.com/book/show/28257707-the-subtle-art-of-not-giving-a-f-ck",
         "summary": "The Subtle Art of Not Giving a Fuck argues that individuals should seek to find meaning through what they find to be important and only engage in values that they can control."
     },
     {
@@ -51,6 +57,8 @@
         ],
         "status": "completed",
         "year": "2021",
+        "cover": "/static/images/re-dan-perempuan.jpg",
+        "goodreads": "https://www.goodreads.com/book/show/58730640-re",
         "summary": "Re is a woman who works as a commercial sex worker, or more precisely, a lesbian sex worker. Re was forced to become a sex worker to pay off her debt to Mami Lani.",
         "dateConsumed": "2024-01-15"
     },
@@ -66,6 +74,8 @@
         ],
         "status": "reading",
         "year": "2014",
+        "cover": "/static/images/on-children.jpg",
+        "goodreads": "https://www.goodreads.com/book/show/78823463-on-children",
         "summary": "Being a tutor gives Wu Xiaole the opportunity to observe her students' families; how parents raise, educate, and love their children.",
         "dateConsumed": "2025-06-02"
     },
@@ -81,6 +91,8 @@
         "status": "reading",
         "rating": 4,
         "year": "2008",
+        "isbn": "9781603580557",
+        "goodreads": "https://www.goodreads.com/book/show/3828902-thinking-in-systems",
         "summary": "A primer on understanding and working with complex systems in various domains.",
         "keyTakeaways": [
             "Strange loops and self-reference are fundamental to consciousness",
