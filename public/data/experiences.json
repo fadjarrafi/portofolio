@@ -1,44 +1,86 @@
 [
     {
-        "role": "Full Stack Developer",
-        "company": "PT. SaranaInsan MudaSelaras",
-        "period": "Jan 2024 - Present",
+        "role": "Fullstack Developer",
+        "company": "PT. Qhome Sukses Abadi",
+        "period": "Feb 2026 - Present",
         "location": "Indonesia",
-        "description": "Designed and implemented a robust CMS using Laravel for real-time content management.",
+        "description": "Maintaining an HRIS and building media pipelines for an internal LMS.",
+        "highlights": [
+            "Diagnosed and fixed broken report exports and form-logic failures across the HRIS, restoring reliable HR operations.",
+            "Built a server-side video compression pipeline (Bash + FFmpeg) for LMS course uploads, cutting storage overhead and standardising playback formats."
+        ],
         "technologies": [
-            "Java",
-            "Android",
-            "PHP",
-            "Laravel",
-            "API Integration",
-            "Networking"
+            "CodeIgniter",
+            "MariaDB",
+            "Bash",
+            "FFmpeg"
         ]
     },
     {
-        "role": "Full Stack Developer",
+        "role": "Web Programmer (Project-based)",
         "company": "Square Indonesia",
-        "period": "Jan 2023 - Present",
+        "period": "Jul 2023 - Jul 2025",
         "location": "Indonesia",
-        "description": "Designed a functional landing page using HTML, Javascript, and TailwindCSS.",
+        "description": "Shipped client-facing e-commerce and company sites end to end, working directly with clients.",
+        "highlights": [
+            "Built Mawar Florist, an e-commerce site with a full Xendit payment flow including checkout and webhook-based transaction status handling.",
+            "Developed Odo Dental Indonesia, a company profile and blog platform for a dental clinic.",
+            "Scoped requirements, triaged issues, and prioritised fixes directly with clients."
+        ],
         "technologies": [
-            "HTML",
-            "JavaScript",
-            "TailwindCSS",
-            "UI/UX"
+            "Laravel",
+            "Vue.js",
+            "React",
+            "MariaDB",
+            "Xendit",
+            "TailwindCSS"
+        ],
+        "links": [
+            {
+                "label": "mawarfloristjogja.com",
+                "url": "https://mawarfloristjogja.com"
+            },
+            {
+                "label": "ododentalindonesia.com",
+                "url": "https://ododentalindonesia.com"
+            }
         ]
     },
     {
-        "role": "Web Programmer",
-        "company": "Kardusinfo Indonesia",
-        "period": "Apr 2021 - Nov 2022",
+        "role": "Fullstack Developer",
+        "company": "PT. Saranainsan Mudaselaras",
+        "period": "Jan 2023 - Jan 2025",
         "location": "Indonesia",
-        "description": "Designed and implemented an efficient e-learning system using the Laravel framework.",
+        "description": "Built a CMS for IPTV content and kept internal systems running for hotel deployments.",
+        "highlights": [
+            "Designed and built a CMS letting hotel staff manage IPTV content, schedules, and user settings in real time.",
+            "Integrated APIs across the Android app, the CMS, and backend infrastructure for real-time sync.",
+            "Maintained and optimised internal systems including network monitoring tools."
+        ],
         "technologies": [
             "Laravel",
-            "PHP",
-            "MySQL",
-            "REST API",
-            "Postman"
+            "MariaDB",
+            "Python",
+            "API Integration"
         ]
-    }
+    },
+    {
+        "role": "Fullstack Developer (Freelance)",
+        "company": "PT. Informatika Media Pratama",
+        "period": "Sep 2025 - Dec 2025",
+        "location": "Kalimalang, East Jakarta",
+        "description": "Built an AI summarisation service for an existing LMS to cut learner time-to-comprehension.",
+        "highlights": [
+            "Developed a FastAPI backend exposing REST endpoints for on-demand and batch summary generation.",
+            "Implemented a Qdrant retrieval pipeline (vector storage + semantic search over chunked content) feeding relevant context to DeepSeek for LLM summarisation."
+        ],
+        "technologies": [
+            "FastAPI",
+            "Python",
+            "Qdrant",
+            "DeepSeek",
+            "Vector Search",
+            "LLM"
+        ]
+    },
 ]
