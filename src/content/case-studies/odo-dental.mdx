@@ -1,0 +1,89 @@
+---
+title: 'Company Profile & Content Platform for a Dental Clinic'
+publishedAt: '2026-07-24'
+summary: 'A company profile website for ODO Dental Clinic with a public-facing landing page and a role-based admin dashboard for articles, leads, newsletters, and a doctor Q&A forum, built on Laravel, React, and Inertia.'
+image: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0'
+featured: true
+topics: ['Laravel', 'React', 'Inertia']
+# client: 'ODO Dental Clinic'
+role: 'Full-stack Developer'
+duration: '2 months'
+liveUrl: 'https://www.ododentalindonesia.com/'
+---
+
+## Short Explanation
+
+I built the company profile website for ODO Dental Clinic. They didn't just want a static brochure page, they wanted somewhere to publish articles, collect patient leads, send newsletters, and take questions from patients. So the site really has two halves: a public landing page that shows off the clinic's services, atmosphere, and reviews, and an admin dashboard behind it where the staff handle content and talk to patients. What started as a company profile ended up being closer to a small content and lead platform.
+
+## Project Goals
+
+The clinic wanted a site they could run themselves. They'd been burned by the usual thing where every little update means going back to a developer, and they didn't want that. They needed to publish content, catch inquiries coming in, and let the doctors answer patients directly.
+
+So the things I set out to build were:
+
+- A landing page that actually looks warm and trustworthy, not sterile
+- Article publishing that staff can do themselves, with SEO handled properly
+- A way to capture leads from the public forms and keep them in one place
+- Newsletter campaigns going out to people who opted in
+- A spot for patients to ask dental questions and get answered over email
+- A real role and permission system so people only see what they should
+
+Basically I wanted the clinic running the day-to-day on their own, while the public side stayed clean and quick.
+
+## Tech Stack
+
+**Backend:**
+
+- Laravel 12 (PHP 8.2+)
+
+**Frontend:**
+
+- React 19 + TypeScript + Inertia.js v2 + Tailwind CSS 4
+
+**Notable tooling:**
+
+- Fortify (authentication)
+- Wayfinder (type-safe routes in the frontend)
+- Tiptap (rich text editor for articles and newsletters)
+- artesaos/seotools (server-side SEO meta and structured data)
+- GSAP (scroll animations on the landing page)
+
+## Features
+
+### 1. Landing Page
+
+The main marketing page, all on one scroll: sticky nav, hero, services, a gallery showing the clinic's atmosphere, patient reviews, and a newsletter sign-up in the footer. I added scroll animations and let the spacing flex with the viewport so it feels modern without trying too hard.
+
+### 2. Role-Based Admin Dashboard
+
+This is the part I put the most thought into. Roles aren't hardcoded, they live in the database. There are two system roles (Super Admin, Admin) plus custom ones like Doctor and Front Office, and a super admin can spin up new roles and hand out menu access through a checkbox matrix. And the access is checked on the server, not just hidden in the sidebar.
+
+### 3. Articles / Blog
+
+Staff can write, edit, and publish articles with a rich text editor, upload images, and set the SEO per article. Published ones are public; anything to do with editing sits behind role permissions.
+
+### 4. Leads
+
+The public forms (newsletter sign-up, forum registration) all funnel visitor details into one leads table, with the source tracked and privacy-policy consent recorded. The staff work through them from the dashboard.
+
+### 5. Newsletter
+
+Admins write up an HTML campaign in the same rich text editor and send it to whoever opted in. Each send tracks how it went, so you can see if it fully sent, partially sent, or failed.
+
+### 6. Doctor Q&A Forum
+
+Patients ask dental questions from the public site, a doctor answers from the admin panel, and the patient gets an email with their original question and the answer. That last bit matters, it means nobody has to remember to reply manually.
+
+## The Problems and How I Addressed It
+
+Access control gave me the most trouble. The clinic has front office staff, doctors, and admins, and they each need to see a different slice of the dashboard. My first instinct was to just check the role in code, but I realized that meant editing and redeploying every time they wanted to change who could do what. That wasn't going to work for a site I'd eventually hand off.
+
+I ended up moving the whole thing into the database. Roles go in one table, menu items in another, and a pivot table ties them together. A super admin sets it all up through a checkbox matrix in the dashboard, so the clinic can add a role or change access on their own. One thing I was careful about: I don't rely on hiding menu items in the sidebar for security. Anyone can still type a URL directly, so I check permissions on the server for every protected route. I also locked down the system roles so they can't be deleted or edited by accident, and regenerated the session on login.
+
+SEO was the other thing I had to plan around. The clinic obviously wants to show up on Google, but Inertia renders on the client, which means a crawler can land on what's basically an empty page. So I generate the meta tags, Open Graph data, and JSON-LD on the server and drop them into the initial HTML. That way the tags are there before any JavaScript runs.
+
+## Lessons Learned
+
+The main thing I took away was to treat permissions as data, not code. Once roles and access lived in the database with a UI to manage them, the clinic didn't need me anymore to reshuffle their team, which is the whole point when you're handing a project over to a client. It also kept me honest about doing the access checks on the backend, because the frontend can't really be trusted for that.
+
+The SEO part taught me to think about it early rather than bolt it on later. On a client-rendered stack it's easy to forget that crawlers don't run your JavaScript, and by the time you notice, you're retrofitting. Deciding up front that the tags had to render server-side changed how I set up the controllers and the base layout, and it saved me a headache down the line.
