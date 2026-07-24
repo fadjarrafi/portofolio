@@ -1,0 +1,49 @@
+---
+title: 'Apa itu Idempotency dalam API'
+publishedAt: '2026-07-24'
+summary: 'Mengenal idempotency dalam API — mengapa request yang sama berulang kali harus menghasilkan efek yang sama, dan bagaimana HTTP method menanganinya.'
+featured: false
+topics: ['programming']
+type: 'note'
+lang: 'id'
+translationSlug: 'what-is-idempotency-in-api'
+---
+
+Dalam konteks API, ada satu konsep penting yang perlu dipahami: **idempotency**.
+
+## Apa itu Idempotency
+
+Idempotency berarti melakukan request yang sama berulang kali menghasilkan efek yang sama dengan melakukannya sekali. Dengan kata lain, seberapa pun sering client mengirim request yang sama, state di server tetap tidak berubah.
+
+Perlu dicatat, yang harus tetap sama adalah *efeknya*, bukan isi response-nya. Misalnya `DELETE` pertama menghapus data dan mengembalikan `200`, sedangkan `DELETE` berikutnya mengembalikan `404` karena data sudah tidak ada—tetapi state server tetap sama: data itu terhapus.
+
+<div className="flex justify-center">
+  <img src="/static/images/idempotency.png" alt="Idempotency diagram" width="700" />
+</div>
+
+## Mengapa Penting
+
+Konsep ini penting untuk menghindari duplikasi request yang tidak disengaja, misalnya akibat jaringan lambat atau client yang melakukan retry otomatis.
+
+Bayangkan Anda memesan barang di ecommerce lalu menekan tombol "Bayar". Karena internet lambat, halaman terus berputar. Anda ragu apakah pembayaran berhasil, lalu menekan tombol "Bayar" beberapa kali lagi.
+
+**Tanpa idempotency:** sistem memproses setiap penekanan tombol sebagai transaksi baru, sehingga Anda bisa ditagih beberapa kali untuk pesanan yang sama.
+
+**Dengan idempotency:** sistem mengenali bahwa semua request tersebut sebenarnya sama (misalnya lewat sebuah *idempotency key* atau ID unik). Meski Anda menekan berkali-kali, hanya satu transaksi yang diproses.
+
+## Idempotency pada HTTP Method
+
+Pada HTTP, masing-masing method memiliki sifat idempotency yang berbeda:
+
+| Method | Idempotent |
+| ------ | ---------- |
+| GET    | YES        |
+| HEAD   | YES        |
+| PUT    | YES        |
+| DELETE | YES        |
+| POST   | NO         |
+| PATCH  | NO         |
+
+`GET` dan `HEAD` hanya membaca data sehingga tidak mengubah apa pun. `PUT` mengganti seluruh resource dengan nilai yang sama setiap kali, dan `DELETE` menghapus resource yang sama. Sebaliknya, `POST` biasanya membuat resource baru pada setiap request, sehingga tidak idempotent secara default—di sinilah *idempotency key* berperan untuk mencegah duplikasi.
+
+**Terima kasih sudah membaca✌️**

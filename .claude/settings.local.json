@@ -7,7 +7,9 @@
       "Bash(Get-ChildItem -Path \"D:\\\\web\\\\Github\\\\portofolio\" -Force)",
       "Bash(Select-Object Name, FullName)",
       "Bash(pnpm --version)",
-      "Bash(pnpm build *)"
+      "Bash(pnpm build *)",
+      "Bash(node -e \"const d=require\\('./public/static/images/idempotency.excalidraw'\\); console.log\\('valid JSON, elements:', d.elements.length\\)\")",
+      "Bash(node -e \"const fs=require\\('fs'\\); const d=JSON.parse\\(fs.readFileSync\\('./public/static/images/idempotency.excalidraw','utf8'\\)\\); console.log\\('valid JSON, elements:', d.elements.length, '| type:', d.type\\)\")"
     ]
   }
 }

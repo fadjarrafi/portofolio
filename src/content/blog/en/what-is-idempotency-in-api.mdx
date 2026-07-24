@@ -1,0 +1,49 @@
+---
+title: 'What is Idempotency in API'
+publishedAt: '2026-07-24'
+summary: 'Understanding idempotency in APIs — why repeating the same request should produce the same effect, and how HTTP methods handle it.'
+featured: false
+topics: ['programming']
+type: 'note'
+lang: 'en'
+translationSlug: 'what-is-idempotency-in-api'
+---
+
+In the context of APIs, there is one important concept worth understanding: **idempotency**.
+
+## What is Idempotency
+
+Idempotency means that making the same request multiple times has the same effect as making it once. In other words, no matter how often a client sends the same request, the server state stays unchanged.
+
+Note that what must stay the same is the *effect*, not the response body. For example, the first `DELETE` removes the data and returns `200`, while the next `DELETE` returns `404` because the data is already gone—but the server state is the same either way: the data is deleted.
+
+<div className="flex justify-center">
+  <img src="/static/images/idempotency.png" alt="Idempotency diagram" width="700" />
+</div>
+
+## Why it Matters
+
+This concept is important to avoid accidental duplicate requests, for example due to a slow network or a client that retries automatically.
+
+Imagine you order an item on an ecommerce site and press the "Pay" button. Because the internet is slow, the page keeps loading. Unsure whether the payment went through, you press "Pay" a few more times.
+
+**Without idempotency:** the system treats every button press as a new transaction, so you could be charged several times for the same order.
+
+**With idempotency:** the system recognizes that all those requests are actually the same (for example, via an *idempotency key* or a unique ID). Even if you press it many times, only one transaction is processed.
+
+## Idempotency in HTTP Methods
+
+In HTTP, each method has different idempotency behavior:
+
+| Method | Idempotent |
+| ------ | ---------- |
+| GET    | YES        |
+| HEAD   | YES        |
+| PUT    | YES        |
+| DELETE | YES        |
+| POST   | NO         |
+| PATCH  | NO         |
+
+`GET` and `HEAD` only read data, so they change nothing. `PUT` replaces the entire resource with the same value every time, and `DELETE` removes the same resource. In contrast, `POST` usually creates a new resource on each request, so it is not idempotent by default—this is where an *idempotency key* comes in to prevent duplicates.
+
+**Thanks for Reading✌️**
