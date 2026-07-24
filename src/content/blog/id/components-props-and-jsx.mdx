@@ -1,0 +1,50 @@
+---
+title: 'Components, Props and JSX'
+publishedAt: '2026-07-24'
+summary: 'Mengenal component sebagai blok penyusun UI di React, dan JSX si sintaks deklaratif untuk mendeskripsikan tampilannya.'
+featured: false
+topics: ['programming']
+type: 'note'
+lang: 'id'
+translationSlug: 'components-props-and-jsx'
+---
+
+Component adalah konsep paling dasar di React. Hampir semua hal di React dibangun dari component.
+
+Anggap saja component sebagai blok penyusun UI. Setiap component punya data, logic, dan tampilannya sendiri. UI yang rumit kita bangun dari banyak component kecil yang disusun lalu digabungkan.
+
+Susunannya berbentuk hierarki, dari parent ke child.
+
+<div className="flex justify-center">
+  <img src="/static/images/components-props-jsx.png" alt="Component hierarchy" width="500" />
+</div>
+
+Ada dua aturan saat menulis component dalam bentuk function:
+
+- Nama function diawali huruf besar.
+- Function harus me-return markup berupa JSX.
+
+## Apa itu JSX
+
+JSX adalah sintaks deklaratif yang mendeskripsikan tampilan sebuah component dan cara kerjanya. Satu component mengembalikan satu blok JSX.
+
+Sekilas JSX mirip HTML, tapi sebenarnya ini perluasan dari JavaScript. Lewat JSX kita bisa menggabungkan JavaScript, CSS, dan component React dalam satu tempat. Di balik layar, setiap elemen JSX diubah menjadi pemanggilan `React.createElement`.
+
+Lalu, apa maksudnya JSX itu deklaratif?
+
+### JSX itu Deklaratif
+
+Cara paling gampang memahaminya adalah dengan membandingkan dua pendekatan:
+
+**Imperatif**
+
+- Memilih dan menelusuri elemen DOM secara manual.
+- Mengubah DOM langkah demi langkah sampai UI sesuai keinginan.
+
+**Deklaratif**
+
+- Mendeskripsikan seperti apa UI seharusnya lewat JSX, berdasarkan data saat ini.
+- React menjadi lapisan abstraksi di atas DOM. Kita tidak pernah menyentuh DOM secara langsung.
+- UI kita anggap sebagai cerminan dari data saat ini.
+
+Dengan pendekatan deklaratif, kita cukup memikirkan "UI-nya harus seperti apa", bukan "bagaimana cara mengubah DOM-nya". Sisanya React yang urus.

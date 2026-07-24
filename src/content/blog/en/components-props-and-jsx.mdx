@@ -1,0 +1,50 @@
+---
+title: 'Components, Props and JSX'
+publishedAt: '2026-07-24'
+summary: 'Getting to know components as the building blocks of UI in React, and JSX, the declarative syntax for describing how they look.'
+featured: false
+topics: ['programming']
+type: 'note'
+lang: 'en'
+translationSlug: 'components-props-and-jsx'
+---
+
+A component is the most basic concept in React. Almost everything in React is built from components.
+
+Think of a component as a building block of the UI. Each one has its own data, logic, and appearance. We build complex UI out of many small components that we arrange and combine.
+
+They are arranged in a hierarchy, from parent to child.
+
+<div className="flex justify-center">
+  <img src="/static/images/components-props-jsx.png" alt="Component hierarchy" width="500" />
+</div>
+
+There are two rules when writing a component as a function:
+
+- The function name starts with an uppercase letter.
+- The function must return markup, which is JSX.
+
+## What is JSX
+
+JSX is a declarative syntax that describes what a component looks like and how it works. A component returns a single block of JSX.
+
+At a glance JSX looks like HTML, but it's actually an extension of JavaScript. With JSX we can combine JavaScript, CSS, and React components in one place. Behind the scenes, every JSX element is turned into a `React.createElement` call.
+
+So what does it mean for JSX to be declarative?
+
+### JSX is Declarative
+
+The easiest way to understand it is by comparing two approaches:
+
+**Imperative**
+
+- Manually selecting and traversing DOM elements.
+- Mutating the DOM step by step until the UI looks the way we want.
+
+**Declarative**
+
+- Describing what the UI should look like through JSX, based on the current data.
+- React sits as an abstraction on top of the DOM. We never touch the DOM directly.
+- We treat the UI as a reflection of the current data.
+
+With the declarative approach, we only think about "what the UI should look like", not "how to mutate the DOM". React handles the rest.
