@@ -47,6 +47,7 @@ const caseStudies = defineCollection({
     client: z.string().optional(),
     role: z.string().optional(),
     duration: z.string().optional(),
+    liveUrl: z.string().url().optional(),
   }),
 });
 

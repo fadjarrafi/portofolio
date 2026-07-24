@@ -71,6 +71,22 @@ const jsonLd = JSON.stringify({
           {entry.data.duration && <><span>·</span><span>{entry.data.duration}</span></>}
           <span>·</span>
           <span>{readingTime} min read</span>
+          {entry.data.liveUrl && (
+            <>
+              <span>·</span>
+              <a
+                href={entry.data.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-1 text-neutral-900 dark:text-neutral-100 hover:underline"
+              >
+                Visit site
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M7 7h10v10" /><path d="M7 17 17 7" />
+                </svg>
+              </a>
+            </>
+          )}
         </div>
 
         {entry.data.topics && entry.data.topics.length > 0 && (

@@ -1,0 +1,95 @@
+---
+title: 'E-Commerce Platform for a Local Florist'
+publishedAt: '2026-07-24'
+summary: 'A full-stack e-commerce platform for a Yogyakarta florist, with a customer storefront, an admin dashboard, and an automated payment-to-invoice pipeline built on Laravel, Vue, and Inertia.'
+image: 'https://images.unsplash.com/photo-1563241527-3004b7be0ffd?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0'
+featured: true
+topics: ['Laravel', 'Vue', 'E-Commerce']
+# client: 'Mawar Florist'
+role: 'Full-stack Developer'
+duration: '3 months'
+liveUrl: 'https://www.mawarfloristjogja.com/'
+---
+
+## Short Explanation
+
+I built an e-commerce platform for Mawar Florist, a flower shop based in Yogyakarta. The shop previously took orders manually over chat and had no way to accept online payments or track sales. I developed a full-stack web application with two sides: a customer-facing storefront where people browse the catalog, manage a cart, and check out online, and an admin dashboard where the owner manages products, orders, discounts, and customers. The platform integrates an online payment gateway that automatically confirms payments and generates PDF invoices, turning a manual, chat-based process into a self-serve online store.
+
+## Project Goals
+
+The client wanted to move their business online. They needed customers to be able to order and pay without back-and-forth messaging, and they needed a single place to manage the shop instead of tracking orders by hand.
+
+My goal was to build a platform that could:
+
+- Let customers browse products, add to cart, and check out as a guest or a registered user
+- Accept real online payments (QRIS, e-wallets, and bank transfers) common in Indonesia
+- Automatically confirm paid orders and issue invoices without manual work
+- Give the shop owner a dashboard to manage products, orders, discounts, and customers
+- Handle Indonesian shipping addresses down to the village level
+
+I wanted the owner to spend time on flowers, not on spreadsheets, and let customers complete a purchase on their own from start to finish.
+
+## Tech Stack
+
+**Backend:**
+
+- Laravel 12 (PHP 8.2+)
+
+**Frontend:**
+
+- Vue 3 + TypeScript + Tailwind CSS 4
+- Inertia.js (SPA bridge — no separate REST API)
+- Vite 7
+
+**Database:**
+
+- MySQL
+
+**Services & Tooling:**
+
+- Xendit (payment gateway)
+- DomPDF (invoice generation)
+- Intervention Image (WebP conversion)
+- Pest PHP (testing) + GitHub Actions (CI/CD)
+
+## Features
+
+### 1. Customer Storefront
+
+A public catalog with search, category filters, and product detail pages with image galleries. Customers can build a cart as a guest or while logged in, and complete checkout with a saved shipping address.
+
+### 2. Online Payment Checkout
+
+Integrated with Xendit's hosted invoice flow. Customers pick a payment method — QRIS, e-wallet, or bank transfer — pay on a hosted page, and get redirected back. No card details ever touch the app.
+
+### 3. Automated Payment Confirmation
+
+A webhook receives payment status from the gateway, verifies it with a timing-safe token check, updates the order and transaction records, and marks the order confirmed — all without the owner lifting a finger.
+
+### 4. Automatic Invoice Generation
+
+The moment a payment is confirmed, the system generates a PDF invoice from a template and stores it for the customer to download. The process is idempotent, so a repeated webhook never produces a duplicate invoice.
+
+### 5. Admin Dashboard
+
+A KPI dashboard plus full management for products, orders, discounts, customers, transactions, and reports. Includes multi-image product upload, order status timelines, discount codes with usage limits, and CSV customer export.
+
+### 6. Indonesian Address System
+
+Cascading Province → Regency → District → Village dropdowns backed by the full Indonesian administrative region dataset, so shipping addresses are accurate down to the village.
+
+## The Problems and How I Addressed It
+
+The biggest concern was payment integrity. A payment gateway confirms orders by calling a webhook, and that endpoint is public — anyone could POST a fake "paid" event. I secured it by verifying a callback token on every request using a timing-safe comparison, matching the incoming payload against our own order records, and mapping gateway statuses to internal ones explicitly rather than trusting whatever was sent. Invoice generation was made idempotent, so even if the gateway sends the same webhook twice, the customer still gets exactly one invoice.
+
+Another challenge was protecting historical data. If a product is renamed or removed later, past orders shouldn't suddenly show the wrong name or break entirely. I solved this by snapshotting the product title and price onto each order item at purchase time, and using soft deletes on products, orders, and categories. Old orders keep showing exactly what the customer bought, no matter what changes afterward.
+
+Midway through, the shop switched payment providers from Midtrans to Xendit. Because I had kept all payment logic behind a single service class instead of scattering it across controllers, the migration was mostly contained to that one service and a database migration — the checkout flow and the rest of the app barely changed.
+
+## Lessons Learned
+
+This project taught me how much of e-commerce is really about trust and data integrity, not features. The interesting work wasn't the shopping cart — it was making sure a payment could never be faked, an invoice could never be duplicated, and an order could never be corrupted by a later change. Designing for those "what if this happens twice?" and "what if this record changes?" cases upfront saved me from a class of bugs that are painful to fix once real money is involved.
+
+I also learned the value of isolating anything that talks to a third party. Putting all the payment logic behind one service class felt like extra work at first, but when the client changed payment providers, that decision paid for itself — the swap touched one file instead of the whole codebase. It reinforced a habit I now apply everywhere: treat external services as something you'll probably have to replace someday.
+
+Finally, building both the customer and admin sides of the same product gave me a fuller picture of what a small business actually needs. A feature isn't done when the customer can use it — it's done when the owner can manage it, report on it, and recover from mistakes. Keeping both audiences in mind made the whole platform more genuinely useful than a storefront alone would have been.
