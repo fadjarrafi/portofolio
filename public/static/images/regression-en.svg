@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="430" viewBox="0 0 700 430" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="700" height="430" rx="14" fill="#ffffff"/>
+
+  <!-- axes -->
+  <line x1="70" y1="40" x2="70" y2="350" stroke="#adb5bd" stroke-width="2"/>
+  <line x1="70" y1="350" x2="640" y2="350" stroke="#adb5bd" stroke-width="2"/>
+
+  <!-- y ticks -->
+  <g font-size="11" fill="#868e96" text-anchor="end" font-family="Consolas, monospace">
+    <line x1="66" y1="350" x2="70" y2="350" stroke="#adb5bd" stroke-width="1.5"/><text x="60" y="354">0</text>
+    <line x1="66" y1="246.67" x2="70" y2="246.67" stroke="#adb5bd" stroke-width="1.5"/><text x="60" y="250">500</text>
+    <line x1="66" y1="143.33" x2="70" y2="143.33" stroke="#adb5bd" stroke-width="1.5"/><text x="60" y="147">1000</text>
+    <line x1="66" y1="40" x2="70" y2="40" stroke="#adb5bd" stroke-width="1.5"/><text x="60" y="44">1500</text>
+  </g>
+
+  <!-- x ticks -->
+  <g font-size="11" fill="#868e96" text-anchor="middle" font-family="Consolas, monospace">
+    <line x1="173.64" y1="350" x2="173.64" y2="354" stroke="#adb5bd" stroke-width="1.5"/><text x="173.64" y="368">100</text>
+    <line x1="277.27" y1="350" x2="277.27" y2="354" stroke="#adb5bd" stroke-width="1.5"/><text x="277.27" y="368">200</text>
+    <line x1="380.91" y1="350" x2="380.91" y2="354" stroke="#adb5bd" stroke-width="1.5"/><text x="380.91" y="368">300</text>
+    <line x1="484.55" y1="350" x2="484.55" y2="354" stroke="#adb5bd" stroke-width="1.5"/><text x="484.55" y="368">400</text>
+    <line x1="588.18" y1="350" x2="588.18" y2="354" stroke="#adb5bd" stroke-width="1.5"/><text x="588.18" y="368">500</text>
+  </g>
+
+  <!-- regression line: y = 300 + 2x -->
+  <line x1="70" y1="288" x2="608.9" y2="73.07" stroke="#4dabf7" stroke-width="2.5"/>
+  <text x="470" y="118" font-size="14" fill="#1c7ed6" font-family="Consolas, monospace">y = 300 + 2x</text>
+
+  <!-- intercept marker -->
+  <circle cx="70" cy="288" r="5" fill="#ffffff" stroke="#1c7ed6" stroke-width="2"/>
+  <text x="80" y="284" font-size="12" fill="#1c7ed6" font-family="Consolas, monospace">β₀ = 300</text>
+
+  <!-- prediction guides x=250 -> y=800 -->
+  <line x1="329.09" y1="350" x2="329.09" y2="184.67" stroke="#37b24d" stroke-width="1.5" stroke-dasharray="4 4"/>
+  <line x1="70" y1="184.67" x2="329.09" y2="184.67" stroke="#37b24d" stroke-width="1.5" stroke-dasharray="4 4"/>
+  <circle cx="329.09" cy="184.67" r="5.5" fill="#37b24d"/>
+  <text x="322" y="180" font-size="12" fill="#2f9e44" text-anchor="end" font-family="Consolas, monospace">(250, 800)</text>
+
+  <!-- data points -->
+  <g fill="#1c7ed6">
+    <circle cx="173.64" cy="246.67" r="5"/>
+    <circle cx="277.27" cy="205.33" r="5"/>
+    <circle cx="380.91" cy="164" r="5"/>
+    <circle cx="484.55" cy="122.67" r="5"/>
+    <circle cx="588.18" cy="81.33" r="5"/>
+  </g>
+
+  <!-- axis titles -->
+  <text x="355" y="393" text-anchor="middle" font-size="13" fill="#495057">Advertising cost (x)</text>
+  <text x="24" y="195" text-anchor="middle" font-size="13" fill="#495057" transform="rotate(-90 24 195)">Units sold (y)</text>
+
+  <!-- caption -->
+  <text x="355" y="417" text-anchor="middle" font-size="12" fill="#868e96">All five points fall exactly on the line — a perfect fit (R² = 1)</text>
+</svg>

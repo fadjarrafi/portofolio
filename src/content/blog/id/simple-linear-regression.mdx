@@ -1,6 +1,7 @@
 ---
 title: 'Simple Linear Regression'
 publishedAt: '2025-10-21'
+summary: 'Panduan langkah demi langkah regresi linier sederhana — menghitung slope, intercept, dan R² dengan dataset nyata serta implementasi JavaScript.'
 featured: false
 topics: ['statistics', 'mathematics']
 type: 'note' 
@@ -8,43 +9,34 @@ lang: 'id'
 translationSlug: 'simple-linear-regression'
 ---
 
-Pernahkah kamu bertanya-tanya bagaimana perusahaan besar mengambil keputusan investasi iklan mereka? Atau bagaimana properti menentukan harga jual rumah? Jawabannya ada pada teknik statistik yang disebut regresi linier sederhana.
+Bagaimana sebuah perusahaan memutuskan berapa besar biaya iklannya, atau seorang agen menentukan harga rumah? Sering kali alat di balik keputusan itu adalah regresi linier sederhana — cara untuk menggambarkan dan memprediksi hubungan antara dua variabel. Bayangkan seperti mencari benang merah yang menghubungkan biaya iklan ($x$) dengan penjualan ($y$).
 
-Regresi linier sederhana adalah metode statistik yang memungkinkan kita memahami dan memprediksi hubungan antara dua variabel. Bayangkan seperti mencari "benang merah" yang menghubungkan biaya iklan ($x$) dengan tingkat penjualan ($y$).
-
-Secara matematis, hubungan ini dapat dinyatakan dengan rumus:
+Secara matematis, hubungan itu terlihat seperti ini:
 
 $$ 
 y = \beta_0 + \beta_1 x + \varepsilon
 $$
 
-Dimana: 
+Di mana: 
 
 | Simbol        | Pengertian    |
 | ------------- | ------------- |
-| $x$             | Variabel Independen |
-| $y$             | Variabel Dependen|
+| $x$             | Variabel independen |
+| $y$             | Variabel dependen|
 | β₀            | *Intercept* (nilai $y$ ketika $x$ = 0)|
 | β₁            | *Slope* (seberapa besar perubahan $y$ untuk setiap unit perubahan $x$)|
 | ε             | *Error term*|
 
 ## Fungsi Regresi Linier
 
-Regresi linier memiliki dua peran krusial dalam analisis data: 
+Regresi linier melakukan dua hal:
 
-1. **Pembuktian Hubungan**
-    - Membuktikan secara statistik apakah ada hubungan nyata antara dua variable.
-    - Mengukur seberapa kuat hubungan tersebut.
-    - Contoh: Apakah benar tingkat pendidikan mempengaruhi tingkat pendapatan?
-
-2. **Kekuatan Prediksi**
-    - Memungkinkan kita memprediksi nilai di masa depan
-    - Membuat keputusan bisnis berdasarkan data historis
-    - Contoh: JIka kita menaikkan anggaran iklan sebesar $x$, berapa peningkatan penjualan ($y$) yang bisa diharapkan?
+1. **Membuktikan hubungan** — membuktikan secara statistik apakah dua variabel benar-benar berhubungan, dan mengukur seberapa kuat hubungan itu. *Apakah tingkat pendidikan benar-benar memengaruhi pendapatan?*
+2. **Memprediksi** — memperkirakan nilai di masa depan dari data lampau. *Jika anggaran iklan dinaikkan sebesar $x$, berapa tambahan penjualan ($y$) yang bisa diharapkan?*
 
 ## Menghitung Regresi Linier
 
-Mari kita ambil kasus dimana kita ingin mengetahui keterkaitan antara biaya iklan ($x$) dan penjualan ($y$). Sebagai contoh kita memiliki data seperti berikut:
+Misalkan kita ingin tahu hubungan antara biaya iklan ($x$) dan penjualan ($y$), dengan data berikut:
 
 | Biaya Iklan  | Unit          |
 | ------------ | ------------- |
@@ -54,90 +46,87 @@ Mari kita ambil kasus dimana kita ingin mengetahui keterkaitan antara biaya ikla
 | 400          | 1100          |
 | 500          | 1300          |
 
-Sebelum kita menghitung regresi linier sederhana dengan data tersebut, kita perlu:
-
-1. Menghitung *Slope* $\beta_1$
-2. Menghitung *Intercept* $\beta_0$
+Untuk menyusun garisnya, kita butuh dua angka: slope $\beta_1$ dan intercept $\beta_0$.
 
 ### Menghitung *Slope* ($\beta_1$)
 
-*Slope* atau kemiringan menggambarkan perubahan variabel $y$ terhadap setiap perubahan variabel $x$. Kita bisa menghitung *slope* menggunakan rumus sebagai berikut:
+*Slope* atau kemiringan adalah seberapa besar $y$ bergerak untuk setiap perubahan $x$:
 
 $$
 \beta_1 = \frac{\sum(x_i - \bar{x})(y_i - \bar{y})}{\sum(x_i - \bar{x})^2}
 $$
 
-Dimana: 
+Di mana: 
 
 | Simbol            | Pengertian    |
 | ----------------- | ------------- |
-| $x_i$             | Nilai individual dari variabel Independen |
-| $y_i$             | Nilai individual dari variabel Dependen |
-| $\bar{x}$         | Rata-rata nilai dari seluruh variabel Independen |
-| $\bar{y}$         | Rata-rata nilai dari seluruh variabel Dependen |
+| $x_i$             | Nilai individual variabel independen |
+| $y_i$             | Nilai individual variabel dependen |
+| $\bar{x}$         | Rata-rata variabel independen |
+| $\bar{y}$         | Rata-rata variabel dependen |
 
-Mari kita hitung terlebih dahulu rata-rata dari tiap biaya iklan (X) dan unit penjualan (Y):
+Mulai dari kedua rata-rata:
 
-$$ \bar{x}  = (100 + 200 + 300 + 400 + 500) / 5 = 300 $$
-
+$$ \bar{x} = (100 + 200 + 300 + 400 + 500) / 5 = 300 $$
 $$ \bar{y} = (500 + 700 + 900 + 1100 + 1300) / 5 = 900 $$
 
-Setelah kita menemukan rata-rata dari biaya iklan dan unit penjualan, selanjutnya kita hitung *Slope* nya:
+Sekarang pembilangnya — tiap $(x_i - \bar{x})(y_i - \bar{y})$:
 
 $$ (100 - 300)(500 - 900) = (-200)(-400) = 80,000 $$
 $$ (200 - 300)(700 - 900) = (-100)(-200) = 20,000 $$
 $$ (300 - 300)(900 - 900) = (0)(0) = 0 $$
 $$ (400 - 300)(1100 - 900) = (100)(200) = 20,000 $$
 $$ (500 - 300)(1300 - 900) = (200)(400) = 80,000 $$
-$$ Total = 200,000  $$
 
-$$ (100 - 300)² = (-200)² = 40,000 $$
-$$ (200 - 300)² = (-100)² = 10,000 $$
-$$ (300 - 300)² = (0)² = 0 $$
-$$ (400 - 300)² = (100)² = 10,000 $$
-$$ (500 - 300)² = (200)² = 40,000 $$
-$$ Total = 100,000 $$
+$$ \text{Total} = 200,000 $$
 
-$$ \beta_1 = 200,000/100,000 = 2 $$
+Lalu penyebutnya — tiap $(x_i - \bar{x})^2$:
 
-Dari penjualan data diatas, kita mendapatkan nilai dari *Slope* = 2 yang berarti bahwa setiap kenaikan 1 unit biaya ($x$), akan meningkatkan penjualan ($y$) sebesar 2 unit.
+$$ (100 - 300)^2 = (-200)^2 = 40,000 $$
+$$ (200 - 300)^2 = (-100)^2 = 10,000 $$
+$$ (300 - 300)^2 = (0)^2 = 0 $$
+$$ (400 - 300)^2 = (100)^2 = 10,000 $$
+$$ (500 - 300)^2 = (200)^2 = 40,000 $$
+
+$$ \text{Total} = 100,000 $$
+$$ \beta_1 = 200,000 / 100,000 = 2 $$
+
+*Slope* bernilai 2 berarti setiap tambahan 1 unit biaya ($x$) membawa 2 unit penjualan tambahan ($y$).
 
 ### Menghitung *Intercept* ($\beta_0$)
 
-Setelah kita menemukan nilai *Slope*, kita hitung nilai *Intercept* dengan rumus berikut:
+Dengan *slope* di tangan, *intercept*-nya adalah:
 
 $$
 \beta_0 = \bar{y} - \beta_1\bar{x}
 $$
 
-Dimana:
+Di mana:
 
 | Simbol            | Pengertian    |
 | ----------------- | ------------- |
-| $\bar{y}$         | Rata-rata nilai dari seluruh variabel independen |
-| $\bar{x}$         | Rata-rata nilai dari seluruh variabel dependen |
+| $\bar{y}$         | Rata-rata variabel dependen |
+| $\bar{x}$         | Rata-rata variabel independen |
 | $\beta_1$         | *Slope* |
 
-Mari kita hitung *Intercept* dari *Slope* yang sudah kita hitung sebelumnya:
-
 $$ \beta_0 = 900 - (2 × 300) $$
-
 $$ \beta_0 = 300 $$
 
-Ini berarti ketika biaya iklan 0, prediksi penjualan adalah 300 unit. Setelah kita mengetahui *Slope* dan *intercept*, maka kita bisa masukkan ke dalam persamaan regresi linier sebagai berikut:
+Jadi ketika biaya iklan 0, prediksi penjualan adalah 300 unit. Gabungkan *slope* dan *intercept*, dan kita dapat garis regresinya:
 
 $$ y = 300 + 2x $$
 
-Lalu bagaimana kita menggunakan rumus ini untuk membuat prediksi? sebagai contoh, di iklan berikutnya kita ingin mengetahu seberapa banyak penjualan jika kita mengeluarkan biaya iklan sejumlah 250. Kita masukkan biaya iklan sejumlah 250 kedalam persamaan yang sudah kita tentukan:
+Untuk memprediksi, tinggal masukkan nilainya. Berapa penjualan dari biaya iklan 250?
 
-$$ y = 300 + 2(250) $$
-$$ y = 300 + 500 $$
-$$ y = 800 $$
+$$ y = 300 + 2(250) = 300 + 500 = 800 $$
 
-Jadi jika kita mengeluarkan biaya iklan sejumlah 250, maka dapat diprediksi tingkat penjualan sejumlah 800 unit. Beikut persamaan yang telah kita dapatkan jika kita gambar dalam grafik:
+Jadi biaya iklan 250 memprediksi 800 unit. Digambar, garis dan kelima titik datanya seperti ini:
 
-Perhitungan regresi linier yang telah kita buat dapat kita simulasikan dalam program sebagai berikut: 
+<div className="flex justify-center">
+  <img src="/static/images/regression-id.svg" alt="Diagram pencar biaya iklan vs unit terjual dengan garis y = 300 + 2x; kelima titik berada di garis, dan x = 250 memprediksi y = 800" width="700" />
+</div>
 
+Berikut perhitungan yang sama dalam bentuk program:
 
 ```js
 // Data penjualan dan iklan
@@ -200,52 +189,34 @@ console.log(`${prediksi} unit`);
 
 ## Asumsi Klasik Regresi Linier
 
-Sebelum mulai menerapkan regresi linier, penting untuk kita memahami asumsi-asumsi dasarnya:
+Regresi hanya andal jika beberapa asumsi terpenuhi. Ada baiknya diperiksa sebelum kamu mempercayai hasilnya:
 
-1. **Linearitas**
+1. **Linearitas.** Hubungan antara $x$ dan $y$ harus kira-kira berupa garis lurus. Scatter plot adalah cara cepat memeriksanya — jika titik-titiknya justru melengkung, transformasi data dulu (logaritma atau akar kuadrat biasanya membantu).
+2. **Independensi.** Setiap pengamatan harus berdiri sendiri. Ini paling terasa pada data time series: penjualan hari ini seharusnya tidak dipengaruhi penjualan kemarin. Autokorelasi (diperiksa dengan plot ACF atau uji Durbin-Watson) membuat hasilnya bias.
+3. **Homoskedastisitas.** Sebaran error harus tetap konstan di semua nilai $x$ — kesalahan prediksi tidak boleh kecil untuk biaya iklan rendah lalu besar untuk yang tinggi. Plot residual terhadap nilai prediksi; bentuk corong menandakan asumsi ini tidak terpenuhi.
+4. **Normalitas.** Residual harus mengikuti distribusi normal — berbentuk lonceng simetris saat dibuat histogram. Ini penting terutama untuk uji hipotesis dan interval kepercayaan. Periksa dengan Q-Q plot, atau uji formal seperti Shapiro-Wilk.
 
-Asumsi pertama dan yang paling mendasar adalah hubungan antara variabel independen ($x$) dan variabel dependen ($y$) harus bersifat linier. Bayangkan jika kita menggambar titik-titik data dalam sebuah grafik, maka titik-titik tersebut seharusnya membentuk pola yang bisa didekati dengan garis lurus. Kita bisa memeriksa asumsi ini dengan membuat scatter plot dari data kita. Jika pola yang terbentuk jauh dari linier, misalnya membentuk kurva atau pola lainnya, maka kita perlu melakukan transformasi data terlebih dahulu. Transformasi yang umum dilakukan bisa berupa logaritma, akar kuadrat, atau transformasi lainnya yang sesuai dengan bentuk data.
+## Menguji Kecocokan dengan R²
 
-2. **Independensi**
-
-Asumsi kedua adalah setiap pengamatan dalam data kita harus bersifat independen atau tidak saling mempengaruhi satu sama lain. Hal ini sangat penting terutama ketika kita bekerja dengan data yang dikumpulkan dari waktu ke waktu (time series). Sebagai contoh, jika kita menganalisis penjualan harian, maka penjualan hari ini seharusnya tidak dipengaruhi oleh penjualan kemarin. Jika terdapat pengaruh antar pengamatan (autokorelasi), hasil analisis kita bisa menjadi bias. Kita bisa memeriksa asumsi ini dengan plot ACF (Autocorrelation Function) atau menggunakan uji statistik seperti Durbin-Watson.
-
-3. **Homoskedastisitas**
-
-Istilah yang mungkin terdengar rumit ini sebenarnya merujuk pada konsep yang cukup sederhana: varians dari error (residual) harus bersifat konstan untuk semua nilai variabel independen. Dalam konteks contoh kita tentang iklan dan penjualan, ini berarti tingkat kesalahan prediksi seharusnya relatif sama, baik untuk biaya iklan yang rendah maupun tinggi. Kita bisa memeriksa asumsi ini dengan membuat plot antara residual dan nilai prediksi. Jika plot menunjukkan pola tertentu (misalnya membentuk corong), maka asumsi ini tidak terpenuhi dan kita perlu melakukan transformasi data atau menggunakan metode analisis yang lebih robust.
-
-4. **Normalitas**
-
-Asumsi terakhir adalah residual atau error harus mengikuti distribusi normal. Ini penting terutama ketika kita ingin melakukan uji hipotesis atau membuat interval kepercayaan. Bayangkan jika kita membuat histogram dari error, maka bentuknya harus menyerupai lonceng yang simetris (kurva normal). Kita bisa memeriksa asumsi ini dengan beberapa cara, mulai dari yang sederhana seperti membuat histogram residual atau Q-Q plot, hingga uji formal seperti Shapiro-Wilk atau Kolmogorov-Smirnov.
-
-
-## Uji Persamaan dengan Koefisien Determinasi ($R^2$)
-
-Lalu bagaimana jika kita ingin mengetahui kemampuan persamaan regresi dalam menerangkan seberapa pengruh variabel independen secara bersama-sama (stimultan) mempengaruhi variabel dependen? disinilah kita melakukan Uji Koefisien Determinasi.  Koefisien determinasi adalah ukuran yang menunjukkan seberapa baik model regresi menjelaskan data. Kita bisa menghitung koefisien determinasi dengan rumus:
+Seberapa baik garisnya benar-benar menjelaskan data? Itulah yang diukur koefisien determinasi, $R^2$:
 
 $$ R^2 = 1 - \frac{\sum(y_i - \hat{y_i})^2}{\sum(y_i - \bar{y})^2} $$
 
-Dimana: 
+Di mana: 
 
 | Simbol            | Pengertian    |
 | ----------------- | ------------- |
-| $y_i$             | Nilai Aktual |
-| $\hat{y_i}$       | Nilai Prediksi |
-| $\bar{y}$         | Rata-Rata Nilai Aktual |
+| $y_i$             | Nilai aktual |
+| $\hat{y_i}$       | Nilai prediksi |
+| $\bar{y}$         | Rata-rata nilai aktual |
 
-Koefisien determinasi menggambarkan besarnya keragaman (informasi) di dalam variabel $y$ yang dapat diberikan oleh model regresi yang kita didapatkan. Nilai koefisien berkisan antara 0 sampai 1. Jika nilai $R^2$ dikalikan 100%, maka ini menunjukkan persentasi keragaman (informasi) dalam variabel $y$.
+$R^2$ berkisar dari 0 sampai 1 dan menunjukkan porsi keragaman $y$ yang berhasil ditangkap model — kalikan 100 untuk membacanya sebagai persentase. Untuk menghitungnya, kita perlu nilai prediksi, total sum of squares, dan residual sum of squares.
 
-Untuk dapat menghitung $R^2$, kita perlu untuk menghitung:
+### Nilai Prediksi ($\hat{y_i}$)
 
-1. Nilai Prediksi ($\hat{y_i}$) untuk Setiap $x$
-2. Nilai Rata-Rata $y$ Aktual ($\bar{y}$)
-3. Nilai SS_total dan SS_residual
+Jalankan tiap $x$ melalui $y = 300 + 2x$:
 
-### Menghitung Nilai Prediksi ($\hat{y_i}$) untuk Setiap $x$
-
-Kita hitung setiap nilai yang kita miliki dengan persamaan regresi linier yang sudah kita dapatkan sebelumnya, yaitu: $y = 300 + 2x$
-
-| Biaya Iklan (X)  | Unit (Y)      | $\bar{y}$ (Y Prediksi) |
+| Biaya Iklan ($x$)  | Unit ($y$)      | $\hat{y}$ (prediksi) |
 | ---------------- | ------------- | ---------------------- |
 | 100              | 500           | 300 + 2(100) = 500     | 
 | 200              | 700           | 300 + 2(200) = 700     |
@@ -253,56 +224,39 @@ Kita hitung setiap nilai yang kita miliki dengan persamaan regresi linier yang s
 | 400              | 1100          | 300 + 2(400) = 1100    |
 | 500              | 1300          | 300 + 2(500) = 1300    |
 
-### Menghitung Nilai Rata-Rata $y$ Aktual ($\bar{y}$)
+### Total Sum of Squares ($SS_{total}$)
 
-$$ \bar{y} = (500 + 700 + 900 + 1100 + 1300) / 5 = 900 $$
+Ini sebaran nilai aktual terhadap rata-ratanya, $\sum(y_i - \bar{y})^2$:
 
-$$ (500 - 900)² = (-400)² = 160,000 $$
-$$ (700 - 900)² = (-200)² = 40,000 $$
-$$ (900 - 900)² = 0 $$
-$$ (1100 - 900)² = (200)² = 40,000 $$
-$$ (1300 - 900)² = (400)² = 160,000 $$
-$$ SStotal = 400,000 $$
+$$ (500 - 900)^2 = (-400)^2 = 160,000 $$
+$$ (700 - 900)^2 = (-200)^2 = 40,000 $$
+$$ (900 - 900)^2 = 0 $$
+$$ (1100 - 900)^2 = (200)^2 = 40,000 $$
+$$ (1300 - 900)^2 = (400)^2 = 160,000 $$
+$$ SS_{total} = 400,000 $$
 
-### Menghitung $R^2$
+### Residual Sum of Squares ($SS_{residual}$)
 
-Kita bisa menghitung $R^2$ dengan menggunakan rumus:
+Ini yang tidak tertangkap model — selisih antara aktual dan prediksi, $\sum(y_i - \hat{y_i})^2$:
 
-$$ R^2 = 1 - (SSresidual / SStotal) $$
+$$ (500 - 500)^2 = 0 $$
+$$ (700 - 700)^2 = 0 $$
+$$ (900 - 900)^2 = 0 $$
+$$ (1100 - 1100)^2 = 0 $$
+$$ (1300 - 1300)^2 = 0 $$
+$$ SS_{residual} = 0 $$
 
-Dimana: 
+### Menyatukannya
 
-| Simbol             | Pengertian    |
-| -----------------  | ------------- |
-| $SSresidual$        | jumlah kuadrat akibat regresi |
-| $SStotal$           | total kuadrat |
+$$ R^2 = 1 - \frac{SS_{residual}}{SS_{total}} = 1 - \frac{0}{400,000} = 1 $$
 
-mari kita hitung total $SStotal$ dan $SSresidual$ sebagai berikut: 
-$$ SStotal = \sum(y - \bar{y})^2 $$
+$R^2$ bernilai 1 berarti:
 
-$$ (500 - 500)² = 0 $$
-$$ (700 - 700)² = 0 $$
-$$ (900 - 900)² = 0 $$
-$$ (1100 - 1100)² = 0 $$
-$$ (1300 - 1300)² = 0 $$
+1. model menjelaskan 100% keragaman dalam data,
+2. setiap titik berada tepat di garis, dan
+3. prediksi sempurna untuk data ini.
 
-$$ SSresidual = 0 $$
-
-Setelah kita mendapatkan nilai dari $SStotal$ dan $SSresidual$, kita masukkan kedalam rumus koefisien determinasi:
-
-$$ R^2 = 1 - (0 / 400,000) $$
-$$ R^2 = 1 $$
-
-Hasil $R^2$ = 1 menunjukkan bahwa:
-
-1. Model menjelaskan 100% variasi dalam data
-2. Semua titik data tepat berada pada garis regresi
-3. Prediksi model sempurna untuk data yang ada
-
-Berikut perhitungan $R^2$ jika kita gambarkan melalui grafik:
-
-
-Ini menunjukkan bahwa bahkan dengan sedikit variasi dalam data, $R^2$ tetap bisa sangat tinggi jika model cocok dengan pola data. Kita dapat mensimulasikan perhitungan koefisien determinasi dengan program segabai berikut:
+Itu terjadi di sini karena datanya benar-benar linier — semua residual bernilai nol. Data di dunia nyata hampir tidak pernah sebersih ini. Berikut perhitungannya dalam kode:
 
 ```js
 // Menghitung koefisien determinasi (R²)
@@ -325,5 +279,5 @@ function hitung_r_squared(data, slope, intercept) {
 
 // Penggunaan
 const r_squared = hitung_r_squared(data_penjualan, slope, intercept);
-console.log(`R² (Koefisien Determinasi): ${r_squared.toFixed(4)}`); // Output  0.9989 yang kita bulatkan menjadi 1
+console.log(`R² (Koefisien Determinasi): ${r_squared.toFixed(4)}`); // Output: 1.0000
 ```
