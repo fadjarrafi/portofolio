@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="250" viewBox="0 0 700 250" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="700" height="250" rx="14" fill="#ffffff"/>
+
+  <!-- quiet window shading -->
+  <rect x="300" y="70" width="170" height="70" fill="#f1f3f5"/>
+  <text x="385" y="60" text-anchor="middle" font-size="12" fill="#868e96">300ms, no typing</text>
+
+  <!-- axis -->
+  <line x1="60" y1="140" x2="640" y2="140" stroke="#dee2e6" stroke-width="2"/>
+
+  <!-- keystroke ticks -->
+  <g font-family="Consolas, monospace" text-anchor="middle">
+    <!-- a -->
+    <line x1="110" y1="140" x2="110" y2="95" stroke="#1c7ed6" stroke-width="2.5"/>
+    <circle cx="110" cy="92" r="4" fill="#1c7ed6"/>
+    <text x="110" y="82" font-size="13" fill="#1c7ed6">a</text>
+    <!-- p -->
+    <line x1="155" y1="140" x2="155" y2="95" stroke="#1c7ed6" stroke-width="2.5"/>
+    <circle cx="155" cy="92" r="4" fill="#1c7ed6"/>
+    <text x="155" y="82" font-size="13" fill="#1c7ed6">p</text>
+    <!-- p -->
+    <line x1="200" y1="140" x2="200" y2="95" stroke="#1c7ed6" stroke-width="2.5"/>
+    <circle cx="200" cy="92" r="4" fill="#1c7ed6"/>
+    <text x="200" y="82" font-size="13" fill="#1c7ed6">p</text>
+    <!-- l -->
+    <line x1="245" y1="140" x2="245" y2="95" stroke="#1c7ed6" stroke-width="2.5"/>
+    <circle cx="245" cy="92" r="4" fill="#1c7ed6"/>
+    <text x="245" y="82" font-size="13" fill="#1c7ed6">l</text>
+    <!-- e -->
+    <line x1="290" y1="140" x2="290" y2="95" stroke="#1c7ed6" stroke-width="2.5"/>
+    <circle cx="290" cy="92" r="4" fill="#1c7ed6"/>
+    <text x="290" y="82" font-size="13" fill="#1c7ed6">e</text>
+  </g>
+  <text x="110" y="162" font-size="12" fill="#868e96">user typing (timer resets on each key)</text>
+
+  <!-- fired call -->
+  <line x1="470" y1="140" x2="470" y2="95" stroke="#37b24d" stroke-width="2.5" stroke-dasharray="5 4"/>
+  <circle cx="470" cy="92" r="5" fill="#37b24d"/>
+  <line x1="470" y1="140" x2="470" y2="188" stroke="#37b24d" stroke-width="2"/>
+  <polygon points="470,194 464,182 476,182" fill="#37b24d"/>
+  <text x="470" y="214" text-anchor="middle" font-size="13.5" fill="#2f9e44" font-family="Consolas, monospace">searchAPI('apple')</text>
+  <text x="470" y="232" text-anchor="middle" font-size="12" fill="#868e96">called once, after typing stops</text>
+</svg>

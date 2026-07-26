@@ -1,5 +1,5 @@
 ---
-title: 'Debouncing in Javascript'
+title: 'Debouncing di Javascript'
 publishedAt: '2025-10-21'
 featured: true
 topics: ['javascript']
@@ -8,70 +8,70 @@ lang: 'id'
 translationSlug: 'debouncing'
 ---
 
-Jika kita ingin meningkatkan performa dari aplikasi kita atau membuat UX aplikasi kita lebih smooth, kita bisa menggunakan teknik yang disebut debouncing.
+Debouncing adalah teknik untuk menunda sebuah fungsi sampai rentetan aktivitas mereda. Trik kecil ini membuat aplikasi terasa lebih mulus sekaligus memangkas banyak pekerjaan yang sia-sia.
 
-## Apa itu Debouncing
+## Apa itu debouncing
 
-Secara garis besar, teknik ini bekerja dengan menunda eksekusi nya sebuah function / code dalam rentang waktu tertentu sehingga tidak ada aktivitas baru dalam periode tertentu. 
+Idenya sederhana: alih-alih menjalankan fungsi di setiap event, kita menunggu sampai event-nya berhenti selama jangka waktu tertentu, lalu menjalankannya sekali.
 
-teknik ini umum digunakan untuk meningkatkan performa dari aplikasi yang kita bangun dan bahkan dapat digunakan menghemat biaya saat kita memanggil sebuah service melalui API.
+Mengetik di kotak pencarian adalah contoh klasiknya. Kita tidak mau mengirim request di setiap ketikan — itu bikin UI terasa laggy dan membebani API. Sebagai gantinya, kita menunggu sampai user berhenti sejenak, baru mengirim satu request berisi apa yang diketik.
 
-Debouncing umum digunakan saat kita berhadapan dengan user input. ketika user mengetik, tidak ada action yang berjalan untuk menghindari UI menjadi laggy. Dan ketika user berhenti mengetik, kode kita mulai memproses input seperti mem filter result. 
+<div className="flex justify-center">
+  <img src="/static/images/debouncing.png" alt="Setiap ketikan mereset timer; panggilan API terjadi sekali setelah user berhenti mengetik" width="680" />
+</div>
 
-Selain itu, dengan teknik ini kita bisa mengurangi beban biaya service dengan mengurangi jumlah request API third-party.
-
-## Contoh Debouncing
-
-Berikut contoh fungsi untuk debouncing
+## Fungsi debounce
 
 ```js
 function debounce(func, delay) {
-    let timeoutId;
-    return function(...args) {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => func.apply(this, args), delay);
-    };
+  let timeoutId
+  return function (...args) {
+    clearTimeout(timeoutId)
+    timeoutId = setTimeout(() => func.apply(this, args), delay)
+  }
 }
 ```
 
-Setiap kali fungsi `debounce()` dipanggil, timer pada pemanggilan sebelumnya di hapus dengan `clearTimeout()` dan timer baru dibuat dengan delay yang ditentukan. Nantinya function yang asli hanya akan dieksekusi ketika tidak ada pemanggilan baru dalam periode delay.
+Setiap panggilan menghapus timer dari panggilan sebelumnya dengan `clearTimeout()` lalu memulai timer baru. Jadi `func` hanya berjalan kalau tidak ada panggilan baru selama satu `delay` penuh.
 
-Mari kita buat contoh sederhana penggunaan dari fungsi `debounce()` diatas untuk searching, kita akan beri nama `searchAPI()`.  
+Sekarang misalkan kita punya fungsi pencarian:
 
 ```js
-
 async function searchAPI(query) {
-    try {
-        const response = await fetch(`/api/search?q=${query}`);
-        const results = await response.json();
-        displayResults(results);
-    } catch (error) {
-        console.error('Error:', error);
-    }
+  try {
+    const response = await fetch(`/api/search?q=${query}`)
+    const results = await response.json()
+    displayResults(results)
+  } catch (error) {
+    console.error('Error:', error)
+  }
 }
-
-``` 
-
-Jika kita panggil fungsi searchAPI() tanpa menggunakan debouncing, request akan dikembalikan secara realtime ke dalam event/component. 
-
-```js
-// Tanpa debouncing - API dipanggil setiap keystroke
-document.getElementById('search').addEventListener('input', (e) => {
-    searchAPI(e.target.value);
-});
-
-// Input Search #1: "a"
-// Input Search #2: "app"
-// Input Search #3: "appl"
-// Input Search #4: "apple"
 ```
 
-Ini akan membuat component yang dikembalikan menjadi laggy dan tidak smooth. Dengan penggunaan debouncing, akan membuat UX lebih baik. 
+Kalau dipasang tanpa debouncing, fungsi ini jalan di tiap ketikan:
 
 ```js
-// Dengan debouncing - API dipanggil setelah user berhenti mengetik
-document.getElementById('search').addEventListener('input', 
-    debounce((e) => searchAPI(e.target.value), 300)
-);
+// tanpa debouncing — satu panggilan API per ketikan
+document.getElementById('search').addEventListener('input', (e) => {
+  searchAPI(e.target.value)
+})
 
-// Input Search #1: "apple"
+// "a" → panggil
+// "app" → panggil
+// "appl" → panggil
+// "apple" → panggil
+```
+
+Bungkus handler-nya dengan `debounce()` dan ia menunggu jeda — satu panggilan, bukan empat:
+
+```js
+// dengan debouncing — satu panggilan API setelah user berhenti mengetik
+document.getElementById('search').addEventListener(
+  'input',
+  debounce((e) => searchAPI(e.target.value), 300)
+)
+
+// "apple" → panggil
+```
+
+Bagi user perilakunya sama, tapi request-nya jauh lebih sedikit.
