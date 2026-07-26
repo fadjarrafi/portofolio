@@ -2,7 +2,9 @@
 
 ## Overview
 
-The site is organized into three main content sections, all using MDX files with YAML frontmatter. Each section has its own utility module for reading and caching posts at build time.
+The site runs on **Astro 5** with `output: 'static'`. Content lives in **Astro content collections** under `src/content/`, defined and validated with Zod in `src/content/config.ts`. Posts are queried at build time with `getCollection()` from `astro:content` — there is no custom frontmatter parser and no per-section utility module.
+
+There are three collections: `blog` (Writing), `thoughts` (Garden), and `case-studies`. Two Garden sub-sections (Concepts, Library) are data-driven from JSON rather than collections.
 
 ---
 
@@ -12,31 +14,24 @@ The site is organized into three main content sections, all using MDX files with
 
 Long-form technical articles. Bilingual — each post can have an English and Indonesian version linked via `translationSlug`.
 
-**Directory:** `app/writing/posts/{en,id}/`
+**Collection:** `blog` · **Directory:** `src/content/blog/{en,id}/`
 
-**Frontmatter schema:**
+**Frontmatter schema** (`src/content/config.ts`):
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | `title` | string | yes | |
 | `publishedAt` | string (YYYY-MM-DD) | yes | |
-| `summary` | string | yes | Shown in post cards and RSS |
-| `topics` | string[] | yes | Used for filtering and related posts |
-| `type` | string | yes | `essay` \| `tutorial` \| `note` \| `reflection` \| `review` |
-| `lang` | `en` \| `id` | yes | Should match the folder |
-| `featured` | boolean | no | Shows post on homepage |
+| `summary` | string | no | Shown in post cards, meta description, and RSS |
+| `image` | string | no | OG image URL (falls back to `/og-default.png`) |
+| `featured` | boolean | no | Surfaces the post on the homepage |
+| `lang` | `en` \| `id` | no | Should match the folder |
 | `translationSlug` | string | no | Slug of the same post in the other language |
-| `image` | string | no | OG image URL |
-| `updated` | string (YYYY-MM-DD) | no | Shows "Updated" badge |
+| `topics` | string[] | no | Used for filtering and related posts |
+| `type` | string | no | `essay` \| `tutorial` \| `note` \| `reflection` \| `review` |
+| `updated` | string (YYYY-MM-DD) | no | Shows an "Updated" badge |
 
-**Utilities (`app/writing/utils.ts`):**
-- `getBlogPosts(lang)` — all posts for a language, cached
-- `getAllBlogPosts()` — all posts across both languages
-- `getBlogPost(slug, lang)` — single post lookup
-- `getRelatedPosts(slug, lang, limit)` — related posts by shared topics
-- `getAllTopics(lang)` — unique topic list
-- `getAllPostTypes(lang)` — unique type list
-- `getTopicStats(lang)` — topic → post count map
+**Pages:** `src/pages/writing/index.astro` (listing) and `src/pages/writing/[lang]/[slug].astro` (post). Posts are read with `getCollection('blog', ({ id }) => id.startsWith('en/'))` and slugged by stripping the `en/` or `id/` prefix and the `.mdx` extension.
 
 ---
 
@@ -44,7 +39,7 @@ Long-form technical articles. Bilingual — each post can have an English and In
 
 Shorter, evolving ideas at different stages of completeness. Same bilingual structure as Writing.
 
-**Directory:** `app/garden/thoughts/posts/{en,id}/`
+**Collection:** `thoughts` · **Directory:** `src/content/thoughts/{en,id}/`
 
 **Frontmatter schema:**
 
@@ -52,54 +47,45 @@ Shorter, evolving ideas at different stages of completeness. Same bilingual stru
 |---|---|---|---|
 | `title` | string | yes | |
 | `publishedAt` | string (YYYY-MM-DD) | yes | |
-| `summary` | string | yes | |
-| `topics` | string[] | yes | |
-| `type` | string | yes | Same values as Writing |
-| `lang` | `en` \| `id` | yes | |
-| `status` | `seed` \| `sapling` \| `tree` | no | Auto-derived from word count if omitted |
+| `summary` | string | no | |
+| `image` | string | no | |
+| `lang` | `en` \| `id` | no | |
 | `translationSlug` | string | no | |
+| `topics` | string[] | no | |
+| `type` | string | no | Same values as Writing |
+| `status` | `seed` \| `sapling` \| `tree` | no | Auto-derived from word count if omitted |
 | `updated` | string | no | |
 
-**Growth stage auto-assignment (when `status` is omitted):**
+**Growth stage** (`getGrowthStage()` in `src/utils/posts.ts`, used when `status` is omitted):
 
 | Stage | Word Count | Meaning |
 |---|---|---|
 | `seed` 🌱 | < 300 | Raw observation or early idea |
 | `sapling` 🌿 | 300–999 | Developing thought |
-| `tree` 🌳 | 1000+ | Fully formed piece |
+| `tree` 🌳 | ≥ 1000 | Fully formed piece |
 
-**Utilities (`app/garden/utils.ts`):**
-- `getGardenThoughts(lang)` — all thoughts for a language, cached
-- `getAllGardenThoughts()` — all thoughts across both languages
-- `getGardenThought(slug, lang)` — single thought lookup
-- `getRelatedThoughts(slug, lang, limit)` — related by shared topics
-- `getAllGardenTopics(lang)` — unique topic list
-- `getAllGardenTypes(lang)` — unique type list
-- `getGardenTopicStats(lang)` — topic → post count map
+**Pages:** `src/pages/garden/thoughts/index.astro` and `src/pages/garden/thoughts/[lang]/[slug].astro`.
 
 ---
 
-### Garden — Concepts (`/garden/concepts`)
+### Garden — Concepts (`/garden/concepts`) & Library (`/garden/library`)
 
-Glossary of technical and interdisciplinary concepts.
+Not content collections. Each is a single index page that reads a static JSON file at build time with `fs.readFileSync`:
 
-**Directory:** `app/garden/concepts/` (route exists, content structure TBD)
+| Section | Page | Data |
+|---|---|---|
+| Concepts | `src/pages/garden/concepts/index.astro` | `public/data/concepts.json` |
+| Library | `src/pages/garden/library/index.astro` | `public/data/library.json` |
 
----
-
-### Garden — Library (`/garden/library`)
-
-Reading notes and curated resources.
-
-**Directory:** `app/garden/library/` (route exists, content structure TBD)
+There is no `[slug]` route or MDX for these — the JSON is the content.
 
 ---
 
 ### Case Studies (`/case-studies`)
 
-In-depth write-ups of projects, not bilingual — English only.
+In-depth project write-ups. English only — no `lang` field.
 
-**Directory:** `app/case-studies/posts/`
+**Collection:** `case-studies` · **Directory:** `src/content/case-studies/`
 
 **Frontmatter schema:**
 
@@ -107,57 +93,71 @@ In-depth write-ups of projects, not bilingual — English only.
 |---|---|---|---|
 | `title` | string | yes | |
 | `publishedAt` | string (YYYY-MM-DD) | yes | |
-| `summary` | string | yes | |
-| `topics` | string[] | yes | |
+| `summary` | string | no | |
+| `image` | string | no | Cover / OG image URL |
 | `featured` | boolean | no | Shows on homepage |
-| `image` | string | no | Cover image URL (supports Unsplash) |
+| `topics` | string[] | no | |
+| `client` | string | no | |
 | `role` | string | no | e.g. `Full-stack Developer` |
 | `duration` | string | no | e.g. `2 months` |
-| `client` | string | no | |
+| `liveUrl` | string (URL) | no | Validated as a URL |
 
-**Utilities (`app/case-studies/utils.ts`):**
-- `getCaseStudies()` — all case studies, cached
-- `getCaseStudy(slug)` — single case study lookup
-- `getFeaturedCaseStudies(limit)` — featured studies sorted by date
+**Pages:** `src/pages/case-studies/index.astro` and `src/pages/case-studies/[slug].astro`.
+
+---
+
+## Utilities
+
+`getCollection()` from `astro:content` handles all querying. The helpers in `src/utils/` add derived data on top:
+
+**`src/utils/posts.ts`:**
+- `calculateReadingTime(content)` — words ÷ 200, rounded up
+- `getGrowthStage(content, explicitStatus?)` — seed / sapling / tree by word count
+- `getRelatedPosts(entries, currentSlug, limit = 3)` — ranks other entries by count of shared `topics`
+
+**`src/utils/format.ts`:**
+- `formatDate(date)` — display formatting
 
 ---
 
 ## MDX Processing
 
-All content is rendered with `next-mdx-remote/rsc` and the following plugins:
+Content is rendered via `@astrojs/mdx` (configured in `astro.config.mjs`):
 
-| Plugin | Purpose |
-|---|---|
-| `remark-gfm` | GitHub-flavored markdown (tables, strikethrough, etc.) |
-| `remark-math` | LaTeX math blocks (`$$...$$`) |
-| `rehype-katex` | Renders LaTeX to HTML |
-| `sugar-high` | Syntax highlighting for code blocks |
+| Plugin | Type | Purpose |
+|---|---|---|
+| `remark-gfm` | remark | GitHub-flavored markdown (tables, strikethrough, etc.) |
+| `remark-math` | remark | LaTeX math blocks (`$$...$$`) |
+| `rehype-katex` | rehype | Renders LaTeX to HTML (`strict: false`, `output: 'html'`) |
+| `rehype-slug` | rehype | Heading IDs (used by the table of contents) |
+| `sugar-high` | — | Syntax highlighting for code blocks |
 
-Custom MDX components are defined in `app/components/mdx.tsx`:
-- Headings auto-generate anchor slugs
-- Links open external URLs in a new tab
-- Images are wrapped with Next.js `<Image>`
+Custom MDX components are injected per-page via `<Content components={{ YouTube }} />`. The `YouTube` component is at `src/components/YouTube.astro`.
 
 ---
 
-## Frontmatter Parsing
+## Images & Diagrams
 
-All three utility modules share the same custom frontmatter parser (not using `gray-matter`). It handles:
-- Plain string values
-- Boolean values (`true` / `false`)
-- Inline arrays (`["a", "b", "c"]`)
+Static assets live in `public/` and are referenced by absolute path. Article diagrams go in `public/static/images/` and are referenced as `/static/images/<name>`. Hand-authored SVGs are used for illustrations (they need no render step and stay crisp).
 
-Multiline YAML values and nested objects are not supported. Keep frontmatter values on a single line.
+For bilingual diagrams that contain text, keep two files with `-en` / `-id` suffixes (e.g. `variance-en.svg`, `variance-id.svg`) and reference the matching one from each language's post.
+
+---
+
+## Schema Validation
+
+All frontmatter is validated by the Zod schemas in `src/content/config.ts`. Only `title` and `publishedAt` are required across every collection; everything else is optional. A build fails fast if a post violates its schema — no separate parser to maintain.
 
 ---
 
 ## URL Structure
 
-| Content | URL Pattern |
-|---|---|
-| Writing post | `/writing/[lang]/[slug]` |
-| Garden thought | `/garden/thoughts/[lang]/[slug]` |
-| Garden concept | `/garden/concepts/[slug]` |
-| Case study | `/case-studies/[slug]` |
+| Content | URL Pattern | Page file |
+|---|---|---|
+| Writing post | `/writing/[lang]/[slug]` | `src/pages/writing/[lang]/[slug].astro` |
+| Garden thought | `/garden/thoughts/[lang]/[slug]` | `src/pages/garden/thoughts/[lang]/[slug].astro` |
+| Garden concept | `/garden/concepts` | index only |
+| Garden library | `/garden/library` | index only |
+| Case study | `/case-studies/[slug]` | `src/pages/case-studies/[slug].astro` |
 
-`[lang]` is either `en` or `id`. All static params are generated at build time via `generateStaticParams`.
+`[lang]` is `en` or `id`. All static paths are generated at build time via `getStaticPaths`. The RSS feed (`src/pages/rss.xml.ts`) and `robots.txt` (`src/pages/robots.txt.ts`) are endpoint routes; the sitemap is generated by the `@astrojs/sitemap` integration at `/sitemap-index.xml`.
