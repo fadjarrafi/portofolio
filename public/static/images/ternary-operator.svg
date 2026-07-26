@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="230" viewBox="0 0 700 230" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="700" height="230" rx="14" fill="#ffffff"/>
+
+  <!-- condition -->
+  <rect x="50" y="64" width="150" height="48" rx="9" fill="#e7f5ff" stroke="#1c7ed6" stroke-width="2"/>
+  <text x="125" y="94" text-anchor="middle" font-size="15" fill="#1c7ed6" font-family="Consolas, monospace">condition</text>
+
+  <!-- ? -->
+  <text x="214" y="96" text-anchor="middle" font-size="22" fill="#868e96" font-family="Consolas, monospace">?</text>
+
+  <!-- value if true -->
+  <rect x="228" y="64" width="176" height="48" rx="9" fill="#ebfbee" stroke="#37b24d" stroke-width="2"/>
+  <text x="316" y="94" text-anchor="middle" font-size="15" fill="#2f9e44" font-family="Consolas, monospace">valueIfTrue</text>
+
+  <!-- : -->
+  <text x="418" y="94" text-anchor="middle" font-size="20" fill="#868e96" font-family="Consolas, monospace">:</text>
+
+  <!-- value if false -->
+  <rect x="432" y="64" width="184" height="48" rx="9" fill="#fff4e6" stroke="#f76707" stroke-width="2"/>
+  <text x="524" y="94" text-anchor="middle" font-size="15" fill="#e8590c" font-family="Consolas, monospace">valueIfFalse</text>
+
+  <!-- labels -->
+  <text x="125" y="138" text-anchor="middle" font-size="12" fill="#868e96">the test</text>
+  <text x="316" y="138" text-anchor="middle" font-size="12" fill="#868e96">used when true</text>
+  <text x="524" y="138" text-anchor="middle" font-size="12" fill="#868e96">used when false</text>
+
+  <!-- concrete example -->
+  <line x1="50" y1="165" x2="650" y2="165" stroke="#f1f3f5" stroke-width="1.5"/>
+  <text x="350" y="199" text-anchor="middle" font-size="14.5" font-family="Consolas, monospace">
+    <tspan fill="#1c7ed6">age >= 18</tspan><tspan fill="#868e96"> ? </tspan><tspan fill="#2f9e44">'adult'</tspan><tspan fill="#868e96"> : </tspan><tspan fill="#e8590c">'minor'</tspan>
+  </text>
+</svg>

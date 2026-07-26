@@ -1,7 +1,7 @@
 ---
 title: 'Ternary Operator in JavaScript'
 publishedAt: '2024-11-26'
-summary: 'A practical guide to the JavaScript ternary operator — syntax, best practices, common pitfalls, and when to avoid nested ternaries in favor of if-else.'
+summary: 'The ternary operator — a one-line shorthand for if-else, where it shines, and where a plain if-else reads better.'
 featured: false
 topics: ['javascript']
 type: 'tutorial' 
@@ -9,112 +9,59 @@ lang: 'en'
 translationSlug: 'ternary-operator'
 ---
 
-The JavaScript ternary operator provides a concise way to write conditional statements. It's a powerful shorthand for if-else expressions that can make your code cleaner and more readable.
-
-## What is the Ternary Operator?
-
-The ternary operator uses this syntax:
+The ternary operator is a one-line shorthand for `if-else`. It's the only JavaScript operator that takes three parts — a condition, a value for when it's true, and a value for when it's false.
 
 ```js
 condition ? valueIfTrue : valueIfFalse
 ```
 
-Let's compare traditional if-else with the ternary operator:
+<div className="flex justify-center">
+  <img src="/static/images/ternary-operator.png" alt="The three parts of a ternary: condition, value if true, value if false" width="660" />
+</div>
+
+The key difference from `if-else` is that a ternary is an *expression* — it evaluates to a value you can assign:
 
 ```js
-// Traditional if-else
-let basket = 'apple'
+const basket = 'apple'
+
+// if-else
+let result
 if (basket === 'apple') {
   result = 'This basket has apples'
 } else {
   result = 'This basket has no apples'
 }
 
-// Ternary operator
-let basket = 'apple'
-let result = basket === 'apple' ? 'This basket has apples' : 'This basket has no apples'
+// ternary — same thing, one line
+const result = basket === 'apple' ? 'This basket has apples' : 'This basket has no apples'
 ```
 
-## Best Practices for Using the Ternary Operator
+## Where it's handy
 
-1. **Use for Simple Conditions**: Best suited for straightforward true/false decisions
-2. **Keep it on One Line**: When possible, write the entire expression on a single line
-3. **Use Proper Spacing**: Add spaces around operators for better readability
-4. **Use Parentheses for Clarity**: When combining with other operations, use parentheses to make your intention clear
-5. **Return Values**: Ternary operators are excellent for returning values from functions
-
-## Practical Real-World Examples
-
-### 1. Conditional Rendering in React
-
-Ternary operators are extremely common in React components for conditional rendering:
+Assigning a value based on a condition, or returning one from a function, is the sweet spot. It's especially common in React for picking a component or a class name:
 
 ```jsx
-// Simple conditional rendering
-return (
-  <div>{isLoggedIn ? <UserDashboard /> : <LoginForm />}</div>
+return <div>{isLoggedIn ? <UserDashboard /> : <LoginForm />}</div>
 
-  // Conditional class names
-)
-;<button className={isActive ? 'btn-active' : 'btn-inactive'}>Click me</button>
+<button className={isActive ? 'btn-active' : 'btn-inactive'}>Click me</button>
 ```
 
-### 2. Handling Default Values
+For a plain default value, reach for `??` (nullish coalescing) instead — it's clearer and only falls back on `null` or `undefined`:
 
 ```js
-// Set default values when destructuring objects
-const { name = 'Guest' } = user
-
-// Alternative with ternary
+// works, but wordy
 const name = user.name ? user.name : 'Guest'
 
-// Or with nullish coalescing (a modern alternative)
+// better
 const name = user.name ?? 'Guest'
 ```
 
-### 3. Form Validation
+## Don't nest them
+
+You *can* chain ternaries, but readability falls off a cliff fast:
 
 ```js
-// Conditional form validation messages
-const errorMessage = isEmailValid ? '' : 'Please enter a valid email address'
-```
-
-### 4. Toggle States
-
-```js
-// Toggle a boolean state
-const toggleStatus = () => {
-  setIsActive((isActive) => !isActive)
-}
-
-// Using ternary to set a new value based on current
-const toggleTheme = () => {
-  setTheme((currentTheme) => (currentTheme === 'light' ? 'dark' : 'light'))
-}
-```
-
-## Ternary Operator vs. Logical AND/OR
-
-Sometimes you can use logical operators as alternatives to ternary operators:
-
-```js
-// Using ternary
-const message = isLoggedIn ? 'Welcome back!' : ''
-
-// Using logical AND (shorter, but be careful)
-const message = isLoggedIn && 'Welcome back!'
-
-// Using logical OR for default values
-const username = inputValue || 'Guest'
-```
-
-## Nested Ternary Operators: When to Use Them
-
-While you can nest ternary operators, it's generally discouraged for readability:
-
-```js
-let basket = 'apple'
-let result =
+const result =
   basket === 'apple'
     ? 'This basket has apples'
     : basket === 'banana'
@@ -122,10 +69,9 @@ let result =
       : 'This basket has no fruit'
 ```
 
-For multiple conditions, prefer using if-else statements or switch cases:
+Once there's more than one condition, `if-else` (or a `switch`) is easier to follow:
 
 ```js
-// Better approach for multiple conditions
 if (basket === 'apple') {
   result = 'This basket has apples'
 } else if (basket === 'banana') {
@@ -135,83 +81,27 @@ if (basket === 'apple') {
 }
 ```
 
-## Common Pitfalls to Avoid
+## A couple of gotchas
 
-1. **Returning Different Types**: Avoid returning different data types from the same ternary expression
-
-   ```js
-   // Bad practice
-   const result = isValid ? 'Valid' : false
-
-   // Better practice
-   const result = isValid ? 'Valid' : 'Invalid'
-   ```
-
-2. **Deeply Nested Ternaries**: They become hard to read and maintain
-
-   ```js
-   // Hard to read and maintain
-   const message = isLoggedIn
-     ? isPremium
-       ? hasCredits
-         ? 'Play premium game'
-         : 'Buy credits'
-       : 'Upgrade account'
-     : 'Login first'
-   ```
-
-3. **Side Effects**: Ternaries should be used for values, not for executing code with side effects
-
-   ```js
-   // Bad practice - side effects
-   isLoggedIn ? saveUserData() : showLoginForm()
-
-   // Better practice
-   if (isLoggedIn) {
-     saveUserData()
-   } else {
-     showLoginForm()
-   }
-   ```
-
-## When to Use the Ternary Operator
-
-✅ Use ternary operators when:
-
-- You have a simple condition with two outcomes
-- The expression fits naturally on one line
-- You're assigning a value based on a condition
-- You're returning different values in a function
-- You need conditional rendering in JSX/React
-
-❌ Avoid ternary operators when:
-
-- You have multiple conditions to check
-- The logic is complex
-- The expression becomes difficult to read
-- You need to execute statements with side effects
-- You're working with vastly different data types
-
-## Modern Alternatives
-
-JavaScript now offers some modern alternatives for certain use cases:
+Keep both branches the same type — mixing a string with `false` leads to surprises down the line:
 
 ```js
-// Traditional ternary for default values
-const name = user.name ? user.name : 'Guest'
-
-// Using nullish coalescing operator (??) - ES2020
-// Only falls back to default if value is null or undefined
-const name = user.name ?? 'Guest'
-
-// Using optional chaining with nullish coalescing
-const city = user?.address?.city ?? 'Unknown'
+const result = isValid ? 'Valid' : false // avoid
+const result = isValid ? 'Valid' : 'Invalid' // clearer
 ```
 
-## Conclusion
+And use it for values, not side effects. If each branch *does* something rather than *returns* something, use `if-else`:
 
-The ternary operator is a powerful tool for writing concise conditional statements in JavaScript. While it shouldn't replace all if-else statements, it's perfect for simple conditions and can make your code more elegant when used appropriately.
+```js
+// don't
+isLoggedIn ? saveUserData() : showLoginForm()
 
-Remember: clarity trumps brevity. If a ternary operator makes your code harder to understand, stick with traditional if-else statements.
+// do
+if (isLoggedIn) {
+  saveUserData()
+} else {
+  showLoginForm()
+}
+```
 
-**Thanks for Reading! ✌️**
+The rule of thumb: a ternary should make a line easier to read at a glance. The moment it doesn't, an `if-else` will.
