@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="260" viewBox="0 0 700 260" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="700" height="260" rx="14" fill="#ffffff"/>
+
+  <!-- request labels (above the boxes) -->
+  <text x="350" y="30" text-anchor="middle" font-size="13" fill="#495057" font-family="Consolas, monospace">GET /data</text>
+  <text x="350" y="52" text-anchor="middle" font-size="12.5" fill="#1c7ed6" font-family="Consolas, monospace">Origin: www.domain-a.com</text>
+
+  <!-- browser -->
+  <rect x="40" y="80" width="180" height="80" rx="10" fill="#e7f5ff" stroke="#1c7ed6" stroke-width="2"/>
+  <text x="130" y="112" text-anchor="middle" font-size="15" fill="#1c7ed6" font-weight="600">Browser</text>
+  <text x="130" y="135" text-anchor="middle" font-size="12.5" fill="#495057" font-family="Consolas, monospace">www.domain-a.com</text>
+
+  <!-- server -->
+  <rect x="480" y="80" width="180" height="80" rx="10" fill="#f3f0ff" stroke="#7048e8" stroke-width="2"/>
+  <text x="570" y="112" text-anchor="middle" font-size="15" fill="#7048e8" font-weight="600">API</text>
+  <text x="570" y="135" text-anchor="middle" font-size="12.5" fill="#495057" font-family="Consolas, monospace">api.domain-b.com</text>
+
+  <!-- request arrow (top) -->
+  <line x1="220" y1="108" x2="474" y2="108" stroke="#adb5bd" stroke-width="2.5"/>
+  <polygon points="480,108 468,102 468,114" fill="#adb5bd"/>
+
+  <!-- response arrow (bottom) -->
+  <line x1="480" y1="140" x2="226" y2="140" stroke="#adb5bd" stroke-width="2.5"/>
+  <polygon points="220,140 232,134 232,146" fill="#adb5bd"/>
+
+  <!-- response label (below the boxes) -->
+  <text x="350" y="188" text-anchor="middle" font-size="12.5" fill="#2f9e44" font-family="Consolas, monospace">Access-Control-Allow-Origin: www.domain-a.com</text>
+
+  <!-- allowed mark -->
+  <circle cx="322" cy="224" r="13" fill="#ebfbee" stroke="#37b24d" stroke-width="2.5"/>
+  <path d="M315 224 l5 5 l9 -10" fill="none" stroke="#37b24d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="344" y="229" font-size="14" fill="#2f9e44" font-weight="600">origin allowed</text>
+</svg>

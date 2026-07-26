@@ -9,40 +9,40 @@ translationSlug: 'cors-what-it-is'
 ---
 
 <div className="flex justify-center">
-  <img src="/static/cors/cors-error.png" alt="CORS Error" width="700" />
+  <img src="/static/cors/cors-error.png" alt="Error CORS di console browser" width="700" />
 </div>
 
-Pernahkah Anda mengalami masalah ini saat merancang aplikasi web? Ya, ini adalah mimpi buruk bagi beberapa pengembang, termasuk saya sendiri ketika pertama kali belajar. Saya menemukan masalah ini ketika belajar cara mengembangkan API untuk sebuah blog. Untuk memahami bagaimana kesalahan ini bisa terjadi, kita perlu mengetahui apa itu CORS dan bagaimana cara kerjanya.
+Kalau kamu pernah membangun aplikasi web, kemungkinan besar pernah bertemu error ini. Buat aku pun ini sempat jadi mimpi buruk waktu pertama kali kena, saat lagi belajar bikin API untuk sebuah blog. Untuk paham kenapa error ini muncul, kita perlu tahu apa itu CORS dan bagaimana cara kerjanya.
 
-## The Same-Origin Policy
+## Same-origin policy
 
-Secara default, browser hanya dapat membuat permintaan jika sumber daya berasal dari sumber yang sama (domain, protokol, atau port yang sama); ini dikenal sebagai kebijakan same-origin (SOP). SOP ini akan membatasi bagaimana skrip dalam aplikasi web kita dari satu asal berinteraksi dengan sumber daya dari asal lain.
+Secara default, browser hanya mengizinkan sebuah halaman meminta sumber daya dari origin-nya sendiri — domain, protokol, dan port yang sama. Inilah same-origin policy (SOP), yang membatasi bagaimana skrip dari satu origin bisa menjangkau sumber daya di origin lain.
 
-Bayangkan Anda memiliki aplikasi web dengan domain 'https://www.domain-a.com' yang membutuhkan data dari API yang berada di 'https://api.domain-b.com'. Permintaan lintas asal (cross-origin) adalah permintaan yang berasal dari asal berbeda.
+Misalnya kamu punya aplikasi web di `https://www.domain-a.com` yang butuh data dari API di `https://api.domain-b.com`. Karena origin-nya berbeda, ini disebut cross-origin request — dan secara default SOP memblokirnya.
 
 <div className="flex justify-center">
-  <img src="/static/cors/cross-origin request.png" alt="Cross-origin request" width="700" />
+  <img src="/static/cors/cross-origin-request.png" alt="Cross-origin request diblokir oleh same-origin policy" width="700" />
 </div>
 
-Namun, apa yang terjadi jika aplikasi web kita harus berkomunikasi dengan sumber yang tidak berada di domain kita? Di sinilah CORS diterapkan.
+Lalu bagaimana kalau aplikasi kita memang perlu berkomunikasi dengan origin lain? Di sinilah CORS berperan.
 
 ## Apa itu CORS
 
-Cross-origin resource sharing adalah cara bagi browser untuk mengelola akses ke sumber daya dari domain lain. Agar browser dan server dapat berkomunikasi, CORS menambahkan header HTTP ke permintaan kita. Header HTTP ini menunjukkan asal mana yang diizinkan untuk mengakses sumber daya tersebut.
+Cross-origin resource sharing adalah cara sebuah server memberi tahu browser origin mana saja yang boleh mengakses sumber dayanya. Mekanismenya lewat header HTTP yang ditambahkan ke respons — browser membaca header itu lalu memutuskan apakah datanya boleh diberikan ke skrip kita.
 
-Ada beberapa [header CORS](https://fetch.spec.whatwg.org/#http-cors-protocol), tetapi header standar utama yang digunakan adalah:
+Ada beberapa [header CORS](https://fetch.spec.whatwg.org/#http-cors-protocol), tetapi yang utama adalah:
 
 - `Access-Control-Allow-Origin`
 - `Access-Control-Allow-Methods`
 - `Access-Control-Allow-Headers`
 
-Ketika kita membuat request seperti `GET`, `POST` atau `HEAD`, request akan dikirim dari browser ke server tanpa header kustom.
+Untuk request sederhana seperti `GET`, `POST`, atau `HEAD`, browser langsung mengirimnya ke server sambil menyertakan header `Origin` yang menandakan asal request.
 
 <div className="flex justify-center">
-  <img src="/static/cors/cors request.png" alt="CORS request" width="700" />
+  <img src="/static/cors/cors-request.png" alt="Request dan respons CORS bertukar header Origin dan Access-Control-Allow-Origin" width="700" />
 </div>
 
-#### Permintaan dari Browser:
+#### Request dari browser:
 
 ```
 GET /data HTTP/1.1
@@ -50,7 +50,7 @@ Host: api.domain-b.com
 Origin: https://www.domain-a.com
 ```
 
-#### Respons dari Server:
+#### Respons dari server:
 
 ```
 HTTP/1.1 200 OK
@@ -60,9 +60,11 @@ Content-Type: application/json
 { "message": "Hello from domain-b!" }
 ```
 
-Namun, jika kita ingin membuat permintaan seperti 'DELETE', 'PUT', 'PATCH', atau permintaan dengan header kustom, browser akan terlebih dahulu melakukan pemeriksaan preflight untuk memastikan bahwa permintaan asli aman untuk dikirim dengan membuat permintaan 'OPTION'. Misalnya, program kita meminta untuk menghapus data.
+Kalau respons mengembalikan `Access-Control-Allow-Origin` yang cocok dengan origin kita, browser meneruskan datanya. Kalau tidak, browser memblokirnya — itulah error di awal tulisan ini.
 
-#### Permintaan Preflight `OPTIONS` dari Browser:
+Request yang bisa mengubah data — `DELETE`, `PUT`, `PATCH`, atau request dengan header kustom — diperlakukan lebih hati-hati. Sebelum mengirim request aslinya, browser melakukan **preflight**: sebuah request `OPTIONS` untuk menanyakan ke server apakah request aslinya diizinkan.
+
+#### Request preflight `OPTIONS` dari browser:
 
 ```
 OPTIONS /data HTTP/1.1
@@ -72,7 +74,7 @@ Access-Control-Request-Method: DELETE
 Access-Control-Request-Headers: Content-Type
 ```
 
-#### Respons Preflight `OPTIONS` dari Server:
+#### Respons preflight `OPTIONS` dari server:
 
 ```
 HTTP/1.1 204 No Content
@@ -81,9 +83,9 @@ Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS
 Access-Control-Allow-Headers: Content-Type
 ```
 
-Setelah berhasil menerima respons dari preflight, browser kita mengirim permintaan, dan jika berhasil, server mengembalikan respons ok.
+Setelah preflight lolos, browser mengirim request aslinya dan menerima responsnya.
 
-#### Permintaan `DELETE` dari Browser:
+#### Request `DELETE` dari browser:
 
 ```
 DELETE /data/123 HTTP/1.1
@@ -92,18 +94,16 @@ Origin: https://www.domain-a.com
 Content-Type: application/json
 ```
 
-#### Respons dari Server:
+#### Respons dari server:
 
 ```
 HTTP/1.1 200 OK
 Access-Control-Allow-Origin: https://www.domain-a.com
 Content-Type: application/json
 
-{"message": "Resource deleted successfully!"}
+{ "message": "Resource deleted successfully!" }
 ```
 
-## Mengapa CORS penting?
+## Kenapa CORS penting
 
-CORS memungkinkan server web untuk menentukan siapa yang dapat mengakses sumber daya. Ini penting untuk mencegah potensi serangan antar domain, seperti serangan [cross-site request forgery (CSRF)](https://hackernoon.com/cross-site-request-forgery-csrf-attacks-an-emerging-threat-to-browser-security?source=rss&ref=dailydev) yang disebabkan oleh kueri tidak sah ke domain lain. Selain itu, CORS memungkinkan aplikasi web untuk berinteraksi secara aman dengan berbagai macam sumber daya dari banyak asal.
-
-**Thanks for Reading✌️**
+CORS membuat server yang menentukan siapa saja yang boleh membaca sumber dayanya. Tanpa itu, situs mana pun bisa diam-diam mengirim request ke domain lain atas nama pengguna — dasar dari serangan seperti [cross-site request forgery (CSRF)](https://owasp.org/www-community/attacks/csrf). Dengan CORS, aplikasi tetap bisa berbagi data lintas origin, tapi hanya kalau server secara eksplisit mengizinkannya.
