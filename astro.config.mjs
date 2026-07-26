@@ -8,7 +8,7 @@ import rehypeKatex from 'rehype-katex';
 import rehypeSlug from 'rehype-slug';
 
 export default defineConfig({
-  site: 'https://fadjarrafi.com',
+  site: 'https://fadjarrafi.my.id',
   output: 'static',
   integrations: [
     mdx({
