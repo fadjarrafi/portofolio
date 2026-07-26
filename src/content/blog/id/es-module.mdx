@@ -1,5 +1,5 @@
 ---
-title: 'Sistem ES module dalam JavaScript Modern'
+title: 'Sistem ES Module dalam JavaScript Modern'
 publishedAt: '2025-04-20'
 featured: false
 topics: ['javascript']
@@ -8,79 +8,50 @@ lang: 'id'
 translationSlug: 'es-module'
 ---
 
-ES Module (ESM) adalah sistem modularisasi standar yang diperkenalkan dalam ECMAScript 2015 (ES6). Sistem ini memberikan standar untuk mengorganisir dan membagi kode JavaScript menjadi komponen yang _reusable_
+ES Module (ESM) adalah cara bawaan JavaScript untuk memecah kode ke banyak file dan menyambungkannya kembali. Ia hadir bersama ECMAScript 2015 (ES6) dan menjadi standar yang mendasari seluruh ekosistem modern.
 
-## Apa itu ES Module?
+Sebelum ESM, tidak ada jawaban resmi, jadi komunitas membuat caranya sendiri — IIFE, CommonJS (Node.js), AMD (RequireJS), UMD. ESM menggantikan tambal sulam itu dengan satu sintaks yang berjalan native di browser dan Node.
 
-ES Module adalah cara standar untuk membagi kode JavaScript menjadi bagian-bagian terpisah yang dapat saling terhubung. Sebelum adanya ES Modules, developer JavaScript menggunakan berbagai pendekatan non-standar seperti:
+## Export dan import
 
-- Pattern IIFE (Immediately Invoked Function Expression)
-- CommonJS (digunakan di Node.js)
-- AMD (Asynchronous Module Definition, populer dengan RequireJS)
-- UMD (Universal Module Definition)
-
-## Mengapa ES Module Penting?
-
-1. **Standarisasi**: Ini adalah sistem modularisasi resmi JavaScript yang didukung secara native oleh browser modern
-2. **Pengorganisasian Kode**: Memisahkan kode ke file-file yang berbeda secara logis
-3. **Reusabilitas**: Membuat komponen dapat digunakan kembali
-4. **Tree Shaking**: Framework modern dapat menghilangkan kode yang tidak digunakan
-5. **Lazy Loading**: Module dapat dimuat hanya ketika dibutuhkan
-
-## Sintaks Dasar ES Module
-
-### Export
-
-Untuk membuat kode tersedia bagi file lain, kita menggunakan keyword `export`.
+Kita tandai apa yang dibagikan sebuah file dengan `export`, lalu menariknya ke file lain dengan `import`.
 
 ```javascript
 // utils.js
-// Export named
 export function sum(a, b) {
   return a + b
 }
 
 export const PI = 3.14159
 
-// Export default
 export default function greet(name) {
   return `Hello, ${name}!`
 }
 ```
 
-Ada dua jenis export:
+Ada dua jenis: **named export** (boleh banyak dalam satu file) dan satu **default export** per file.
 
-- **Named exports**: Dapat memiliki banyak per file
-- **Default export**: Hanya boleh satu per file
+<div className="flex justify-center">
+  <img src="/static/images/es-module.png" alt="utils.js meng-export sum, PI, dan greet; app.js meng-import-nya" width="680" />
+</div>
 
-### Import
-
-Untuk menggunakan kode dari module lain, kita menggunakan keyword `import`.
+Sisi import-nya mengikuti bentuk yang sama:
 
 ```javascript
 // app.js
-// Import default export
-import greet from './utils.js'
-
-// Import named exports
-import { sum, PI } from './utils.js'
-
-// Import dengan alias
-import { sum as addNumbers } from './utils.js'
-
-// Import semua named exports
-import * as Utils from './utils.js'
+import greet from './utils.js' // default
+import { sum, PI } from './utils.js' // named
+import { sum as addNumbers } from './utils.js' // dengan alias
+import * as Utils from './utils.js' // semuanya, sebagai namespace
 
 console.log(greet('World')) // "Hello, World!"
 console.log(sum(2, 3)) // 5
-console.log(PI) // 3.14159
-console.log(addNumbers(4, 5)) // 9
 console.log(Utils.PI) // 3.14159
 ```
 
-## Perbedaan Dengan CommonJS
+## Bedanya dengan CommonJS
 
-Jika kamu familiar dengan CommonJS (digunakan di Node.js), ada beberapa perbedaan penting:
+Kalau kamu pernah pakai CommonJS di Node, sintaksnya mirip tapi modelnya berbeda:
 
 ```javascript
 // CommonJS
@@ -92,16 +63,11 @@ import { sum } from './utils.js'
 export const myFunction = () => {}
 ```
 
-Perbedaan utama:
+Perbedaan utamanya, `import`/`export` di ESM bersifat **statis** — tetap di bagian atas file dan dianalisis sebelum kode dijalankan. `require()` di CommonJS bersifat dinamis dan diselesaikan saat runtime. Struktur statis inilah yang memungkinkan bundler melakukan *tree shaking*: karena mereka tahu persis apa yang di-import, export yang tidak dipakai bisa dibuang.
 
-1. ES Module menggunakan sintaks `import`/`export` yang statis dan dianalisis saat waktu kompilasi
-2. CommonJS menggunakan `require()`/`module.exports` yang dinamis dan dieksekusi saat runtime
-3. ES Module mendukung "tree shaking" karena struktur import-nya statis
-4. ES Module secara default bersifat asinkron, sementara CommonJS sinkron
+## Di browser
 
-## Menggunakan ES Module di Browser
-
-Untuk menggunakan ES Module langsung di browser, tambahkan atribut `type="module"` pada script:
+Tambahkan `type="module"` pada `<script>` dan browser memperlakukannya sebagai ESM:
 
 ```html
 <script type="module">
@@ -109,83 +75,22 @@ Untuk menggunakan ES Module langsung di browser, tambahkan atribut `type="module
   console.log(sum(1, 2))
 </script>
 
-<!-- Atau import dari file terpisah -->
 <script type="module" src="app.js"></script>
 ```
 
-Penting untuk diingat:
+Ada beberapa konsekuensinya: script module berjalan dalam mode strict, dieksekusi secara asinkron, di-fetch dengan CORS, dan butuh server sungguhan — `file://` tidak akan jalan.
 
-- File ES Module di-serve dengan CORS
-- Harus di-serve dari server web (tidak bisa dari `file://` protocol)
-- Secara otomatis berjalan dalam mode strict
-- Dieksekusi secara asinkron
+## Import dinamis
 
-## Import Dinamis
-
-ES Module juga mendukung import dinamis untuk memuat module hanya ketika dibutuhkan:
+`import` juga bisa dipakai sebagai fungsi yang mengembalikan promise, jadi sebuah module bisa dimuat hanya ketika benar-benar dibutuhkan:
 
 ```javascript
 button.addEventListener('click', async () => {
-  // Module dimuat hanya saat tombol diklik
   const { renderChart } = await import('./chart.js')
   renderChart(data)
 })
 ```
 
-Ini sangat berguna untuk:
+Di sini `chart.js` tidak diunduh sampai tombolnya diklik — dasar dari code splitting dan lazy loading, yang menjaga muatan awal halaman tetap ringan.
 
-- Lazy loading
-- Code splitting
-- Pengurangan waktu pemuatan awal
-
-## ES Module dan Framework Modern
-
-Jika kamu berencana untuk belajar React, Vue, atau framework modern lainnya, pemahaman tentang ES Module sangat penting karena:
-
-```javascript
-// React Component menggunakan ES Module
-import React from 'react';
-import { useState } from 'react';
-import Header from './components/Header';
-
-export default function App() {
-  const [count, setCount] = useState(0);
-  return (/* ... */);
-}
-```
-
-```javascript
-// Vue Component menggunakan ES Module
-import { ref } from 'vue'
-import Header from './components/Header.vue'
-
-export default {
-  components: { Header },
-  setup() {
-    const count = ref(0)
-    return { count }
-  },
-}
-```
-
-Framework modern menggunakan sistem build seperti [Webpack](https://webpack.js.org/), [Rollup](https://rollupjs.org/), atau [Vite](https://vite.dev/) yang memanfaatkan ES Module untuk:
-
-1. **Tree shaking**: Menghilangkan kode yang tidak digunakan
-2. **Code splitting**: Memecah aplikasi menjadi bundle terpisah
-3. **Hot Module Replacement**: Memperbarui modul tanpa reload penuh
-
-## Best Practices
-
-1. **Gunakan satu module per file** dengan nama file yang menggambarkan isinya
-2. **Pilih antara named export atau default export** secara konsisten
-3. **Hindari side effects** dalam module (operasi yang mengubah state global)
-4. **Pilih path yang jelas** dengan ekstensi file `.js` untuk kejelasan
-5. **Pertimbangkan performa** dengan teknik code splitting dan lazy loading
-
-## Kesimpulan
-
-ES Module system adalah elemen penting dalam ekosistem JavaScript modern. Dengan memahami cara kerjanya, kamu memiliki fondasi yang kuat untuk mempelajari framework front-end seperti React dan Vue.
-
-Konsep modularisasi ini bukan hanya tentang sintaks `import`/`export`, tetapi tentang cara mengorganisir kode secara logis, meningkatkan maintainability, dan mengoptimalkan performa aplikasi web modern.
-
-**Thanks for Reading! ✌️**
+Segitu intinya. Setiap framework dan build tool modern — React, Vue, [Vite](https://vite.dev/), [Rollup](https://rollupjs.org/) — dibangun di atas fondasi `import`/`export` yang sama, jadi memahaminya sangat berguna.

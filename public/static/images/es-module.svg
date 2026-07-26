@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="220" viewBox="0 0 700 220" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="700" height="220" rx="14" fill="#ffffff"/>
+
+  <!-- utils.js (exports) -->
+  <rect x="45" y="40" width="255" height="150" rx="10" fill="#e7f5ff" stroke="#1c7ed6" stroke-width="2"/>
+  <text x="62" y="66" font-size="13.5" fill="#1c7ed6" font-weight="600" font-family="Consolas, monospace">utils.js</text>
+  <line x1="45" y1="80" x2="300" y2="80" stroke="#a5d8ff" stroke-width="1.5"/>
+  <g font-family="Consolas, monospace" font-size="12.5">
+    <text x="62" y="108"><tspan fill="#7048e8">export</tspan> <tspan fill="#495057">function </tspan><tspan fill="#1c7ed6">sum</tspan><tspan fill="#495057">()</tspan></text>
+    <text x="62" y="134"><tspan fill="#7048e8">export</tspan> <tspan fill="#495057">const </tspan><tspan fill="#1c7ed6">PI</tspan></text>
+    <text x="62" y="160"><tspan fill="#7048e8">export default</tspan> <tspan fill="#1c7ed6">greet</tspan><tspan fill="#495057">()</tspan></text>
+  </g>
+
+  <!-- arrow -->
+  <line x1="300" y1="115" x2="394" y2="115" stroke="#adb5bd" stroke-width="2.5"/>
+  <polygon points="400,115 388,109 388,121" fill="#adb5bd"/>
+  <text x="350" y="107" text-anchor="middle" font-size="11.5" fill="#868e96" font-family="Consolas, monospace">import</text>
+
+  <!-- app.js (imports) -->
+  <rect x="400" y="40" width="255" height="150" rx="10" fill="#f3f0ff" stroke="#7048e8" stroke-width="2"/>
+  <text x="417" y="66" font-size="13.5" fill="#7048e8" font-weight="600" font-family="Consolas, monospace">app.js</text>
+  <line x1="400" y1="80" x2="655" y2="80" stroke="#d0bfff" stroke-width="1.5"/>
+  <g font-family="Consolas, monospace" font-size="12.5">
+    <text x="417" y="115"><tspan fill="#7048e8">import</tspan> <tspan fill="#1c7ed6">greet</tspan> <tspan fill="#495057">from</tspan> <tspan fill="#2f9e44">'./utils.js'</tspan></text>
+    <text x="417" y="147"><tspan fill="#7048e8">import</tspan> <tspan fill="#495057">{ </tspan><tspan fill="#1c7ed6">sum</tspan><tspan fill="#495057">, </tspan><tspan fill="#1c7ed6">PI</tspan><tspan fill="#495057"> }</tspan></text>
+  </g>
+</svg>
