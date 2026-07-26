@@ -8,11 +8,9 @@ lang: 'id'
 translationSlug: 'destructuring-object'
 ---
 
-Destrukturisasi objek merupakan fitur yang ampuh untuk mengekstrak properti dari objek secara efisien. Alih-alih mengakses nya satu persatu, dengan destrukturisasi membuat syntax kita lebih rapih dan mudah dibaca.
+Destructuring adalah cara singkat untuk mengeluarkan properti dari sebuah objek ke dalam variabel masing-masing. Daripada mengambil properti satu per satu, kita ambil semua yang dibutuhkan dalam satu baris.
 
-Sesuai dengan istilah nya, destrukturisasi pada objek merupakan proses memecah properti dari objek dan memasukkan nya kedalam variabel yang terpisah.
-
-Anggap lah kita memiliki variabel apple yang memiliki object `name`, `color`, `weight` dan `taste` seperti berikut:
+Anggap kita punya objek `apple` dengan properti `name`, `color`, `weight`, dan `taste`:
 
 ```js
 const apple = {
@@ -23,67 +21,62 @@ const apple = {
 }
 ```
 
-Tanpa destrukturisasi, kita perlu mendeklarasikan satu persatu dari properti apple untuk mengakses nilai setiap properti.
+Tanpa destructuring, kita harus menetapkan tiap properti di barisnya sendiri:
 
 ```js
-let name = apple.name // output: Apple
-
-let color = apple.color // output: Red
-
-let weight = apple.weight // output: 150
-
-let taste = apple.taste // output: Sweet
+const name = apple.name // 'Apple'
+const color = apple.color // 'Red'
+const weight = apple.weight // 150
+const taste = apple.taste // 'Sweet'
 ```
 
-Tentu ini akan sangat menguras tenaga jika kita berurusan dengan objek yang sangat banyak atau bahkan nested object seperti jika kita sedang berurusan dengan respon JSON pada API.
+Cara ini cepat terasa merepotkan, apalagi kalau objeknya besar atau bertingkat seperti respons JSON dari sebuah API.
 
-## Dasar dari Object Destructuring
+## Dasarnya
 
-Lalu bagaimana kita melakukan destrukturisasi pada objek apple yang telah kita buat tadi? kita bisa melakukan nya hanya dengan satu baris kode saja.
+Ini hal yang sama dengan destructuring — cukup satu baris:
 
 ```js
 const { name, color, weight } = apple
 
-console.log(name) // "Apple"
-console.log(color) // "Red"
+console.log(name) // 'Apple'
+console.log(color) // 'Red'
 ```
 
-Dengan begitu, `name`, `color` dan `weight` memiliki nilai yang sama objek dari apple.
+Tiap variabel mengambil nilai dari properti yang namanya cocok di `apple`.
 
-## Advanced Destructuring Techniques
+<div className="flex justify-center">
+  <img src="/static/images/destructuring-object.png" alt="Properti objek apple diekstrak ke dalam variabel terpisah" width="640" />
+</div>
 
-Destrukturisasi juga bisa kita gunakan dalam case-case tertentu seperti:
+## Beberapa pola yang berguna
 
-### 1. Renaming Variables
+### Mengganti nama variabel
 
-Kita bisa mengekstrak properti dengan nama variabel yang kita inginkan:
+Beri nama lain pada variabel dengan tanda titik dua:
 
 ```js
 const { name: fruitName, color: fruitColor } = apple
 
-console.log(fruitName) // "Apple"
-console.log(fruitColor) // "Red"
+console.log(fruitName) // 'Apple'
+console.log(fruitColor) // 'Red'
 ```
 
-### 2. Default Values
+### Nilai default
 
-Anggaplah kita ingin mengambil properti size dalam variable apple:
-
-```js
-console.log(size) // undefined
-```
-
-Karena didalam variabel apple tidak ada properti size, maka value akan muncul sebagain `undefined`. Kita bisa menambahkan default value kedalam variabel size.
+Kalau propertinya tidak ada, variabelnya jadi `undefined`. Kita bisa menyiapkan nilai cadangan:
 
 ```js
 const { size = 'Medium' } = apple
 
-console.log(size) // "Medium"
+console.log(size) // 'Medium'
 ```
 
-### 3. Nested Object Destructuring
+Karena `apple` tidak punya properti `size`, nilai default-nya yang dipakai.
 
-Kita juga bisa mengekstrak nilai dari nested object. ini akan sangat berguna jika kita berhubungan dengan respon JSON sebuah API.
+### Nested object
+
+Kita juga bisa masuk ke objek bertingkat — berguna untuk respons API:
 
 ```js
 const fruit = {
@@ -102,20 +95,16 @@ console.log(vitamin_c) // 4.6
 console.log(fiber) // 2.4
 ```
 
-### 4. Function Parameter Destructuring
+### Parameter fungsi
 
-Kita bisa menggunakan destrukturisasi dalam fungsi sebagai parameter.
+Destructuring bisa langsung dipakai di daftar parameter, jadi fungsi cukup mengambil field yang dibutuhkan saja:
 
 ```js
 function describeFruit({ name, color, taste }) {
   return `The ${name} is ${color} and tastes ${taste}.`
 }
 
-describeFruit(apple) // "The Apple is Red and tastes Sweet."
+describeFruit(apple) // 'The Apple is Red and tastes Sweet.'
 ```
 
-## Conclusion
-
-Destrukturisasi Objek mempermudah kita untuk mengakses properti dan membuat kode javascript kita lebih maintainable. Dan ini akan sangat berguna ketika kita mengolah data JSON dalam API atau struktur data yang kompleks.
-
-**Thanks for Reading! ✌️**
+Segini dulu yang paling sering dipakai sehari-hari. Begitu terbiasa, destructuring bakal kamu pakai di mana-mana — respons API, argumen fungsi, sampai import.

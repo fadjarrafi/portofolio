@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="260" viewBox="0 0 700 260" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="700" height="260" rx="14" fill="#ffffff"/>
+
+  <!-- object box -->
+  <rect x="45" y="40" width="230" height="180" rx="10" fill="#e7f5ff" stroke="#1c7ed6" stroke-width="2"/>
+  <text x="160" y="68" text-anchor="middle" font-size="14" fill="#1c7ed6" font-weight="600" font-family="Consolas, monospace">const apple</text>
+  <line x1="45" y1="82" x2="275" y2="82" stroke="#a5d8ff" stroke-width="1.5"/>
+
+  <text x="70" y="112" font-size="13.5" fill="#495057" font-family="Consolas, monospace">name:</text>
+  <text x="150" y="112" font-size="13.5" fill="#2f9e44" font-family="Consolas, monospace">'Apple'</text>
+
+  <text x="70" y="146" font-size="13.5" fill="#495057" font-family="Consolas, monospace">color:</text>
+  <text x="150" y="146" font-size="13.5" fill="#2f9e44" font-family="Consolas, monospace">'Red'</text>
+
+  <text x="70" y="180" font-size="13.5" fill="#495057" font-family="Consolas, monospace">weight:</text>
+  <text x="150" y="180" font-size="13.5" fill="#7048e8" font-family="Consolas, monospace">150</text>
+
+  <!-- arrows -->
+  <line x1="275" y1="105" x2="435" y2="88" stroke="#adb5bd" stroke-width="2.5"/>
+  <polygon points="440,87 427,86 431,97" fill="#adb5bd"/>
+
+  <line x1="275" y1="140" x2="435" y2="140" stroke="#adb5bd" stroke-width="2.5"/>
+  <polygon points="440,140 428,134 428,146" fill="#adb5bd"/>
+
+  <line x1="275" y1="175" x2="435" y2="192" stroke="#adb5bd" stroke-width="2.5"/>
+  <polygon points="440,193 431,183 427,194" fill="#adb5bd"/>
+
+  <!-- variable pills -->
+  <rect x="445" y="70" width="200" height="36" rx="8" fill="#f8f9fa" stroke="#ced4da" stroke-width="1.5"/>
+  <text x="465" y="93" font-size="13.5" fill="#495057" font-family="Consolas, monospace">name = 'Apple'</text>
+
+  <rect x="445" y="122" width="200" height="36" rx="8" fill="#f8f9fa" stroke="#ced4da" stroke-width="1.5"/>
+  <text x="465" y="145" font-size="13.5" fill="#495057" font-family="Consolas, monospace">color = 'Red'</text>
+
+  <rect x="445" y="174" width="200" height="36" rx="8" fill="#f8f9fa" stroke="#ced4da" stroke-width="1.5"/>
+  <text x="465" y="197" font-size="13.5" fill="#495057" font-family="Consolas, monospace">weight = 150</text>
+
+  <!-- caption -->
+  <text x="350" y="245" text-anchor="middle" font-size="13" fill="#868e96" font-family="Consolas, monospace">const { name, color, weight } = apple</text>
+</svg>
