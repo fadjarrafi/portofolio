@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="270" viewBox="0 0 700 270" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="700" height="270" rx="14" fill="#ffffff"/>
+
+  <!-- mean line -->
+  <line x1="385" y1="45" x2="385" y2="245" stroke="#adb5bd" stroke-width="2" stroke-dasharray="5 5"/>
+  <text x="385" y="34" text-anchor="middle" font-size="13" fill="#495057">rata-rata = 30</text>
+
+  <!-- Hutan A -->
+  <text x="40" y="100" font-size="14" fill="#495057">Hutan A</text>
+  <line x1="130" y1="95" x2="640" y2="95" stroke="#dee2e6" stroke-width="2"/>
+  <g fill="#1c7ed6">
+    <circle cx="359.5" cy="95" r="5"/>
+    <circle cx="372.25" cy="95" r="5"/>
+    <circle cx="385" cy="95" r="5"/>
+    <circle cx="397.75" cy="95" r="5"/>
+    <circle cx="410.5" cy="95" r="5"/>
+  </g>
+  <text x="385" y="126" text-anchor="middle" font-size="12" fill="#868e96">rapat di sekitar rata-rata — varians kecil</text>
+
+  <!-- Hutan B -->
+  <text x="40" y="205" font-size="14" fill="#495057">Hutan B</text>
+  <line x1="130" y1="200" x2="640" y2="200" stroke="#dee2e6" stroke-width="2"/>
+  <g fill="#1c7ed6">
+    <circle cx="130" cy="200" r="5"/>
+    <circle cx="257.5" cy="200" r="5"/>
+    <circle cx="385" cy="200" r="5"/>
+    <circle cx="512.5" cy="200" r="5"/>
+    <circle cx="640" cy="200" r="5"/>
+  </g>
+  <text x="385" y="231" text-anchor="middle" font-size="12" fill="#868e96">tersebar jauh dari rata-rata — varians besar</text>
+</svg>
