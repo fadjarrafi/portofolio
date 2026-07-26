@@ -7,160 +7,126 @@ type: 'tutorial'
 lang: 'id'
 translationSlug: 'spread-operator'
 ---
-Spread operator (`...`) dalam JavaScript adalah fitur canggih yang mempermudah manipulasi array dan objek. Diperkenalkan dalam ES6, fitur ini memungkinkan kita mengekspansi elemen dengan cepat dan efisien, menghasilkan kode yang lebih bersih, mempertahankan immutability, dan menyediakan cara fleksibel untuk bekerja dengan koleksi data.
 
-## Apa Itu Spread Operator?
+Spread operator (`...`) mengekspansi sebuah iterable — array, string, atau objek — menjadi elemen-elemennya satu per satu. Fitur ini hadir sejak ES6 dan cepat jadi salah satu hal yang dipakai tiap hari: menggabungkan array, menyalin objek, atau mengoper daftar argumen, semuanya tanpa mengubah data aslinya.
 
-Spread operator ditandai dengan tiga titik (`...`) dan berfungsi untuk mengekspansi iterable (seperti array atau string) menjadi elemen-elemen individual. Fitur ini sangat berguna untuk operasi array, argumen fungsi, dan manipulasi objek.
-
-## Penggunaan Umum Spread Operator
-
-### 1. Operasi Array
+## Array
 
 ```javascript
-// Menggabungkan array
+// Menggabungkan dua array
 const buah = ['apel', 'pisang']
 const sayuran = ['wortel', 'tomat']
 const gabungan = [...buah, ...sayuran]
-// Hasil: ['apel', 'pisang', 'wortel', 'tomat']
+// ['apel', 'pisang', 'wortel', 'tomat']
 
-// Membuat salinan array
+// Menyalin array
 const asli = [1, 2, 3]
 const salinan = [...asli]
 ```
 
-### 2. Argumen Fungsi
+Tiga titik itu "membongkar" tiap array sehingga isinya berjajar di array baru:
+
+<div className="flex justify-center">
+  <img src="/static/images/spread-operator.png" alt="Dua array di-spread menjadi satu array gabungan" width="560" />
+</div>
+
+## Argumen fungsi
+
+Ekspansi array menjadi argumen terpisah yang diminta sebuah fungsi:
 
 ```javascript
 const angka = [1, 2, 3]
-const maksimum = Math.max(...angka)
-// Sama dengan Math.max(1, 2, 3)
+Math.max(...angka) // sama dengan Math.max(1, 2, 3)
 ```
 
-### 3. Operasi Objek
+## Objek
 
 ```javascript
-const penggunaDasar = { nama: 'Budi', umur: 30 }
-const penggunaTambahan = {
-  ...penggunaDasar,
-  lokasi: 'Jakarta',
-}
-// Hasil: { nama: 'Budi', umur: 30, lokasi: 'Jakarta' }
-
-// Menimpa properti
-const defaultSetting = { tema: 'terang', notifikasi: true }
-const preferensiPengguna = { tema: 'gelap' }
-
-const pengaturan = { ...defaultSetting, ...preferensiPengguna }
-// Hasil: { tema: 'gelap', notifikasi: true }
-
-// Urutan berpengaruh
-const pengaturanTerbalik = { ...preferensiPengguna, ...defaultSetting }
-// Hasil: { tema: 'terang', notifikasi: true }
+const pengguna = { nama: 'Budi', umur: 30 }
+const denganLokasi = { ...pengguna, lokasi: 'Jakarta' }
+// { nama: 'Budi', umur: 30, lokasi: 'Jakarta' }
 ```
 
-### 4. Bekerja dengan Set dan Map
+Urutan berpengaruh. Properti yang ditulis belakangan menimpa yang di depan — pas untuk menggabungkan nilai default dengan nilai override:
 
 ```javascript
-// Menggunakan spread dengan Set untuk nilai unik
-const angkaUnik = [...new Set([1, 2, 2, 3, 3, 4])]
-// Hasil: [1, 2, 3, 4]
+const bawaan = { tema: 'terang', notifikasi: true }
+const preferensi = { tema: 'gelap' }
 
-// Menggunakan spread dengan Map
-const peta = new Map([
-  ['a', 1],
-  ['b', 2],
-])
+const pengaturan = { ...bawaan, ...preferensi }
+// { tema: 'gelap', notifikasi: true }
+```
+
+Balik urutannya, dan nilai default yang menang.
+
+## Set dan Map
+
+Karena keduanya iterable, spread mengubahnya kembali menjadi array — cara cepat untuk membuang duplikat:
+
+```javascript
+const unik = [...new Set([1, 2, 2, 3, 3, 4])]
+// [1, 2, 3, 4]
+
+const peta = new Map([['a', 1], ['b', 2]])
 const entri = [...peta]
-// Hasil: [['a', 1], ['b', 2]]
+// [['a', 1], ['b', 2]]
 ```
 
-## Rest Parameter vs. Spread Operator
+## Spread vs rest
 
-Meskipun menggunakan sintaks `...` yang sama, rest parameter dan spread operator memiliki tujuan berbeda:
+Tiga titik yang sama, tugas yang berlawanan. Spread membongkar koleksi menjadi item; rest mengumpulkan item kembali menjadi array. Cara membedakannya: rest muncul di daftar parameter fungsi, spread di tempat lainnya.
 
 ```javascript
-// Rest parameter (mengumpulkan item menjadi array)
-function kumpulkanArgumen(...args) {
+// rest: mengumpulkan
+function kumpulkan(...args) {
   return args
 }
-kumpulkanArgumen(1, 2, 3) // [1, 2, 3]
+kumpulkan(1, 2, 3) // [1, 2, 3]
 
-// Spread operator (mengekspansi array menjadi item terpisah)
+// spread: mengekspansi
 const angka = [1, 2, 3]
 console.log(...angka) // 1 2 3
 ```
 
-## Kesalahan Umum dan Solusinya
+## Jebakan shallow copy
 
-### Shallow Copy vs Deep Copy
+Ini yang paling sering menjebak. Spread cuma menyalin satu level. Objek bersarang tetap dibagikan lewat referensi, jadi mengubahnya ikut mengubah data aslinya.
 
 ```javascript
-// Keterbatasan shallow copy
 const bersarang = { a: { b: 1 } }
-const salinDangkal = { ...bersarang }
-// Objek bersarang masih berbagi referensi
+const salinan = { ...bersarang }
 
-// Solusi untuk deep copying
-// Menggunakan JSON (dengan keterbatasan untuk fungsi, objek Date, dll.)
-const salinDalam1 = JSON.parse(JSON.stringify(bersarang))
-
-// Menggunakan structuredClone (browser modern)
-const salinDalam2 = structuredClone(bersarang)
-
-// Menggunakan library seperti lodash
-// const salinDalam3 = _.cloneDeep(bersarang)
+salinan.a.b = 2
+bersarang.a.b // 2 — data asli ikut berubah
 ```
 
-## Aplikasi di Dunia Nyata
-
-Spread operator sangat berguna dalam framework dan library modern:
+Kalau butuh deep copy sungguhan, pakai `structuredClone`:
 
 ```javascript
-// Di React untuk pembaruan state yang immutable
+const salinan = structuredClone(bersarang)
+```
+
+(`JSON.parse(JSON.stringify(...))` juga bisa, tapi membuang fungsi, objek `Date`, dan apa pun yang tak bisa direpresentasikan JSON.)
+
+## Paling berguna: update yang immutable
+
+Pembaruan state di React dan Redux mengandalkan pengembalian objek baru alih-alih mengubah yang lama. Spread membuatnya rapi:
+
+```javascript
 function reducer(state, action) {
   switch (action.type) {
     case 'UPDATE_USER':
       return {
         ...state,
-        user: {
-          ...state.user,
-          ...action.payload,
-        },
+        user: { ...state.user, ...action.payload },
       }
-    // kasus lainnya...
   }
-}
-
-// Di Redux untuk pembaruan immutable
-const stateBaruTambahan = {
-  ...state,
-  filterVisibilitas: 'TAMPILKAN_SELESAI',
 }
 ```
 
-## Pertimbangan Performa
+## Beberapa catatan
 
-Meskipun spread operator sangat mudah digunakan, kita perlu memperhatikan performa saat bekerja dengan struktur data besar:
+- Untuk array yang sangat besar (ribuan elemen), `concat()` bisa lebih cepat daripada spread.
+- Spread sudah didukung semua browser modern. Kalau harus mendukung Internet Explorer, transpile dengan Babel.
 
-- Untuk array yang sangat besar (ribuan elemen), metode tradisional seperti `Array.prototype.concat()` mungkin lebih efisien
-- Operasi spread yang bersarang dalam bisa berdampak pada performa
-- Pertimbangkan alternatif lain ketika performa menjadi kritis dalam aplikasi kamu
-
-## Kompatibilitas Browser
-
-Spread operator didukung di semua browser modern tetapi membutuhkan transpilasi dengan tools seperti Babel ketika perlu mendukung browser lama seperti Internet Explorer.
-
-## Praktik Terbaik
-
-1. Gunakan spread untuk operasi array/objek sederhana
-2. Kombinasikan dengan destructuring untuk penugasan variabel yang lebih powerful
-3. Perhatikan dampak struktur bersarang saat menyalin objek
-4. Gunakan nama variabel yang bermakna untuk kejelasan
-5. Waspadai keterbatasan shallow copy saat bekerja dengan struktur bersarang
-
-## Kesimpulan
-
-Spread operator adalah fitur JavaScript penting yang menyederhanakan kode dan meningkatkan keterbacaan. Memahami kemampuan dan keterbatasannya membantu menulis kode yang lebih efisien dan mudah dirawat. Ketika digunakan dengan tepat, spread operator dapat secara signifikan mengurangi kode boilerplate sambil mempertahankan prinsip immutability yang sering dibutuhkan aplikasi JavaScript modern.
-
-**Thanks for Reading! ✌️**
+Segitu saja. Begitu menggabungkan, menyalin, dan menimpa jadi satu baris, susah kembali ke cara lama — cukup ingat perilaku shallow copy saat datamu bersarang.

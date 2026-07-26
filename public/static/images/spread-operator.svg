@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="250" viewBox="0 0 560 250" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="560" height="250" rx="14" fill="#ffffff"/>
+
+  <!-- fruits -->
+  <text x="140" y="34" text-anchor="middle" font-size="15" fill="#e8590c" font-weight="600">fruits</text>
+  <g fill="#fff4e6" stroke="#e8590c" stroke-width="2">
+    <rect x="55" y="44" width="85" height="40" rx="6"/>
+    <rect x="140" y="44" width="85" height="40" rx="6"/>
+  </g>
+  <text x="97" y="70" text-anchor="middle" font-size="14" fill="#1e1e1e">apple</text>
+  <text x="182" y="70" text-anchor="middle" font-size="14" fill="#1e1e1e">banana</text>
+
+  <!-- vegetables -->
+  <text x="392" y="34" text-anchor="middle" font-size="15" fill="#2f9e44" font-weight="600">vegetables</text>
+  <g fill="#ebfbee" stroke="#2f9e44" stroke-width="2">
+    <rect x="307" y="44" width="85" height="40" rx="6"/>
+    <rect x="392" y="44" width="85" height="40" rx="6"/>
+  </g>
+  <text x="349" y="70" text-anchor="middle" font-size="14" fill="#1e1e1e">carrot</text>
+  <text x="434" y="70" text-anchor="middle" font-size="14" fill="#1e1e1e">tomato</text>
+
+  <!-- spread expression -->
+  <text x="280" y="135" text-anchor="middle" font-size="15" fill="#495057" font-family="Consolas, monospace">[ ...fruits, ...vegetables ]</text>
+
+  <!-- arrows -->
+  <g stroke="#adb5bd" stroke-width="2" fill="none">
+    <path d="M140 90 C 140 120, 140 130, 118 158"/>
+    <path d="M182 90 C 182 118, 190 132, 202 158"/>
+    <path d="M349 90 C 349 118, 300 132, 288 158"/>
+    <path d="M434 90 C 434 120, 400 138, 372 158"/>
+  </g>
+
+  <!-- combined -->
+  <g fill="#f8f9fa" stroke="#495057" stroke-width="2">
+    <rect x="75" y="162" width="85" height="40" rx="6"/>
+    <rect x="160" y="162" width="85" height="40" rx="6"/>
+    <rect x="245" y="162" width="85" height="40" rx="6"/>
+    <rect x="330" y="162" width="85" height="40" rx="6"/>
+  </g>
+  <text x="117" y="188" text-anchor="middle" font-size="14" fill="#1e1e1e">apple</text>
+  <text x="202" y="188" text-anchor="middle" font-size="14" fill="#1e1e1e">banana</text>
+  <text x="287" y="188" text-anchor="middle" font-size="14" fill="#1e1e1e">carrot</text>
+  <text x="372" y="188" text-anchor="middle" font-size="14" fill="#1e1e1e">tomato</text>
+  <text x="450" y="188" font-size="15" fill="#495057" font-weight="600">combined</text>
+</svg>
