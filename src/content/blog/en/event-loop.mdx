@@ -11,62 +11,65 @@ translationSlug: 'event-loop'
 
 ## What is the event loop in JavaScript?
 
-To understand the event loop, we first need to know that JavaScript is single-threaded. This means code runs one instruction at a time, in sequence — only one instruction can be processed at any given moment.
+JavaScript is single-threaded. It runs one instruction at a time, in order, and only one thing can happen at any given moment.
 
-This is where the event loop comes in: it lets us run operations as if they were happening simultaneously, without halting the other instructions waiting in line.
+That sounds limiting, but the event loop is what lets JavaScript deal with slow operations without freezing everything else. It runs them off to the side, so the instructions still waiting in line don't have to stop.
 
 <div className="flex justify-center">
-  <img src="/static/images/event-loop-en.png" alt="Event Loop di Javascript" width="700" />
+  <img src="/static/images/event-loop-en.png" alt="How the event loop works: delegate to Web APIs, stay non-blocking, drain microtasks before the next macrotask, then repeat" width="700" />
 </div>
 
-## Examples of Web API features that take a long time:
+## Web API operations that take a while
 
-1. **Fetch API / XMLHttpRequest**: Network requests that pull data from a server can take anywhere from hundreds of milliseconds to several seconds, depending on connection speed and data size. For example, `fetch('https://api.example.com/data')` pulling down a large dataset.
-2. **File API / FileReader**: Reading large files uploaded by a user can take a while. For example, `fileReader.readAsDataURL(largeImageFile)` for a large image.
-3. **IndexedDB Operations**: Browser database operations for storing or retrieving large amounts of data. For example, `indexedDB.getAll()` on a database with thousands of entries.
-4. **Media Processing**: Decoding and rendering large audio/video files. For example, `video.play()` for an HD or 4K video.
-5. **Geolocation API**: Determining a user's location can take a fair amount of time, especially on devices with slow GPS. For example, `navigator.geolocation.getCurrentPosition()`.
+Some browser operations are slow enough that you don't want to sit and wait for them:
 
-So why does the event loop matter so much? When we call a Web API feature that takes a long time, without special handling the entire application would stall, waiting for that process to finish. To prevent this, JavaScript moves those heavy operations into a separate environment: the Web APIs.
+1. **Fetch / XMLHttpRequest** — a network request can take anywhere from a few hundred milliseconds to several seconds, depending on the connection and how much data comes back. Think `fetch('https://api.example.com/data')` pulling down a large dataset.
+2. **FileReader** — reading a large file a user uploaded, like `fileReader.readAsDataURL(largeImageFile)`.
+3. **IndexedDB** — reading or writing a lot of data, like `indexedDB.getAll()` on a store with thousands of entries.
+4. **Media processing** — decoding and playing large audio or video, like `video.play()` on a 4K clip.
+5. **Geolocation** — `navigator.geolocation.getCurrentPosition()` can be slow, especially on a device with a weak GPS signal.
 
-Imagine your web app runs a `fetch` to download a 10MB dataset from a server. Without the event loop, the entire UI would "freeze" for the duration. Users couldn't scroll, click buttons, or interact at all until the data finished downloading — clearly a poor experience for any app that depends on interaction.
+If JavaScript ran these on the main thread, the whole app would stop and wait for each one to finish. So it doesn't. Slow work gets handed off to the Web APIs, which live outside the main thread.
 
-With the event loop, when `fetch` runs, JavaScript hands it off to the Web APIs and continues executing the next lines of code. The user can still interact with the UI, and once the data finishes downloading, the associated callback enters the Callback Queue to be processed by the event loop when the Call Stack is empty.
+Picture a `fetch` pulling down a 10MB dataset. Handle it inline and the UI freezes for the entire download — no scrolling, no clicking, nothing until the data lands. With the event loop, JavaScript kicks off the `fetch`, moves on to the next line, and the user keeps interacting. When the download finishes, its callback waits in a queue until the call stack is clear, then runs.
 
-This is why JavaScript is called "non-blocking": slow operations don't lock up the main thread. The event loop keeps the application responsive even while heavy work runs in the background, making it a core part of modern JavaScript architecture.
+That's what "non-blocking" means: a slow operation never locks the main thread. Heavy work runs in the background while the app stays responsive.
 
 The event loop is responsible for:
 
-1. orchestrating code execution
-2. collecting and processing events
-3. running the tasks waiting in the queues
+- orchestrating what runs and when
+- collecting and processing events
+- running the tasks waiting in the queues
 
-Types of tasks:
-1. **Synchronous Tasks** → executed directly on the Call Stack
-2. **Microtasks** → high-priority asynchronous tasks
-3. **Macrotasks** → low-priority asynchronous tasks
+It deals with three kinds of work:
 
-Components of the event loop:
+1. **Synchronous tasks** run straight on the Call Stack.
+2. **Microtasks** are high-priority async work, like Promise callbacks.
+3. **Macrotasks** are lower-priority async work, like `setTimeout`.
+
+And the pieces it moves work between:
 
 - Call Stack
 - Web APIs
-- Task Queue
+- Callback Queue (macrotasks)
 - Microtask Queue
-- Event Loop
+- the Event Loop itself
 
-## How the Event Loop Works, Step by Step
+## How the event loop works, step by step
 
-At a high level, the loop repeats this cycle:
+The cycle boils down to this:
 
-1. **Execute all synchronous code on the Call Stack.**
-2. **Process every microtask in the Microtask Queue until it's empty.**
-3. **Process a single task from the Macrotask Queue.**
-4. **Repeat.**
+1. Run all synchronous code on the Call Stack.
+2. Drain the entire Microtask Queue.
+3. Take one task from the Callback Queue.
+4. Repeat.
+
+The priority in steps 2 and 3 is the part people miss: every microtask clears before a single macrotask runs. So a `Promise.then` scheduled after a `setTimeout(…, 0)` still runs first.
 
 In more detail:
 
-1. **Execute synchronous code**: JavaScript code enters the Call Stack and runs one piece at a time. A function is called → pushed onto the stack → executed → popped off the stack.
-2. **Delegate asynchronous operations**: When it encounters an asynchronous operation (`setTimeout`, `fetch`, an event listener), JavaScript hands it off to the Web APIs so it runs outside the Call Stack.
-3. **Handle the callback**: Once the asynchronous operation completes, its callback is placed in a queue — Promise callbacks go to the Microtask Queue, all other callbacks go to the Callback Queue.
-4. **Run the event loop cycle**: The event loop continuously checks whether the Call Stack is empty. As soon as it is, it inspects the queues by priority: first the Microtask Queue (all microtasks are processed until empty), then the Callback Queue (one callback per cycle). The chosen callback is moved onto the Call Stack to run.
-5. **Repeat**: This cycle keeps turning as long as there's code left to run, letting JavaScript handle asynchronous operations without locking up the main thread.
+1. **Sync code runs first.** A function gets pushed onto the Call Stack, executes, and pops off, one at a time.
+2. **Async work gets delegated.** When JavaScript hits something like `setTimeout`, `fetch`, or an event listener, it hands the operation to the Web APIs so it runs off the stack.
+3. **The callback gets queued.** Once the async operation finishes, its callback goes into a queue — Promise callbacks to the Microtask Queue, everything else to the Callback Queue.
+4. **The loop drains the queues.** Whenever the Call Stack is empty, the event loop clears every microtask first, then pulls a single macrotask, and moves it onto the stack to run.
+5. **Repeat.** The cycle keeps turning as long as there's work left, which is how JavaScript stays asynchronous without ever blocking the main thread.
