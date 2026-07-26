@@ -1,5 +1,5 @@
 ---
-title: 'Manupulasi Array dalam Javascript'
+title: 'Manipulasi Array dalam Javascript'
 publishedAt: '2025-01-05'
 featured: false
 topics: ['javascript']
@@ -7,19 +7,26 @@ type: 'tutorial'
 lang: 'id'
 translationSlug: 'array-method'
 ---
-Array merupakan tipe data yang sangat penting dan pasti ada pada setiap bahasa pemrograman. Javascript memiliki metode yang memungkinkan kita untuk memanipulasi dan mengolah array menjadi mudah. Terdapat banyak method yang ada dalam javascript yang sering digunakan untuk memanipulasi array seperti `map`, `filter`, `reduce`, `find`, `findIndex`, `push`, `pop`, `shift`, `unshift`, `slice`, `splice`, `forEach`, `some` dan `every`. Mari kita bahas satu persatu.
 
-## Metode Map
+Array ada di mana-mana, dan JavaScript menyediakan sekumpulan method untuk mengolahnya tanpa menulis loop secara manual. Yang paling sering dipakai adalah `map`, `filter`, `reduce`, `find`, `findIndex`, `push`, `pop`, `shift`, `unshift`, `slice`, `splice`, `forEach`, `some`, dan `every`. Mari kita bahas satu per satu.
 
-Jika kita ingin mengubah setiap elemen yang kita miliki dalam array, kita bisa menggunakan `map()`. Metode ini akan menghasilkan array baru yang elemen nya sudah berubah sesuai dengan apa yang kita mau. Sebagai contoh kita memiliki array yang berisi beberapa angka dan kita ingin mengkalikan dengan 2 pada setiap elemen yang kita miliki didalam array. Metode ini akan sangat berguna jika kita ingin mengubah semua elemen yang ada dalam array kita tanpa mengubah ukuran dari array yang kita miliki.
+Tiga yang paling sering dipakai adalah `map`, `filter`, dan `reduce` — mengubah tiap elemen, menyaring yang dibutuhkan, atau meringkas semuanya jadi satu nilai:
+
+<div className="flex justify-center">
+  <img src="/static/images/array-method.png" alt="map mengubah tiap elemen, filter menyaring elemen yang cocok, reduce menggabungkannya jadi satu nilai" width="640" />
+</div>
+
+## map
+
+`map()` menjalankan tiap elemen lewat sebuah fungsi dan mengembalikan array baru berisi hasilnya — panjangnya sama, nilainya berubah. Misalnya kita ingin mengalikan tiap angka dengan 2:
 
 ```javascript
 const numbers = [1, 2, 3, 4]
 const doubled = numbers.map((num) => num * 2)
-// Hasil: [2, 4, 6, 8]
+// [2, 4, 6, 8]
 ```
 
-Selain itu, metode `map()` ini akan sangat berguna jika kita ingin mengekstrak data tertentu. sebagai contoh kita memiliki objek `id` dan `nama` yang ada dalam array.
+`map()` juga andalan untuk mengambil satu field dari kumpulan objek:
 
 ```javascript
 const users = [
@@ -28,92 +35,80 @@ const users = [
   { id: 3, name: 'Doe' },
 ]
 const userIds = users.map((user) => user.id)
-// Hasil: userIds: [1, 2, 3]
+// [1, 2, 3]
 ```
 
-## Metode Filter
+## filter
 
-Metode `filter()` digunakan jika kita ingin menghasilkan array baru yang berisi elemen-elemen yang memenuhi kriteria tertentu. Setiap elemen akan diproses melalui fungsi callback yang akan mengembalikan nilai true atau false, yang akan menentukan apakah elemen tersebut layak dimasukkan ke dalam array baru.
+`filter()` mengembalikan array baru berisi elemen yang lolos sebuah tes. Callback mengembalikan `true` untuk menyimpan elemen, `false` untuk membuangnya:
 
 ```javascript
 const ages = [15, 25, 35, 12, 40]
 const adults = ages.filter((age) => age >= 18)
-// Hasil: [25, 35, 40]
+// [25, 35, 40]
 ```
 
-Pada contoh diatas, kita ingin mencetak sebuah array umur yang yang baru dan memiliki element umur sama atau diatas 18. Maka kita menerapkan kondisi `age >= 18`.
+Di sini kita hanya menyimpan umur yang 18 ke atas.
 
-## Metode Reduce
+## reduce
 
-Metode `reduce()` memungkinkan kita menggabungkan semua elemen array menjadi satu nilai tunggal. Fleksibilitas metode ini membuatnya berguna untuk berbagai keperluan, mulai dari menjumlahkan angka hingga membuat struktur data kompleks. Nilai akumulator akan diproses bersama setiap elemen array untuk menghasilkan output akhir.
+`reduce()` meringkas array menjadi satu nilai. Ia menelusuri tiap elemen sambil membawa sebuah akumulator, dan kita yang menentukan bagaimana keduanya digabung:
 
 ```javascript
 const prices = [10, 20, 30]
-
 const total = prices.reduce((sum, price) => sum + price, 0)
-
-// Hasil: 60
+// 60
 ```
 
-Pada contoh di atas, nilai awal akumulator adalah 0, kemudian setiap elemen dalam array ditambahkan ke akumulator hingga menghasilkan total 60.
+Akumulator mulai dari `0`, lalu tiap harga ditambahkan ke atasnya sampai tersisa `60`.
 
-## Metode Find dan FindIndex
+## find dan findIndex
 
-Berikut metode yang membantu menemukan elemen tertentu dalam array:
+Keduanya mencari elemen pertama yang cocok dengan sebuah kondisi:
 
-- `find()` mengembalikan elemen pertama yang cocok dengan kondisi, sangat berguna untuk mencari item unik.
-
-- `findIndex()` mengembalikan posisi (indeks) dari elemen pertama yang cocok, berguna saat kita perlu tahu lokasi elemen dalam array.
+- `find()` mengembalikan elemennya.
+- `findIndex()` mengembalikan posisinya di dalam array.
 
 ```javascript
 const users = [
   { id: 1, name: 'John' },
-
   { id: 2, name: 'Jane' },
 ]
 
 const john = users.find((user) => user.name === 'John')
-
 const johnIndex = users.findIndex((user) => user.name === 'John')
 ```
 
-## Push, Pop, Shift, dan Unshift
+## push, pop, shift, dan unshift
 
-Metode-metode ini memodifikasi array asli dengan menambah atau menghapus elemen dari salah satu ujungnya. Sangat penting untuk operasi stack dan queue dalam JavaScript:
+Method ini mengubah array asli dengan menambah atau menghapus satu elemen di salah satu ujungnya — dasar dari stack dan queue:
 
 ```javascript
 const fruits = ['apple']
 
-fruits.push('banana') // Menambahkan ke akhir: ['apple', 'banana']
-
-fruits.pop() // Menghapus dari akhir: ['apple']
-
-fruits.unshift('orange') // Menambahkan ke awal: ['orange', 'apple']
-
-fruits.shift() // Menghapus dari awal: ['apple']
+fruits.push('banana') // menambah di akhir: ['apple', 'banana']
+fruits.pop() // menghapus dari akhir: ['apple']
+fruits.unshift('orange') // menambah di depan: ['orange', 'apple']
+fruits.shift() // menghapus dari depan: ['apple']
 ```
 
-## Slice dan Splice
+## slice dan splice
 
-Dua metode yang kuat untuk memanipulasi bagian array dengan tujuan berbeda:
+Namanya mirip, tugasnya beda — dan salah satunya mengubah array asli:
 
 ```javascript
-// Slice: Mengekstrak bagian array tanpa memodifikasinya
-
+// slice: menyalin sebagian, array aslinya tidak berubah
 const numbers = [1, 2, 3, 4, 5]
-
 const subset = numbers.slice(1, 3) // [2, 3]
 
-// Splice: Mengubah array dengan menghapus/mengganti elemen
-
+// splice: mengubah array di tempat, menghapus/mengganti elemen
 const letters = ['a', 'b', 'c']
-
-letters.splice(1, 1, 'x') // Menggantikan 'b' dengan 'x'
+letters.splice(1, 1, 'x') // mengganti 'b' dengan 'x' → ['a', 'x', 'c']
 ```
 
-## Metode forEach
+## forEach
 
-Metode ini memungkinkan kita menjalankan kode untuk setiap elemen array tanpa membuat array baru. Ideal untuk operasi yang tidak memerlukan nilai kembalian, seperti mencatat informasi atau memperbarui variabel eksternal.
+`forEach()` menjalankan sebuah fungsi untuk tiap elemen tanpa membuat array baru. Cocok untuk side effect — mencatat log, atau memperbarui sesuatu di luar loop:
 
 ```javascript
 const items = ['book', 'pen', 'desk']
@@ -123,24 +118,20 @@ items.forEach((item, index) => {
 })
 ```
 
-## Metode Some dan Every
+## some dan every
 
-Metode untuk menguji elemen array menggunakan kondisi boolean:
+Keduanya mengembalikan boolean setelah menguji elemen array:
 
-- `some()`: Memeriksa apakah minimal satu elemen memenuhi kondisi yang diberikan
-
-- `every()`: Memeriksa apakah semua elemen memenuhi kondisi yang diberikan
+- `some()` — apakah ada minimal satu elemen yang cocok?
+- `every()` — apakah semua elemen cocok?
 
 ```javascript
 const scores = [75, 80, 95]
 
 const hasPassingScore = scores.some((score) => score >= 90) // true
-
 const allPassed = scores.every((score) => score >= 70) // true
 ```
 
-## Kesimpulan
+## Penutup
 
-Memahami metode array merupakan hal yang sangat penting untuk mencapai pengembangan JavaScript yang efisien. Metode-metode ini tidak hanya memberikan solusi yang jelas dan mudah dipahami untuk berbagai tugas pemrograman, tetapi juga membantu Anda menulis kode yang lebih terawat dan berkinerja optimal. Dengan menguasai berbagai metode ini, Anda akan lebih siap dalam menghadapi tantangan manipulasi data yang kompleks dalam proyek JavaScript Anda.
-
-**Thanks for Reading✌️**
+Sebagian besar pekerjaan dengan array intinya memilih method yang tepat: `map` untuk mengubah, `filter` untuk menyaring, `reduce` untuk menggabungkan, dan sisanya untuk tugas-tugas kecil di antaranya. Pakai method ini daripada loop manual, dan kodemu jadi lebih ringkas serta lebih mudah dibaca.
