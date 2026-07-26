@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="250" viewBox="0 0 700 250" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="700" height="250" rx="14" fill="#ffffff"/>
+
+  <text x="350" y="34" text-anchor="middle" font-size="14" fill="#1c7ed6" font-weight="600" font-family="Consolas, monospace">const fruits</text>
+
+  <!-- array cells -->
+  <g font-family="Consolas, monospace" text-anchor="middle">
+    <!-- cell 0 -->
+    <rect x="110" y="50" width="150" height="46" rx="8" fill="#e7f5ff" stroke="#1c7ed6" stroke-width="2"/>
+    <text x="185" y="79" font-size="14.5" fill="#2f9e44">'apple'</text>
+    <text x="120" y="66" font-size="10.5" fill="#868e96">0</text>
+    <!-- cell 1 -->
+    <rect x="275" y="50" width="150" height="46" rx="8" fill="#e7f5ff" stroke="#1c7ed6" stroke-width="2"/>
+    <text x="350" y="79" font-size="14.5" fill="#2f9e44">'banana'</text>
+    <text x="285" y="66" font-size="10.5" fill="#868e96">1</text>
+    <!-- cell 2 -->
+    <rect x="440" y="50" width="150" height="46" rx="8" fill="#e7f5ff" stroke="#1c7ed6" stroke-width="2"/>
+    <text x="515" y="79" font-size="14.5" fill="#2f9e44">'grape'</text>
+    <text x="450" y="66" font-size="10.5" fill="#868e96">2</text>
+  </g>
+
+  <!-- arrows (by position) -->
+  <g stroke="#adb5bd" stroke-width="2.5" fill="#adb5bd">
+    <line x1="185" y1="96" x2="185" y2="150"/>
+    <polygon points="185,156 179,144 191,144"/>
+    <line x1="350" y1="96" x2="350" y2="150"/>
+    <polygon points="350,156 344,144 356,144"/>
+    <line x1="515" y1="96" x2="515" y2="150"/>
+    <polygon points="515,156 509,144 521,144"/>
+  </g>
+
+  <!-- variable pills -->
+  <g font-family="Consolas, monospace" text-anchor="middle">
+    <rect x="110" y="160" width="150" height="40" rx="8" fill="#f8f9fa" stroke="#ced4da" stroke-width="1.5"/>
+    <text x="185" y="185" font-size="13.5" fill="#495057">first</text>
+    <rect x="275" y="160" width="150" height="40" rx="8" fill="#f8f9fa" stroke="#ced4da" stroke-width="1.5"/>
+    <text x="350" y="185" font-size="13.5" fill="#495057">second</text>
+    <rect x="440" y="160" width="150" height="40" rx="8" fill="#f8f9fa" stroke="#ced4da" stroke-width="1.5"/>
+    <text x="515" y="185" font-size="13.5" fill="#495057">third</text>
+  </g>
+
+  <!-- caption -->
+  <text x="350" y="232" text-anchor="middle" font-size="13" fill="#868e96" font-family="Consolas, monospace">const [first, second, third] = fruits</text>
+</svg>

@@ -8,250 +8,137 @@ lang: 'id'
 translationSlug: 'destructuring-array'
 ---
 
-Jika sebelumnya kita melakukan destrukturisasi pada objek, kita juga bisa melakukan destrukturisasi pada array.
+Kita sudah membahas [destructuring pada objek](/writing/id/destructuring-object) — array bekerja dengan cara yang sama, bedanya nilainya dicocokkan berdasarkan **posisi**, bukan nama.
 
-## Dasar Destrukturisasi Array
-
-Ekstrak nilai dari array ke dalam variabel terpisah:
+## Dasarnya
 
 ```js
 const fruits = ['apple', 'banana', 'grape', 'orange']
 
-// Destrukturisasi
 const [first, second, third, fourth] = fruits
 
-console.log(first) // "apple"
-console.log(second) // "banana"
+console.log(first) // 'apple'
+console.log(second) // 'banana'
 ```
 
-## Teknik Destrukturisasi Lanjutan
+Variabel pertama mengambil elemen pertama, variabel kedua mengambil elemen kedua, begitu seterusnya.
 
-### Melewati Elemen
+<div className="flex justify-center">
+  <img src="/static/images/destructuring-array.png" alt="Elemen array dicocokkan ke variabel berdasarkan posisinya" width="640" />
+</div>
 
-Lewati elemen array yang tidak diinginkan menggunakan koma:
+## Beberapa pola yang berguna
+
+### Melewati elemen
+
+Beri jarak dengan koma untuk melewati elemen yang tidak dibutuhkan:
 
 ```js
 const fruits = ['apple', 'banana', 'grape', 'orange']
 const [first, , third] = fruits
 
-console.log(first) // "apple"
-console.log(third) // "grape"
+console.log(first) // 'apple'
+console.log(third) // 'grape'
 ```
 
-### Operator Rest
+### Rest
 
-Kumpulkan elemen yang tersisa menggunakan operator rest (...):
+Kumpulkan sisa elemen ke dalam array dengan `...`:
 
 ```js
 const fruits = ['apple', 'banana', 'grape', 'orange']
 const [first, second, ...remaining] = fruits
 
-console.log(first) // "apple"
-console.log(remaining) // ["grape", "orange"]
+console.log(first) // 'apple'
+console.log(remaining) // ['grape', 'orange']
 ```
 
-### Nilai Default
+### Nilai default
 
-Berikan nilai default untuk elemen yang tidak ada atau undefined:
+Siapkan nilai cadangan untuk elemen yang mungkin tidak ada:
 
 ```js
 const colors = ['red']
 const [primary, secondary = 'blue'] = colors
 
-console.log(primary) // "red"
-console.log(secondary) // "blue" (nilai default digunakan)
+console.log(primary) // 'red'
+console.log(secondary) // 'blue' — nilai default
 ```
 
-### Destrukturisasi Array Bersarang
+### Array bersarang
 
-Ekstrak nilai dari array yang bersarang (nested arrays):
+Kita bisa masuk ke array bersarang dengan meniru bentuknya:
 
 ```js
 const fruits = ['apple', ['red', 'green'], 'banana']
 const [name, [color1, color2]] = fruits
 
-console.log(name) // "apple"
-console.log(color1) // "red"
-console.log(color2) // "green"
+console.log(name) // 'apple'
+console.log(color1) // 'red'
+console.log(color2) // 'green'
 ```
 
-### Kombinasi dengan Destrukturisasi Objek
+### Digabung dengan objek
 
-Destrukturisasi bisa dikombinasikan antara array dan objek:
+Destructuring array dan objek bisa dipadukan saat datanya campuran:
 
 ```js
 const data = ['apple', { color: 'red', weight: 150 }]
 const [name, { color, weight }] = data
 
-console.log(name) // "apple"
-console.log(color) // "red"
+console.log(name) // 'apple'
+console.log(color) // 'red'
 console.log(weight) // 150
 ```
 
-### Destrukturisasi Parameter Fungsi
+### Parameter fungsi
 
-Destrukturisasi array langsung pada parameter fungsi:
+Destructuring bisa langsung di daftar parameter:
 
 ```js
 function analyzeFruits([first, second, ...others]) {
-  console.log(`Buah pertama: ${first}`)
-  console.log(`Buah kedua: ${second}`)
-  console.log(`Buah lainnya: ${others.join(', ')}`)
+  console.log(`Pertama: ${first}`)
+  console.log(`Kedua: ${second}`)
+  console.log(`Lainnya: ${others.join(', ')}`)
 }
 
 analyzeFruits(['apple', 'banana', 'grape', 'orange'])
 ```
 
-### Menukar Nilai
+### Menukar nilai
 
-Tukar nilai antar variabel dengan mudah:
+Trik yang rapi — menukar dua variabel tanpa variabel bantu:
 
 ```js
 let a = 'apple'
-let b = ('banana'[
-  // Tukar nilai
-  (a, b)
-] = [b, a])
+let b = 'banana'
 
-console.log(a) // "banana"
-console.log(b) // "apple"
+;[a, b] = [b, a]
+
+console.log(a) // 'banana'
+console.log(b) // 'apple'
 ```
 
-### Penanganan Error
+### Iterable lain
 
-Destrukturisasi dengan array kosong atau undefined harus diperhatikan:
+Tidak terbatas pada array — string dan set juga bisa, karena keduanya iterable:
 
 ```js
-// Contoh 1: Dengan array kosong dan nilai default
-const [first = 'default'] = []
-console.log(first) // "default"
+const [x, y, z] = 'xyz'
+console.log(x, y, z) // 'x' 'y' 'z'
 
-// Contoh 2: Error handling saat destrukturisasi null
-try {
-  const [a, b] = null // Akan menghasilkan TypeError
-} catch (error) {
-  console.error('Hati-hati saat melakukan destrukturisasi null/undefined')
-}
+const [head, ...rest] = new Set([1, 2, 3])
+console.log(head, rest) // 1 [2, 3]
 ```
 
-### Destrukturisasi dengan Iterables Lainnya
+## Di mana kamu akan menemuinya
 
-Destrukturisasi bisa digunakan untuk iterable lain, bukan hanya array:
-
-```js
-// String iterable
-const [a, b, c] = 'xyz'
-console.log(a, b, c) // "x" "y" "z"
-
-// Set iterable
-const [first, ...rest] = new Set([1, 2, 3])
-console.log(first, rest) // 1, [2, 3]
-```
-
-## Contoh Penggunaan Praktis
-
-### 1. Pengembalian Fungsi
+Dua contoh sehari-hari: memecah string, dan `useState` di React yang mengembalikan pasangan `[value, setter]` yang namanya kamu tentukan sendiri.
 
 ```js
-function getCoordinates() {
-  // Implementasi yang jelas
-  return [10, 20, 30] // x, y, z coordinates
-}
+const [year, month, day] = '2024-09-29'.split('-')
 
-const [x, y, z] = getCoordinates()
-console.log(x, y, z) // 10, 20, 30
-```
-
-### 2. Pemrosesan Array
-
-```js
-const numbers = [1, 2, 3, 4, 5]
-const [head, ...tail] = numbers
-
-console.log(head) // 1
-console.log(tail) // [2, 3, 4, 5]
-```
-
-### 3. Penugasan Beberapa Nilai
-
-```js
-const dateString = '2024-09-29'
-const [year, month, day] = dateString.split('-')
-
-console.log(`Tanggal: ${day}, Bulan: ${month}, Tahun: ${year}`)
-```
-
-### 4. React Hooks
-
-```js
-// Penggunaan destrukturisasi array dalam React Hooks
 const [count, setCount] = useState(0)
-const [isLoading, setIsLoading] = useState(false)
-
-// Custom hooks juga menggunakan pola yang sama
-const [data, loading, error] = useCustomData()
 ```
 
-### 5. Pattern Matching
-
-```js
-// Menggunakan destrukturisasi untuk pattern matching
-function processAction(actionData) {
-  if (Array.isArray(actionData) && actionData.length >= 2) {
-    const [action, payload] = actionData
-
-    if (action === 'ADD_USER') {
-      // Proses penambahan user dengan payload
-      return `User ${payload.name} ditambahkan`
-    }
-  }
-  return 'Format aksi tidak valid'
-}
-
-console.log(processAction(['ADD_USER', { name: 'John' }]))
-```
-
-## Pertimbangan Performa
-
-Meskipun destrukturisasi sangat berguna, perlu diperhatikan beberapa hal terkait performa:
-
-- Hindari destrukturisasi berlebihan dalam loop dengan jumlah iterasi besar
-- Untuk operasi berulang pada data yang sama, simpan hasil destrukturisasi di luar loop
-- Jika hanya memerlukan satu atau dua item dari array besar, pertimbangkan akses indeks langsung
-
-```js
-// Kurang efisien dalam loop besar
-for (let i = 0; i < 10000; i++) {
-  const [a, b] = getBigArray() // Overhead jika dilakukan berulang
-}
-
-// Lebih efisien
-const bigArray = getBigArray()
-const [a, b] = bigArray // Destrukturisasi sekali
-for (let i = 0; i < 10000; i++) {
-  // Gunakan a dan b tanpa destrukturisasi lagi
-}
-```
-
-## Praktik Terbaik
-
-✅ Lakukan:
-
-- Gunakan destrukturisasi untuk mengembalikan beberapa nilai
-- Beri nama variabel secara jelas berdasarkan isinya
-- Gunakan operator rest untuk fleksibilitas
-- Destrukturisasi parameter fungsi ketika berurusan dengan array
-- Selalu berikan nilai default untuk elemen yang mungkin undefined
-
-❌ Hindari:
-
-- Destrukturisasi array yang sangat bersarang (lebih dari 2-3 level)
-- Menggunakan terlalu banyak slot kosong (elemen yang dilewati)
-- Terlalu banyak destrukturisasi ketika hanya beberapa nilai yang dibutuhkan
-- Melakukan destrukturisasi berulang kali dalam loop besar
-
-## Langkah Selanjutnya
-
-Pelajari cara menerapkan prinsip yang sama pada objek di artikel berikutnya: [Destrukturisasi Objek pada JavaScript](/writing/id/destructuring-object).
-
-**Thanks for Reading! ✌️**
+Begitu destructuring berbasis posisi ini terbiasa, kamu bakal melihatnya di mana-mana — nilai kembalian fungsi, hooks, dan di mana pun sebuah fungsi mengembalikan lebih dari satu nilai.
