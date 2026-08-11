@@ -1,0 +1,98 @@
+---
+title: 'Database Transactions'
+publishedAt: '2026-08-11'
+summary: 'A transaction groups multiple database operations into one all-or-nothing unit. ACID properties, isolation levels, and how to use transactions in code.'
+featured: false
+topics: ['programming', 'database']
+type: 'note'
+lang: 'en'
+translationSlug: 'database-transaction'
+---
+
+Transfer money from Account A to Account B and it's really two operations: debit one, credit the other. Now imagine your app crashes right between them. The first update already ran. The second never gets the chance. The money just vanishes — debited from A, never credited to B. A database transaction is what stops that from happening.
+
+## What is a Database Transaction
+
+A transaction groups multiple operations into a single all-or-nothing unit. Either every operation in it succeeds and gets saved, or none of them do — there's no state where only some of the steps went through.
+
+```sql
+BEGIN TRANSACTION;
+
+UPDATE accounts SET balance = balance - 50 WHERE id = 'A';
+UPDATE accounts SET balance = balance + 50 WHERE id = 'B';
+
+COMMIT;
+```
+
+If both `UPDATE` statements succeed, `COMMIT` makes them permanent. If anything goes wrong in between — a constraint violation, a lost connection, an explicit check that fails — you call `ROLLBACK` instead, and the database reverts to exactly how it looked before `BEGIN TRANSACTION` ran, as if neither update ever happened.
+
+```sql
+BEGIN TRANSACTION;
+
+UPDATE accounts SET balance = balance - 50 WHERE id = 'A';
+-- something fails here
+ROLLBACK; -- Account A's balance goes back to what it was
+```
+
+<div className="flex justify-center">
+  <img src="/static/images/database-transaction.svg" alt="A transaction debits Account A and credits Account B as one unit — if both steps succeed it commits and saves permanently, if any step fails it rolls back and undoes everything" width="700" />
+</div>
+
+## The ACID Properties
+
+Transactions are usually described by four guarantees, remembered as ACID:
+
+- **Atomicity** — the transaction is one indivisible unit. It fully happens or fully doesn't; there's no partial state.
+- **Consistency** — a transaction can only move the database from one valid state to another. It can't leave a foreign key pointing at nothing or a constraint violated.
+- **Isolation** — transactions running at the same time don't see each other's uncommitted changes. One transaction in progress looks invisible to every other one until it commits.
+- **Durability** — once a transaction commits, the change survives a crash. It's written to disk, not sitting in memory waiting to disappear on power loss.
+
+Atomicity is the one that solves the bank transfer problem directly. But what happens when two transactions touch the same row at the same time? That's where isolation matters — without it, one transaction could read a half-finished update from another and act on numbers that were never actually true.
+
+### Isolation Levels
+
+Isolation isn't all-or-nothing — databases let you dial it up or down, because stricter isolation costs performance. A few common levels, from loosest to strictest:
+
+- **Read Uncommitted** — a transaction can see another transaction's uncommitted changes. Fast, but risks reading data that gets rolled back a moment later.
+- **Read Committed** — the default in PostgreSQL and most setups. You only ever see changes that have already been committed.
+- **Repeatable Read** — reading the same row twice in one transaction always returns the same value, even if another transaction commits a change in between.
+- **Serializable** — the strictest level. Transactions behave as if they ran one at a time, with no overlap at all.
+
+Higher isolation means more locking, which means more transactions waiting on each other instead of running concurrently. Most apps run fine on their database's default and only reach for something stricter when a specific race condition shows up.
+
+## Transactions in Code
+
+Most ORMs wrap this in an API rather than making you write raw `BEGIN`/`COMMIT`/`ROLLBACK`. Prisma, for example:
+
+```js
+await prisma.$transaction(async (tx) => {
+  await tx.account.update({
+    where: { id: 'A' },
+    data: { balance: { decrement: 50 } },
+  });
+
+  await tx.account.update({
+    where: { id: 'B' },
+    data: { balance: { increment: 50 } },
+  });
+});
+```
+
+If either `update` throws, Prisma rolls back both automatically — you don't write the rollback logic yourself, you just let the error propagate and the transaction handles it.
+
+## When You Actually Need One
+
+Not every write needs a transaction. A single `UPDATE` on one row is already atomic on its own — there's nothing to coordinate. Reach for a transaction specifically when an operation spans more than one write that all have to succeed or fail together:
+
+- Moving money between two accounts
+- Creating an order and decrementing inventory in the same request
+- Inserting a parent row and its child rows, where an orphaned child would break a foreign key
+- Any "read a value, then write based on it" sequence that has to stay consistent under concurrent access
+
+## Why it Matters
+
+Without transactions, a partial failure doesn't look like an error. It looks like a bug that only shows up under load, when a request happens to die between two writes that were supposed to be one unit. That kind of inconsistency is hard to reproduce and expensive to clean up after the fact — by the time you notice, the bad data is already sitting in production next to everything else.
+
+The same all-or-nothing thinking shows up elsewhere in backend work. An [idempotent API](/writing/en/what-is-idempotency-in-api) keeps repeated requests from causing repeated side effects. Avoiding the [N+1 query problem](/writing/en/n-plus-one-query-problem) keeps a single request from firing far more queries than it needs. Transactions apply that same instinct to writes: the database should never be caught in a state that's only half true.
+
+**Thanks for Reading✌️**
