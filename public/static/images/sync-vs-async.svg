@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="290" viewBox="0 0 700 290" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="700" height="290" rx="14" fill="#ffffff"/>
+
+  <!-- SYNCHRONOUS -->
+  <text x="30" y="28" font-size="13.5" font-weight="600" fill="#495057">Synchronous — each task waits for the one before it</text>
+
+  <rect x="30" y="44" width="200" height="48" rx="8" fill="#e7f5ff" stroke="#1c7ed6" stroke-width="2"/>
+  <text x="130" y="72" text-anchor="middle" font-size="13" fill="#1864ab" font-family="Consolas, monospace">Task A</text>
+
+  <rect x="240" y="44" width="200" height="48" rx="8" fill="#e7f5ff" stroke="#1c7ed6" stroke-width="2"/>
+  <text x="340" y="72" text-anchor="middle" font-size="13" fill="#1864ab" font-family="Consolas, monospace">Task B</text>
+
+  <rect x="450" y="44" width="200" height="48" rx="8" fill="#e7f5ff" stroke="#1c7ed6" stroke-width="2"/>
+  <text x="550" y="72" text-anchor="middle" font-size="13" fill="#1864ab" font-family="Consolas, monospace">Task C</text>
+
+  <line x1="30" y1="106" x2="660" y2="106" stroke="#adb5bd" stroke-width="1.5"/>
+  <polygon points="668,106 656,100 656,112" fill="#adb5bd"/>
+  <text x="628" y="122" font-size="11" fill="#868e96">time</text>
+
+  <!-- ASYNCHRONOUS -->
+  <text x="30" y="156" font-size="13.5" font-weight="600" fill="#495057">Asynchronous — B and C run while Task A waits in the background</text>
+
+  <text x="30" y="180" font-size="10.5" fill="#868e96">Main thread</text>
+
+  <rect x="110" y="188" width="120" height="34" rx="7" fill="#f3f0ff" stroke="#7048e8" stroke-width="2"/>
+  <text x="170" y="210" text-anchor="middle" font-size="11.5" fill="#5f3dc4" font-family="Consolas, monospace">Task A start</text>
+
+  <rect x="238" y="188" width="90" height="34" rx="7" fill="#f3f0ff" stroke="#7048e8" stroke-width="2"/>
+  <text x="283" y="210" text-anchor="middle" font-size="11.5" fill="#5f3dc4" font-family="Consolas, monospace">Task B</text>
+
+  <rect x="336" y="188" width="90" height="34" rx="7" fill="#f3f0ff" stroke="#7048e8" stroke-width="2"/>
+  <text x="381" y="210" text-anchor="middle" font-size="11.5" fill="#5f3dc4" font-family="Consolas, monospace">Task C</text>
+
+  <rect x="450" y="188" width="150" height="34" rx="7" fill="#f3f0ff" stroke="#7048e8" stroke-width="2" stroke-dasharray="4 3"/>
+  <text x="525" y="210" text-anchor="middle" font-size="11.5" fill="#5f3dc4" font-family="Consolas, monospace">Task A callback</text>
+
+  <line x1="110" y1="222" x2="110" y2="236" stroke="#adb5bd" stroke-width="1.5" stroke-dasharray="3 3"/>
+  <line x1="450" y1="222" x2="450" y2="236" stroke="#adb5bd" stroke-width="1.5" stroke-dasharray="3 3"/>
+
+  <text x="30" y="254" font-size="10.5" fill="#868e96">Web API / OS</text>
+  <rect x="110" y="236" width="340" height="26" rx="6" fill="#f8f9fa" stroke="#adb5bd" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <text x="280" y="253" text-anchor="middle" font-size="10.5" fill="#495057">waiting on I/O — network, timer, disk…</text>
+</svg>

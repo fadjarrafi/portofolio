@@ -1,0 +1,127 @@
+---
+title: 'Synchronous vs Asynchronous in JavaScript'
+publishedAt: '2026-08-11'
+summary: 'Synchronous code blocks the main thread until it finishes; asynchronous code hands slow work to the background so the rest of your program keeps running. Callbacks, promises, async/await, and when to reach for each.'
+featured: false
+topics: ['javascript']
+type: 'tutorial'
+lang: 'en'
+translationSlug: 'synchronous-vs-asynchronous'
+---
+
+Code runs top to bottom — until it doesn't. The moment a line has to wait on something slow, like a network response or a timer, JavaScript has a choice: freeze everything until it's done, or keep going and deal with the result later. That choice is the whole difference between synchronous and asynchronous code.
+
+## Synchronous Code
+
+Synchronous code runs one line at a time, in order, and each line has to finish before the next one starts. Nothing else happens while a synchronous operation is running.
+
+```js
+console.log('Start');
+
+function heavyLoop() {
+  let total = 0;
+  for (let i = 0; i < 1e9; i++) total += i;
+  return total;
+}
+
+console.log(heavyLoop()); // the whole app waits here
+console.log('End');
+```
+
+That loop can take a noticeable moment to finish, and during that moment nothing else runs — no click handlers, no re-renders, nothing. In a browser tab, that's a frozen page. This is what "blocking" means: the operation occupies the main thread until it's done, and everything else is stuck behind it in line.
+
+## Asynchronous Code
+
+Asynchronous code lets a slow operation run in the background — off the main thread, via the browser or Node's APIs — so the rest of your program keeps going instead of waiting.
+
+```js
+console.log('Start');
+
+fetch('/api/data')
+  .then((res) => res.json())
+  .then((data) => console.log(data));
+
+console.log('End');
+```
+
+Here, `'End'` logs before the fetched data does, even though `fetch()` is written earlier in the file. The request starts, JavaScript moves on immediately, and the `.then()` callbacks only run once the response actually arrives — whenever that is.
+
+You'll run into asynchronous operations constantly in real code, almost always because something outside your program has to happen first:
+
+- **Network requests** — `fetch()`, an API call, loading a script from a CDN
+- **Timers** — `setTimeout()`, `setInterval()`
+- **File and disk I/O** — reading a file in Node, writing to IndexedDB in the browser
+- **User input** — waiting on a click, a keypress, a form submission
+- **Database queries** — anything that has to round-trip to a database server
+
+None of these finish instantly, and none of them are things JavaScript itself controls the timing of — which is exactly why they're handed off instead of run inline.
+
+<div className="flex justify-center">
+  <img src="/static/images/sync-vs-async.svg" alt="Synchronous: Task A, B, and C run one after another, each waiting for the last. Asynchronous: Task A starts, hands off to the Web API to wait on I/O, while Task B and C run immediately; Task A's callback runs once the wait is over" width="700" />
+</div>
+
+## Three Ways to Write Asynchronous Code
+
+JavaScript has gone through three generations of async syntax, and you'll still see all three in real code.
+
+### Callbacks
+
+Pass a function to run once the operation finishes:
+
+```js
+fs.readFile('data.txt', (err, data) => {
+  if (err) throw err;
+  console.log(data);
+});
+```
+
+Simple for one async step, painful once you need several in sequence — nesting callbacks inside callbacks is where "callback hell" comes from.
+
+### Promises
+
+An object representing a value that isn't ready yet, chained with `.then()`:
+
+```js
+readFilePromise('data.txt')
+  .then((data) => console.log(data))
+  .catch((err) => console.error(err));
+```
+
+Chaining flattens the nesting problem and gives you one `.catch()` for errors instead of checking `err` at every step.
+
+### Async/await
+
+Syntax sugar over promises that lets async code read like synchronous code:
+
+```js
+async function loadData() {
+  try {
+    const data = await readFilePromise('data.txt');
+    console.log(data);
+  } catch (err) {
+    console.error(err);
+  }
+}
+```
+
+Same behavior as the promise version, but it reads top to bottom like the synchronous example at the start of this post — which is exactly the appeal.
+
+## Key Differences
+
+Side by side, the trade-off comes down to one question: does this operation depend on something outside your own code finishing first?
+
+| | Synchronous | Asynchronous |
+| --- | --- | --- |
+| Execution | One line at a time, in order | Slow work runs in the background |
+| Main thread | Blocked until the operation finishes | Stays free while waiting |
+| Order of results | Matches the order in the code | Depends on when each operation finishes |
+| Written with | Plain function calls | Callbacks, promises, `async`/`await` |
+| Good for | Fast, CPU-only work | Network requests, timers, file/disk I/O |
+
+## Why it Matters
+
+So why not write everything asynchronously and be done with it? Because async code is harder to reason about — results can come back in a different order than you wrote them, and every `await` is a point where the rest of the function has to wait its turn behind whatever else is running. Synchronous code is simpler precisely because none of that is possible: one thing happens, then the next, always in the order on the page. The trade-off is that a single slow synchronous call freezes everything downstream of it, including the UI, while asynchronous code keeps the app responsive at the cost of that added complexity.
+
+[Debouncing](/writing/en/debouncing) a search input is a good example of this trade-off in practice: the `fetch()` call inside it is asynchronous specifically so typing doesn't freeze while the request is in flight. If you want the deeper mechanics — how JavaScript actually decides when a pending callback gets to run — that's what [the event loop](/writing/en/event-loop) handles, sitting one layer below the sync/async distinction described here.
+
+**Thanks for Reading✌️**
