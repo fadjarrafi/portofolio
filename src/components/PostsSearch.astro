@@ -71,6 +71,12 @@ const serialized = JSON.stringify(posts.map((p) => ({
     <p class="text-sm text-neutral-500 mb-2">No posts found</p>
     <button id="ps-clear2" class="text-sm text-neutral-900 dark:text-neutral-100 hover:underline">Clear filters</button>
   </div>
+
+  <div id="ps-pagination" class="hidden items-center justify-center gap-4 mt-8">
+    <button id="ps-prev" class="text-xs px-3 py-1.5 border border-neutral-200 dark:border-neutral-800 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors">Previous</button>
+    <span id="ps-page-info" class="text-xs text-neutral-500"></span>
+    <button id="ps-next" class="text-xs px-3 py-1.5 border border-neutral-200 dark:border-neutral-800 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors">Next</button>
+  </div>
 </div>
 
 <template id="ps-card-template">
@@ -102,6 +108,13 @@ const serialized = JSON.stringify(posts.map((p) => ({
   const emptyEl = document.getElementById('ps-empty');
   const countEl = document.getElementById('ps-count');
   const template = document.getElementById('ps-card-template');
+  const paginationEl = document.getElementById('ps-pagination');
+  const prevBtn = document.getElementById('ps-prev');
+  const nextBtn = document.getElementById('ps-next');
+  const pageInfoEl = document.getElementById('ps-page-info');
+
+  const PAGE_SIZE = 9;
+  let currentPage = 1;
 
   function formatDate(dateStr) {
     const d = new Date(dateStr.includes('T') ? dateStr : `${dateStr}T00:00:00`);
@@ -125,10 +138,20 @@ const serialized = JSON.stringify(posts.map((p) => ({
     countEl.classList.toggle('hidden', !active);
     if (active) countEl.textContent = `${filtered.length} of ${posts.length} posts`;
 
+    const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    currentPage = Math.min(currentPage, pageCount);
+    const pageItems = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+    paginationEl.classList.toggle('hidden', pageCount <= 1);
+    paginationEl.classList.toggle('flex', pageCount > 1);
+    pageInfoEl.textContent = `Page ${currentPage} of ${pageCount}`;
+    prevBtn.disabled = currentPage <= 1;
+    nextBtn.disabled = currentPage >= pageCount;
+
     grid.innerHTML = '';
     emptyEl.classList.toggle('hidden', filtered.length > 0);
 
-    filtered.forEach((p) => {
+    pageItems.forEach((p) => {
       const card = template.content.cloneNode(true);
       const a = card.querySelector('a');
       a.href = `/writing/en/${p.slug}`;
@@ -161,14 +184,32 @@ const serialized = JSON.stringify(posts.map((p) => ({
     searchEl.value = '';
     typeEl.value = 'all';
     topicEl.value = 'all';
+    currentPage = 1;
     render();
   }
 
-  searchEl.addEventListener('input', render);
-  typeEl.addEventListener('change', render);
-  topicEl.addEventListener('change', render);
+  function onFilterChange() {
+    currentPage = 1;
+    render();
+  }
+
+  searchEl.addEventListener('input', onFilterChange);
+  typeEl.addEventListener('change', onFilterChange);
+  topicEl.addEventListener('change', onFilterChange);
   clearEl.addEventListener('click', clearFilters);
   clearEl2.addEventListener('click', clearFilters);
+  prevBtn.addEventListener('click', () => {
+    if (currentPage > 1) {
+      currentPage -= 1;
+      render();
+      grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+  nextBtn.addEventListener('click', () => {
+    currentPage += 1;
+    render();
+    grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
 
   render();
 </script>
