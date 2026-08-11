@@ -1,0 +1,83 @@
+---
+title: 'Browser Object Model (BOM) vs Document Object Model (DOM)'
+publishedAt: '2026-08-11'
+summary: 'DOM merepresentasikan konten halamanmu; BOM merepresentasikan browser itu sendiri — window, navigator, location, history, dan screen. Perbedaannya, dan bagaimana keduanya sama-sama berada di bawah `window`.'
+featured: false
+topics: ['javascript']
+type: 'tutorial'
+lang: 'id'
+translationSlug: 'bom-vs-dom'
+---
+
+JavaScript di browser berbicara dengan dua pohon objek yang berbeda, dan pemula sering menganggapnya sebagai satu hal yang sama: Document Object Model (DOM) dan Browser Object Model (BOM). Keduanya bukan hal yang sama. Salah menganggap keduanya sama tidak fatal—kebanyakan kode tetap jalan—tapi tahu mana yang mana menjelaskan banyak keputusan desain API yang kalau tidak, terlihat asal-asalan.
+
+## Apa itu DOM
+
+Document Object Model adalah representasi halaman HTML-mu di memori browser, disusun sebagai pohon (tree) node. Setiap elemen, atribut, dan potongan teks menjadi objek yang bisa kamu baca atau ubah dengan JavaScript.
+
+```js
+document.querySelector('h1').textContent = 'Updated title';
+document.body.appendChild(document.createElement('p'));
+document.getElementById('menu').classList.toggle('open');
+```
+
+DOM distandarkan oleh [W3C](https://www.w3.org/TR/dom/), makanya perilakunya sama di semua browser modern dan bahkan di luar browser—tools seperti [jsdom](https://github.com/jsdom/jsdom) mengimplementasikannya di Node untuk kebutuhan testing.
+
+Di dalamnya, setiap node dalam pohon itu punya salah satu dari beberapa tipe—element node (`<div>`, `<p>`), text node (kata-kata di dalamnya), dan comment node, di antara yang lain. Kamu bisa berpindah antar node dengan `parentNode`, `childNodes`, `nextSibling`, dan semacamnya—itulah yang membuat DOM tetap berbentuk pohon, bukan daftar datar: anak dari sebuah elemen adalah elemen lain yang punya anaknya sendiri.
+
+## Apa itu BOM
+
+Browser Object Model adalah semua hal yang bisa dipakai JavaScript untuk berbicara dengan browser itu sendiri, bukan dengan konten halaman. Cakupannya termasuk address bar, riwayat tab, layar, dan metadata milik browser.
+
+```js
+window.location.href = 'https://example.com'; // navigasi
+window.history.back(); // kembali ke halaman sebelumnya
+window.navigator.userAgent; // info browser dan OS
+window.screen.width; // lebar layar perangkat
+```
+
+Berbeda dari DOM, BOM tidak pernah distandarkan secara resmi—ia tumbuh dari apa yang dirilis Netscape dan Internet Explorer di era 90-an, lalu browser lain mengikutinya. Sejarah itulah yang membuat API BOM kurang konsisten dibanding DOM, dan kenapa sebagian di antaranya (seperti sebagian isi `navigator`) masih berbeda-beda antar browser sampai sekarang.
+
+Misalnya kamu menambahkan tombol "kembali ke halaman sebelumnya". Itu adalah `window.history.back()`, bukan sesuatu dari `document`—kamu tidak mengubah konten halaman, kamu memerintah browser itu sendiri, dan itulah persis fungsi BOM.
+
+### Lebih Jauh Soal BOM
+
+`navigator`, `location`, `history`, dan `screen` adalah empat yang paling sering dipakai, tapi cakupan BOM lebih luas dari itu:
+
+- `window.open()` / `window.close()` — membuka atau menutup tab atau popup browser
+- `window.innerWidth` / `window.innerHeight` — ukuran viewport, berbeda dengan `screen.width` yang mengukur seluruh layar fisik
+- `navigator.geolocation` — meminta lokasi pengguna
+- `navigator.clipboard` — membaca atau menulis ke clipboard sistem
+- `window.alert()`, `window.confirm()`, `window.prompt()` — kotak dialog bawaan browser
+
+Tidak satu pun dari ini mendeskripsikan atau mengubah konten halaman, dan itulah pola yang perlu diingat: kalau urusannya tentang browser sebagai program, bukan dokumen yang sedang ditampilkannya, berarti itu BOM.
+
+<div className="flex justify-center">
+  <img src="/static/images/bom-dom.svg" alt="window (Browser Object Model) berisi document (pohon DOM dari html, head, body) bersama objek sejawat navigator, location, history, dan screen" width="700" />
+</div>
+
+## Bagaimana Keduanya Berhubungan
+
+Keduanya berada di bawah satu akar: `window`. `window.document` adalah DOM—konten halaman—sementara `window.navigator`, `window.location`, `window.history`, dan `window.screen` adalah BOM, berada di samping `document` sebagai sejawat, bukan di dalamnya.
+
+Itulah kenapa `document.querySelector(...)` dan `location.href` sama-sama bisa dipakai tanpa awalan `window.`—`window` adalah objek global, jadi semua yang menempel padanya sudah otomatis berada dalam scope.
+
+## Perbedaan Utama
+
+Cara cepat mengeceknya: kalau kamu membaca atau mengubah sesuatu yang bisa dilihat pengguna di halaman—teks, elemen, style, atribut—berarti kamu sedang di DOM. Kalau kamu meminta browser melakukan sesuatu pada dirinya sendiri—navigasi, kembali, membuka tab, melaporkan ukuran layar—berarti kamu sedang di BOM. Berikut perbandingannya secara berdampingan:
+
+| | DOM | BOM |
+| --- | --- | --- |
+| Merepresentasikan | Konten HTML halaman | Jendela browser itu sendiri |
+| Objek akar | `document` | `window` |
+| Distandarkan | Ya, oleh W3C | Tidak ada spesifikasi resmi |
+| Penggunaan umum | Membaca/mengubah elemen, teks, atribut | Navigasi, info browser, ukuran layar |
+| Contoh properti | `document.title` | `window.location.href` |
+
+## Kenapa Ini Penting
+
+Jadi kenapa perbedaan ini perlu diingat? Karena keduanya berperilaku berbeda begitu ada yang tidak sesuai harapan. `document.title` mengubah apa yang tertulis di tab, tapi itu tetap DOM, bukan BOM—itu tetap mendeskripsikan konten halaman, hanya kebetulan konten itu ditampilkan di chrome browser. `window.location.reload()` tidak menyentuh satu elemen pun; ia memerintahkan browser untuk mengulang seluruh proses navigasi.
+
+Mengetahui objek mana yang sedang kamu pakai juga menjelaskan kenapa DOM terasa dapat diprediksi di semua browser sementara beberapa keanehan BOM—prompt geolocation, string `navigator.userAgent`, pemblokiran popup—masih berbeda-beda. Yang satu punya spesifikasi yang diimplementasikan sama oleh semua orang. Yang lain adalah kumpulan konvensi masing-masing vendor browser yang kebetulan menyatu—makanya tools testing seperti jsdom bisa mensimulasikan DOM dengan akurat, tapi hanya meniru sebagian kecil dari BOM.
+
+**Thanks for Reading✌️**

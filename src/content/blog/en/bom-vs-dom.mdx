@@ -1,0 +1,83 @@
+---
+title: 'Browser Object Model (BOM) vs Document Object Model (DOM)'
+publishedAt: '2026-08-11'
+summary: 'The DOM represents your page content; the BOM represents the browser itself — window, navigator, location, history, and screen. How they differ, and how both hang off `window`.'
+featured: false
+topics: ['javascript']
+type: 'tutorial'
+lang: 'en'
+translationSlug: 'bom-vs-dom'
+---
+
+JavaScript in the browser talks to two different object trees, and beginners often lump them into one: the Document Object Model (DOM) and the Browser Object Model (BOM). They're not the same thing. Mixing them up isn't fatal — most code works either way — but knowing which is which explains a lot of API design decisions that would otherwise look arbitrary.
+
+## What is the DOM
+
+The Document Object Model is the browser's in-memory representation of your HTML page, structured as a tree of nodes. Every element, attribute, and piece of text becomes an object you can read or change with JavaScript.
+
+```js
+document.querySelector('h1').textContent = 'Updated title';
+document.body.appendChild(document.createElement('p'));
+document.getElementById('menu').classList.toggle('open');
+```
+
+The DOM is standardized by the [W3C](https://www.w3.org/TR/dom/), which is why it behaves the same way across every modern browser and even outside the browser — tools like [jsdom](https://github.com/jsdom/jsdom) implement it in Node for testing.
+
+Under the hood, every node in that tree is one of a handful of types — element nodes (`<div>`, `<p>`), text nodes (the words inside them), and comment nodes, among others. You can walk between them with `parentNode`, `childNodes`, `nextSibling`, and so on, which is how the DOM stays a tree rather than a flat list: an element's children are themselves elements with children of their own.
+
+## What is the BOM
+
+The Browser Object Model is everything JavaScript can use to talk to the browser itself, rather than the page's content. It covers the address bar, the tab's history, the screen, and the browser's own metadata.
+
+```js
+window.location.href = 'https://example.com'; // navigate
+window.history.back(); // go to the previous page
+window.navigator.userAgent; // browser and OS info
+window.screen.width; // device screen width
+```
+
+Unlike the DOM, the BOM was never formally standardized — it grew out of what Netscape and Internet Explorer shipped in the '90s, and other browsers followed along. That history is why BOM APIs are less consistent than DOM ones, and why a few of them (like parts of `navigator`) still vary between browsers today.
+
+Say you're adding a "back to previous page" button. That's `window.history.back()`, not anything from `document` — you're not changing page content, you're commanding the browser itself, which is exactly what the BOM is for.
+
+### More of the BOM
+
+`navigator`, `location`, `history`, and `screen` are the four you'll reach for most, but the BOM covers more ground than that:
+
+- `window.open()` / `window.close()` — open or close a browser tab or popup window
+- `window.innerWidth` / `window.innerHeight` — the viewport size, as opposed to `screen.width`, which is the whole physical display
+- `navigator.geolocation` — ask the user for their location
+- `navigator.clipboard` — read from or write to the system clipboard
+- `window.alert()`, `window.confirm()`, `window.prompt()` — the browser's built-in dialog boxes
+
+None of these describe or modify the page's content, which is the pattern worth remembering: if it's about the browser as a program rather than the document it's showing, it's BOM.
+
+<div className="flex justify-center">
+  <img src="/static/images/bom-dom.svg" alt="window (the Browser Object Model) contains document (the DOM tree of html, head, body) alongside sibling objects navigator, location, history, and screen" width="700" />
+</div>
+
+## How They Relate
+
+Both live under one root: `window`. `window.document` is the DOM — the page content — while `window.navigator`, `window.location`, `window.history`, and `window.screen` are the BOM, sitting next to `document` as siblings rather than inside it.
+
+That's why `document.querySelector(...)` and `location.href` both work without the `window.` prefix — `window` is the global object, so everything hanging off it is already in scope.
+
+## Key Differences
+
+A quick gut check: if you're reading or changing something a user can see on the page — text, elements, styles, attributes — you're in the DOM. If you're asking the browser to do something to itself — navigate, go back, open a tab, report the screen size — you're in the BOM. Here's the same distinction laid out side by side:
+
+| | DOM | BOM |
+| --- | --- | --- |
+| Represents | The page's HTML content | The browser window itself |
+| Root object | `document` | `window` |
+| Standardized | Yes, by the W3C | No official spec |
+| Typical use | Reading/changing elements, text, attributes | Navigation, browser info, screen size |
+| Example property | `document.title` | `window.location.href` |
+
+## Why it Matters
+
+So why keep the distinction in your head at all? Because the two behave differently the moment something goes wrong. `document.title` changes what's in the tab, but it's DOM, not BOM — it's still describing page content, just content the browser chrome happens to display. `window.location.reload()` isn't touching a single element; it's telling the browser to redo the whole navigation.
+
+Knowing which object you're reaching for also explains why the DOM feels predictable across browsers while a few BOM quirks — geolocation prompts, `navigator.userAgent` strings, popup blocking — still differ. One has a spec everyone implements the same way. The other is a set of browser-vendor conventions that happened to converge, which is also why testing tools like jsdom can faithfully simulate the DOM but only stub out a thin slice of the BOM.
+
+**Thanks for Reading✌️**

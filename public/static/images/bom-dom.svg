@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="300" viewBox="0 0 700 300" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="700" height="300" rx="14" fill="#ffffff"/>
+
+  <!-- window (BOM) outer box -->
+  <rect x="20" y="20" width="660" height="260" rx="12" fill="#f3f0ff" stroke="#7048e8" stroke-width="2"/>
+  <text x="38" y="46" font-size="14" fill="#7048e8" font-weight="600" font-family="Consolas, monospace">window — Browser Object Model (BOM)</text>
+  <line x1="20" y1="58" x2="680" y2="58" stroke="#d0bfff" stroke-width="1.5"/>
+
+  <!-- document (DOM) inner box -->
+  <rect x="42" y="76" width="290" height="184" rx="10" fill="#e7f5ff" stroke="#1c7ed6" stroke-width="2"/>
+  <text x="58" y="98" font-size="13" fill="#1c7ed6" font-weight="600" font-family="Consolas, monospace">document — DOM</text>
+
+  <!-- DOM tree nodes -->
+  <rect x="140" y="112" width="76" height="28" rx="6" fill="#ffffff" stroke="#1c7ed6" stroke-width="1.5"/>
+  <text x="178" y="130" text-anchor="middle" font-size="12" fill="#1864ab" font-family="Consolas, monospace">html</text>
+
+  <line x1="178" y1="140" x2="120" y2="168" stroke="#74c0fc" stroke-width="1.5"/>
+  <line x1="178" y1="140" x2="236" y2="168" stroke="#74c0fc" stroke-width="1.5"/>
+
+  <rect x="80" y="168" width="80" height="26" rx="6" fill="#ffffff" stroke="#1c7ed6" stroke-width="1.5"/>
+  <text x="120" y="185" text-anchor="middle" font-size="11.5" fill="#1864ab" font-family="Consolas, monospace">head</text>
+
+  <rect x="196" y="168" width="80" height="26" rx="6" fill="#ffffff" stroke="#1c7ed6" stroke-width="1.5"/>
+  <text x="236" y="185" text-anchor="middle" font-size="11.5" fill="#1864ab" font-family="Consolas, monospace">body</text>
+
+  <line x1="236" y1="194" x2="236" y2="212" stroke="#74c0fc" stroke-width="1.5"/>
+  <rect x="176" y="212" width="120" height="26" rx="6" fill="#ffffff" stroke="#1c7ed6" stroke-width="1.5"/>
+  <text x="236" y="229" text-anchor="middle" font-size="11.5" fill="#1864ab" font-family="Consolas, monospace">h1, p, div, …</text>
+
+  <!-- BOM sibling objects grid -->
+  <rect x="360" y="90" width="140" height="52" rx="8" fill="#ffffff" stroke="#9775fa" stroke-width="1.5"/>
+  <text x="430" y="121" text-anchor="middle" font-size="12.5" fill="#5f3dc4" font-family="Consolas, monospace">navigator</text>
+
+  <rect x="512" y="90" width="140" height="52" rx="8" fill="#ffffff" stroke="#9775fa" stroke-width="1.5"/>
+  <text x="582" y="121" text-anchor="middle" font-size="12.5" fill="#5f3dc4" font-family="Consolas, monospace">location</text>
+
+  <rect x="360" y="154" width="140" height="52" rx="8" fill="#ffffff" stroke="#9775fa" stroke-width="1.5"/>
+  <text x="430" y="185" text-anchor="middle" font-size="12.5" fill="#5f3dc4" font-family="Consolas, monospace">history</text>
+
+  <rect x="512" y="154" width="140" height="52" rx="8" fill="#ffffff" stroke="#9775fa" stroke-width="1.5"/>
+  <text x="582" y="185" text-anchor="middle" font-size="12.5" fill="#5f3dc4" font-family="Consolas, monospace">screen</text>
+
+  <text x="506" y="234" text-anchor="middle" font-size="11" fill="#868e96">not part of the DOM tree —</text>
+  <text x="506" y="250" text-anchor="middle" font-size="11" fill="#868e96">talk to the browser itself</text>
+</svg>
