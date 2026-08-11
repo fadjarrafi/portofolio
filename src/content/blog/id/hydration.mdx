@@ -1,0 +1,79 @@
+---
+title: 'Hydration'
+publishedAt: '2026-08-11'
+summary: 'Hydration adalah yang membuat halaman hasil server-side rendering bisa diklik — ia menelusuri HTML yang sudah tergambar, mencocokkannya dengan apa yang seharusnya di-render framework, lalu memasang interaktivitas tanpa membangun ulang satu node pun.'
+featured: false
+topics: ['programming', 'web']
+type: 'note'
+lang: 'id'
+translationSlug: 'hydration'
+---
+
+Halaman hasil [server-side rendering](/writing/id/server-side-rendering) muncul dengan cepat. Konten langsung ada di layar begitu HTML tiba. Tapi coba klik tombol di detik pertama itu, tidak akan terjadi apa-apa — markup-nya sudah ada, tapi JavaScript yang seharusnya merespons klik itu belum terpasang. Hydration adalah langkah yang menutup jeda itu.
+
+## Apa yang Sebenarnya Dilakukan Hydration
+
+Membangun halaman dari nol dan meng-hydrate halaman yang sudah ada terlihat mirip di kode, tapi keduanya bukan operasi yang sama:
+
+```js
+// Client-side rendering: bangun DOM dari nol
+createRoot(document.getElementById('root')).render(<App />);
+
+// Hydration: menempel ke DOM yang sudah ada
+hydrateRoot(document.getElementById('root'), <App />);
+```
+
+`createRoot` tidak peduli apa isi `#root` — ia buang semuanya dan bangun dari awal. `hydrateRoot` melakukan kebalikannya: ia menganggap HTML di dalam `#root` sudah benar, menelusurinya node demi node, dan memakai ulang setiap elemen yang ditemukan alih-alih membuatnya lagi. Yang ditambahkan cuma bagian yang tidak bisa diungkapkan HTML sendiri: event listener, state komponen, ref.
+
+## Cocokkan, Baru Pasang
+
+Langkah demi langkah, begini cara kerja hydration:
+
+1. HTML hasil server-side rendering tergambar. Pengguna langsung melihat konten sungguhan.
+2. Bundle JS untuk halaman itu dimuat, paralel atau tepat setelahnya.
+3. `hydrateRoot` menelusuri DOM yang sudah ada, membandingkannya dengan apa yang seharusnya di-render framework sendiri: tag yang sama, urutan yang sama, atribut yang sama.
+4. Di mana keduanya cocok, tidak ada yang dibangun ulang. Framework cuma memasang listener dan menyambungkan node itu ke pohon komponennya.
+5. Halaman jadi interaktif, tanpa satu pun elemen yang sempat berkedip hilang lalu muncul lagi.
+
+<div className="flex justify-center">
+  <img src="/static/images/hydration.svg" alt="hydrate() menelusuri DOM yang sudah ada dan membandingkan tiap node dengan apa yang diharapkan framework — kalau cocok, listener dipasang dan node dipakai ulang; kalau tidak cocok, node dibuang dan dibangun ulang dari nol di client" width="700" />
+</div>
+
+## Ketika Kecocokannya Gagal
+
+Langkah 3 adalah titik di mana semuanya bisa berantakan. Kalau DOM yang sebenarnya ada di browser tidak cocok dengan apa yang diharapkan framework, itu namanya hydration mismatch, dan satu-satunya jalan keluar framework adalah membuang bagian yang tidak cocok itu dan membangunnya ulang di client, persis seperti yang akan dilakukan CSR biasa.
+
+Beberapa cara mismatch ini muncul di kode sungguhan:
+
+```js
+// server merender satu waktu, client merender waktu yang sedikit berbeda
+<span>{new Date().toLocaleTimeString()}</span>
+```
+
+- **Waktu dan locale**: potongan kode di atas merender jam berapa pun saat itu di server, lalu jam yang sedikit berbeda di client. Dua string berbeda, komponen yang sama.
+- **ID acak atau hasil generate**: `Math.random()` atau UUID baru menghasilkan nilai berbeda di setiap render, termasuk di server.
+- **Pengecekan yang hanya berlaku di `window`**: kode yang berperilaku beda tergantung ada tidaknya `window` akan merender satu cara di server (tidak ada `window`) dan cara lain di browser.
+- **Ekstensi browser**: Grammarly dan tool sejenis menyuntikkan atribut ke DOM sebelum hydration sempat jalan, jadi "DOM yang sudah ada" yang diperiksa hydration sebenarnya bukan persis apa yang dikirim server.
+
+Perbaikan untuk kasus timestamp biasanya bukan melawannya: render placeholder di server, dan isi nilai sungguhannya cuma setelah client mengambil alih.
+
+```js
+const [time, setTime] = useState(null);
+useEffect(() => setTime(new Date().toLocaleTimeString()), []);
+
+return <span>{time ?? '--:--:--'}</span>;
+```
+
+Sekarang server dan client sepakat di render pertama (`null`), dan nilai sungguhannya baru muncul setelah hydration selesai, yang memang dari awal sudah pasti akan berubah di titik itu juga.
+
+## Biaya yang Tidak Terlihat Siapa Pun
+
+Hydration tidak melewati pekerjaan yang dilakukan CSR, ia cuma memindahkannya. JS yang sama tetap harus diunduh, di-parsing, dan dijalankan, membangun pohon komponen yang persis sama seperti kalau dibangun dari nol, cuma untuk memastikan ia bisa memakai ulang apa yang sudah ada alih-alih membuatnya lagi. Halaman berat dengan puluhan komponen interaktif bisa terlihat sudah selesai total, padahal masih beberapa ratus milidetik lagi sebelum benar-benar merespons klik.
+
+Itulah bagian anehnya SSR dalam skala besar: kontennya sungguhan, dan halamannya terlihat siap jauh sebelum benar-benar siap.
+
+## Kenapa Ini Penting
+
+Hydration adalah jahitan di antara dua model rendering yang sudah dibahas sebelumnya. [SSR](/writing/id/server-side-rendering) melewati jeda halaman kosong ala CSR dengan mengirim HTML sungguhan lebih dulu. [CSR](/writing/id/client-side-rendering) membangun dan memasang interaktivitas sekaligus dalam satu proses, dan tidak ada yang ditampilkan sampai keduanya selesai. Hydration adalah yang dibayar SSR belakangan supaya tetap dapat interaktivitas ala CSR, tanpa harus melepas keunggulan first paint yang cepat itu — biaya JavaScript yang sama seperti CSR, cuma dipindah ke setelah konten sudah ada di layar, bukan sebelumnya.
+
+**Terima Kasih Sudah Membaca✌️**
