@@ -1,0 +1,78 @@
+---
+title: 'Server-Side Rendering (SSR)'
+publishedAt: '2026-08-11'
+summary: 'Server-side rendering merender HTML sebuah halaman di server untuk setiap request dan mengirimkannya dalam keadaan sudah terisi — jadi browser punya sesuatu untuk digambar sebelum satu baris JavaScript pun berjalan.'
+featured: false
+topics: ['programming', 'web']
+type: 'note'
+lang: 'id'
+translationSlug: 'server-side-rendering'
+---
+
+Buka aplikasi yang di-render di client lewat koneksi lambat, dan ini yang akan terlihat: halaman putih kosong selama satu-dua detik, lalu seluruh UI langsung muncul sekaligus. Jeda itu adalah waktu browser mengunduh bundle JavaScript, menjalankannya, baru kemudian membangun halaman. Server-side rendering ada untuk menutup jeda itu.
+
+## Apa itu Server-Side Rendering
+
+Dengan client-side rendering, server hampir tidak mengirim apa-apa: sebuah `<div id="root"></div>` kosong dan tag script. Browser harus mengambil script itu, menjalankannya, baru setelah itu ada sesuatu yang muncul.
+
+Server-side rendering membalik urutan itu. Server menjalankan sendiri logika render aplikasi, khusus untuk request itu, dan mengirim kembali halaman HTML utuh yang kontennya sudah terisi:
+
+```js
+import { renderToString } from 'react-dom/server';
+
+app.get('/', (req, res) => {
+  const html = renderToString(<App />);
+  res.send(`<html><body><div id="root">${html}</div></body></html>`);
+});
+```
+
+Browser bisa langsung menggambar HTML itu begitu tiba. Tidak ada JavaScript yang perlu jalan lebih dulu.
+
+## Hydration
+
+Ada satu jebakan: HTML saja tidak interaktif. Halaman yang di-render server punya konten di layar, tapi belum ada click handler yang terpasang, belum ada state, belum ada `useEffect` yang jalan. Halaman itu terlihat selesai. Padahal belum, belum sepenuhnya.
+
+Itulah yang diperbaiki hydration. JavaScript yang sama, yang seharusnya membangun halaman di client, sebaliknya menempel ke HTML yang sudah ada:
+
+```js
+import { hydrateRoot } from 'react-dom/client';
+
+hydrateRoot(document.getElementById('root'), <App />);
+```
+
+React menelusuri DOM yang sudah ada, mencocokkannya dengan apa yang seharusnya ia render, lalu memasang event listener tanpa menyentuh markup-nya. Pengguna langsung melihat konten dan mendapat interaktivitas sesaat kemudian, bukannya tidak dapat apa-apa sampai keduanya datang bersamaan.
+
+<div className="flex justify-center">
+  <img src="/static/images/server-side-rendering.svg" alt="Client-side rendering menampilkan halaman kosong selama JavaScript diunduh dan dijalankan sebelum konten muncul; server-side rendering mengirim HTML yang sudah dirender sehingga konten langsung muncul, lalu JavaScript melakukan hydrate di latar belakang supaya halaman jadi interaktif" width="700" />
+</div>
+
+## SSR vs Client-Side Rendering
+
+| | Client-Side Rendering | Server-Side Rendering |
+| --- | --- | --- |
+| Konten pertama muncul | Setelah JS diunduh dan dijalankan | Begitu HTML tiba |
+| Kerja server per request | Menyajikan shell statis | Merender halaman penuh |
+| SEO / crawler | Tergantung crawler-nya menjalankan JS atau tidak | Langsung melihat konten penuh |
+| Waktu sampai interaktif | Kurang lebih sama dengan konten pertama | Datang setelah hydration selesai |
+
+Tidak ada yang menang mutlak. CSR melempar beban kerja ke client dan membuat server tetap murah. SSR melakukan yang sebaliknya. Mana yang lebih mahal buat kamu sepenuhnya bergantung pada apa yang lebih langka: CPU server, atau waktu pengguna menatap tab kosong.
+
+## Konsekuensi SSR
+
+Merender di setiap request berarti server benar-benar bekerja untuk setiap pengunjung, bukan cuma yang pertama kali memicu build. Itu model biaya yang jauh berbeda dari menyajikan file statis, dan dampaknya langsung terlihat di time-to-first-byte: server tidak bisa merespons sebelum selesai merender.
+
+Hydration punya cara gagalnya sendiri. Kalau HTML yang dikirim server tidak cocok dengan apa yang akan di-render client — tanggal yang diformat dengan timezone berbeda, pengecekan yang bergantung pada `window` dan berperilaku beda di server — React melempar hydration mismatch, dan bagian yang bermasalah tetap di-render ulang dari nol di client.
+
+Tidak semua halaman butuh render baru di setiap kunjungan juga. Kalau kontennya tidak berubah antar-request, merendernya sekali saat build (static generation) lebih murah daripada membayar biaya SSR berulang-ulang untuk hasil yang persis sama.
+
+## SSR dalam Praktik
+
+Semua ini sebenarnya bukan hal baru. Rails, Django, dan PHP sudah merender HTML per request jauh sebelum "server-side rendering" jadi istilah yang dibutuhkan framework JavaScript. Yang berubah adalah React, Vue, dan sejenisnya menjadikan client-side rendering sebagai default, dan SSR kembali sebagai pilihan yang sengaja diaktifkan: `getServerSideProps` dan server component di Next.js, server load function di SvelteKit, Nuxt.
+
+Situs ini contohnya. Dibangun dengan Astro, yang mendukung SSR, tapi memilih output statis (`output: 'static'` di konfigurasinya). Setiap tulisan di sini sama untuk semua pengunjung dan tidak berubah antar-request, jadi tidak ada untungnya merender ulang tiap kali. Satu proses build mengerjakannya sekali, dan setiap request setelahnya tinggal menyajikan file yang sudah jadi.
+
+## Kapan Memakainya
+
+Pilih SSR kalau halamannya memang berbeda tiap request (dashboard yang butuh login, total keranjang belanja, hasil pencarian) dan konten yang terlihat sebelum JS selesai dimuat masih penting. Pilih static generation kalau kontennya sama untuk semua orang dan tidak berubah di setiap request — kamu tetap dapat first paint secepat SSR tanpa harus membayar biaya render ulang. Client-side rendering pantas dipakai kalau aplikasinya sangat interaktif dan baik SEO maupun kecepatan tampilan awal bukan prioritas, misalnya alat admin internal yang semua pengunjungnya sudah login dan tidak akan sadar ada tambahan beberapa ratus milidetik.
+
+**Terima Kasih Sudah Membaca✌️**

@@ -1,0 +1,78 @@
+---
+title: 'Server-Side Rendering (SSR)'
+publishedAt: '2026-08-11'
+summary: "Server-side rendering builds a page's HTML on the server for every request and sends it back already filled in — so the browser has something to paint before a single line of JavaScript runs."
+featured: false
+topics: ['programming', 'web']
+type: 'note'
+lang: 'en'
+translationSlug: 'server-side-rendering'
+---
+
+Open a client-rendered app on a slow connection and you'll see it happen: a blank white page for a second or two, then the whole UI snaps into place at once. That gap is the browser downloading a JavaScript bundle, running it, and only then building the page. Server-side rendering exists to close that gap.
+
+## What is Server-Side Rendering
+
+With client-side rendering, the server sends almost nothing: an empty `<div id="root"></div>` and a script tag. The browser has to fetch that script, execute it, and only then does anything show up.
+
+Server-side rendering flips the order. The server runs the app's render logic itself, for that specific request, and sends back a full HTML page with the content already in it:
+
+```js
+import { renderToString } from 'react-dom/server';
+
+app.get('/', (req, res) => {
+  const html = renderToString(<App />);
+  res.send(`<html><body><div id="root">${html}</div></body></html>`);
+});
+```
+
+The browser can paint that HTML the moment it arrives. No JavaScript has to run first.
+
+## Hydration
+
+There's a catch: HTML alone isn't interactive. A server-rendered page has content on screen, but no click handlers wired up yet, no state, no `useEffect` running. The page looks done. It isn't, not quite.
+
+That's what hydration fixes. The same JavaScript that would've built the page on the client instead attaches itself to the HTML that's already there:
+
+```js
+import { hydrateRoot } from 'react-dom/client';
+
+hydrateRoot(document.getElementById('root'), <App />);
+```
+
+React walks the existing DOM, matches it against what it would have rendered, and wires up event listeners without touching the markup. The user sees content immediately and gets interactivity a beat later, instead of getting nothing until both arrive at once.
+
+<div className="flex justify-center">
+  <img src="/static/images/server-side-rendering.svg" alt="Client-side rendering shows a blank page while JavaScript downloads and runs before content appears; server-side rendering sends already-rendered HTML so content appears immediately, then JavaScript hydrates it in the background to make it interactive" width="700" />
+</div>
+
+## SSR vs Client-Side Rendering
+
+| | Client-Side Rendering | Server-Side Rendering |
+| --- | --- | --- |
+| First content | After JS downloads and runs | As soon as HTML arrives |
+| Server work per request | Serves a static shell | Renders the full page |
+| SEO / crawlers | Depends on the crawler executing JS | Sees full content immediately |
+| Time to interactive | Roughly the same as first content | Comes after hydration finishes |
+
+Neither one wins outright. CSR pushes the work onto the client and keeps the server cheap. SSR does the opposite. Which one costs you more depends entirely on what's scarce: your server's CPU, or your user's time staring at a blank tab.
+
+## The Cost of SSR
+
+Rendering on every request means the server does real work for every single visitor, not just the first one who happens to trigger a build. That's a fundamentally different cost model than serving a static file, and it shows up directly in time-to-first-byte: the server can't respond until it's finished rendering.
+
+Hydration brings its own failure mode. If the HTML the server sent doesn't match what the client would render — a date formatted in the wrong timezone, a `window`-dependent check that behaves differently server-side — React throws a hydration mismatch, and the affected part re-renders from scratch on the client anyway.
+
+Not every page needs a fresh render on every visit, either. If the content doesn't change between requests, rendering it once at build time (static generation) beats paying the SSR cost over and over for the exact same output.
+
+## SSR in Practice
+
+None of this is actually new. Rails, Django, and PHP were rendering HTML per request long before "server-side rendering" became a term JavaScript frameworks needed. What changed is that React, Vue, and friends made client-side rendering the default, and SSR came back as a deliberate opt-in: `getServerSideProps` and server components in Next.js, SvelteKit's server load functions, Nuxt.
+
+This site is a case in point. It's built with Astro, which supports SSR, but ships as static output instead (`output: 'static'` in the config). Every post here is the same for every visitor and doesn't change between requests, so there's nothing to gain from rendering it fresh each time. A build step does it once, and every request after that is just a file being served.
+
+## When to Reach for It
+
+Pick SSR when the page actually differs per request (a dashboard behind auth, a cart total, search results) and content visible before the JS finishes loading still matters. Pick static generation when the content is the same for everyone and doesn't change on every request. You get SSR's fast first paint without paying to re-render it. Client-side rendering earns its place when the app is heavily interactive and neither SEO nor initial paint speed is the priority, like an internal admin tool where every visitor is already logged in and won't notice a few hundred extra milliseconds.
+
+**Thanks for Reading✌️**
