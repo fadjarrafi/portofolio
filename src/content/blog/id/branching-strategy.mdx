@@ -1,0 +1,95 @@
+---
+title: 'Strategi Branching di Git'
+publishedAt: '2026-08-11'
+summary: 'Strategi branching adalah aturan yang disepakati tim untuk membuat, menamai, dan menggabungkan branch — pembeda antara rilis yang berjalan tenang dan merge conflict yang harus diurai jam 5 sore hari Jumat.'
+featured: false
+topics: ['programming', 'git']
+type: 'note'
+lang: 'id'
+translationSlug: 'branching-strategy'
+---
+
+Setiap repository dengan lebih dari satu kontributor cepat atau lambat menghadapi pertanyaan yang sama: di mana pekerjaan baru dimulai, dan bagaimana caranya kembali ke `main`? Tanpa jawaban yang disepakati, daftar branch berubah jadi kuburan `fix2`, `fix2-final`, dan `fix2-final-really`, dan tidak ada yang yakin mana yang aman untuk di-deploy. Strategi branching ada supaya ini tidak terjadi.
+
+## Apa itu Strategi Branching
+
+Strategi branching adalah aturan yang disepakati tim untuk tiga hal: kapan membuat branch, bagaimana menamainya, dan bagaimana branch itu digabungkan kembali. Ini bukan soal perintah `git branch`. Bagian itu sepele. Ini soal alur kerja di sekitarnya: siapa yang boleh merge, apa yang memicu deploy, dan bagaimana rilis dibuat.
+
+Strategi yang tepat bergantung pada cara tim merilis produk. Deploy berkali-kali dalam sehari itu masalah yang beda dari rilis terjadwal setiap beberapa minggu. Pakai strategi yang dirancang untuk kondisi lain, dan yang didapat cuma friksi yang sebenarnya tidak ada hubungannya dengan kode.
+
+<div className="flex justify-center">
+  <img src="/static/images/branching-strategy.svg" alt="Branch feature/* bercabang dari main, menambah dua commit, lalu digabung kembali; branch hotfix/* bercabang dari main, menambah satu commit, lalu digabung kembali—main terus berjalan maju sepanjang waktu" width="700" />
+</div>
+
+## Git Flow
+
+Git Flow berjalan di atas dua branch berumur panjang: `main` untuk produksi dan `develop` untuk integrasi. Sisanya berumur pendek dan dibuat untuk satu tugas saja:
+
+- `feature/*` dibuat dari `develop`, digabung kembali ke `develop`
+- `release/*` dibuat dari `develop` saat sudah siap rilis, digabung ke `main` dan `develop`
+- `hotfix/*` dibuat dari `main` untuk perbaikan mendesak, digabung ke `main` dan `develop`
+
+```bash
+git checkout -b feature/checkout-flow develop
+# ... proses pengerjaan ...
+git checkout develop
+git merge feature/checkout-flow
+```
+
+Struktur ini memberi proses rilis yang sesungguhnya: ada ruang untuk menstabilkan build sebelum dirilis, dan batas yang jelas antara "sedang dikerjakan" dan "sudah di produksi". Konsekuensinya juga ada. Setiap perubahan menyentuh minimal dua branch, dan tim yang sering deploy bakal merasakan merge tambahan ini sebagai hambatan, bukan pengaman. Git Flow cocok untuk software berversi dengan changelog. Untuk aplikasi SaaS yang rilis lima kali sehari, jauh lebih tidak cocok.
+
+## GitHub Flow
+
+GitHub Flow membuang sebagian besar itu. Satu branch berumur panjang, `main`, dan tidak ada lagi yang bertahan lama. Setiap perubahan adalah feature branch berumur pendek yang digabung kembali lewat pull request.
+
+```bash
+git checkout -b add-search-filter main
+# ... proses pengerjaan ...
+# buka PR, direview, lalu merge ke main
+```
+
+Satu aturan menopang semuanya: `main` selalu bisa di-deploy. Merge, dan itu langsung rilis, biasanya otomatis lewat CI/CD, tanpa `develop` yang perlu disinkronkan dan tanpa `release/*` yang perlu diurus. Yang jadi jebakan adalah apa yang diasumsikan aturan itu: pipeline CI yang benar-benar bisa dipercaya, dan feature flag untuk apa pun yang belum siap begitu merge terjadi. Lewatkan salah satunya, dan "selalu bisa di-deploy" diam-diam berubah jadi "bisa di-deploy, biasanya, semoga."
+
+## Trunk-Based Development
+
+Trunk-based development mengambil GitHub Flow dan memperpendek lagi jangka hidup branch-nya. Branch, kalaupun ada, hidup dalam hitungan jam. Developer langsung push perubahan kecil ke `main` (sang "trunk"), atau menggabungkan feature branch dalam sehari.
+
+Perubahan besar tetap dirilis. Bedanya, dirilis diam-diam, disembunyikan di balik feature flag, bukan diparkir di sebuah branch selama berminggu-minggu:
+
+```js
+if (featureFlags.isEnabled('new-checkout')) {
+  return <NewCheckout />;
+}
+return <LegacyCheckout />;
+```
+
+Branch berumur pendek berarti diff kecil, dan diff kecil berarti merge conflict yang benar-benar bisa diselesaikan. Harganya adalah disiplin. Test coverage yang benar-benar diandalkan, feature flag untuk apa pun yang belum selesai, dan tim yang terbiasa commit dalam potongan kecil, bukan satu branch raksasa di akhir sprint. Lewatkan jaring pengaman itu, dan tim besar di satu codebase bukan cuma sesekali merusak `main` — tapi tiap minggu.
+
+## GitLab Flow
+
+GitLab Flow ada di tengah-tengah. Ia mempertahankan `main` sebagai satu-satunya sumber kebenaran seperti GitHub Flow, tapi menambahkan environment branch (`staging`, `production`) untuk tim yang butuh rollout bertahap yang sesungguhnya, bukan sekadar "merge berarti deploy, titik."
+
+```
+main → staging → production
+```
+
+Kode bergerak satu arah, menurun lewat tiap environment. Hasilnya, ada tahap staging yang nyata tanpa harus menyeret kembali seluruh matriks branch ala Git Flow.
+
+## Membandingkan Strategi
+
+| Strategi | Branch berumur panjang | Paling cocok untuk |
+| --- | --- | --- |
+| Git Flow | `main`, `develop` | Rilis terjadwal, software berversi |
+| GitHub Flow | `main` | Continuous deployment, tim kecil-menengah |
+| Trunk-Based | `main` | Deploy frekuensi tinggi, disiplin test/flag kuat |
+| GitLab Flow | `main` + environment branch | Rollout bertahap (staging → production) |
+
+## Cara Memilih
+
+Mulai dari seberapa sering tim merilis. Bukan dari strategi mana yang kedengaran paling profesional di dokumen desain.
+
+Tim yang deploy ke produksi berkali-kali sehari nggak dapat apa-apa dari `develop` dan `release/*` selain merge tambahan yang harus diurus. GitHub Flow atau trunk-based development lebih cocok. Tim yang merilis produk berversi sesuai jadwal, di mana sebuah fix kadang juga harus mendarat di rilis kuartal lalu, justru butuh struktur yang disediakan Git Flow.
+
+Sesuaikan strategi dengan apa yang benar-benar bisa didukung tim, bukan dengan apa yang terlihat rapi di atas kertas. Trunk-based development tanpa feature flag atau CI yang solid tidak menghilangkan kekacauan — cuma memindahkannya dari daftar branch langsung ke `main`. Pilih strategi paling sederhana yang sesuai ritme rilis, dan tambahkan struktur lagi hanya ketika ada masalah nyata (bukan hipotetis) yang benar-benar menuntutnya.
+
+**Terima Kasih Sudah Membaca✌️**

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="300" viewBox="0 0 700 300" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="700" height="300" rx="14" fill="#ffffff"/>
+
+  <!-- main branch -->
+  <line x1="40" y1="150" x2="655" y2="150" stroke="#1c7ed6" stroke-width="3" stroke-linecap="round"/>
+  <polygon points="668,150 656,144 656,156" fill="#1c7ed6"/>
+  <text x="40" y="176" font-size="13" font-weight="600" fill="#1864ab" font-family="Consolas, monospace">main</text>
+
+  <circle cx="90" cy="150" r="6" fill="#ffffff" stroke="#1c7ed6" stroke-width="2.5"/>
+
+  <!-- feature branch -->
+  <circle cx="220" cy="150" r="5" fill="#7048e8"/>
+  <path d="M220,150 L260,95 L400,95 L440,150" fill="none" stroke="#7048e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="300" cy="95" r="6" fill="#ffffff" stroke="#7048e8" stroke-width="2.5"/>
+  <circle cx="360" cy="95" r="6" fill="#ffffff" stroke="#7048e8" stroke-width="2.5"/>
+  <text x="330" y="76" text-anchor="middle" font-size="12" font-weight="600" fill="#5f3dc4" font-family="Consolas, monospace">feature/*</text>
+  <circle cx="440" cy="150" r="6" fill="#2f9e44"/>
+  <text x="440" y="176" text-anchor="middle" font-size="10.5" fill="#2f9e44">merge</text>
+
+  <!-- hotfix branch -->
+  <circle cx="480" cy="150" r="5" fill="#e03131"/>
+  <path d="M480,150 L520,205 L560,205 L600,150" fill="none" stroke="#e03131" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="540" cy="205" r="6" fill="#ffffff" stroke="#e03131" stroke-width="2.5"/>
+  <text x="540" y="227" text-anchor="middle" font-size="12" font-weight="600" fill="#c92a2a" font-family="Consolas, monospace">hotfix/*</text>
+  <circle cx="600" cy="150" r="6" fill="#2f9e44"/>
+  <text x="600" y="176" text-anchor="middle" font-size="10.5" fill="#2f9e44">merge</text>
+
+  <text x="655" y="140" text-anchor="end" font-size="10.5" fill="#868e96">later →</text>
+</svg>
