@@ -18,7 +18,7 @@ Strategi branching adalah aturan yang disepakati tim untuk tiga hal: kapan membu
 Strategi yang tepat bergantung pada cara tim merilis produk. Deploy berkali-kali dalam sehari itu masalah yang beda dari rilis terjadwal setiap beberapa minggu. Pakai strategi yang dirancang untuk kondisi lain, dan yang didapat cuma friksi yang sebenarnya tidak ada hubungannya dengan kode.
 
 <div className="flex justify-center">
-  <img src="/static/images/branching-strategy.svg" alt="Branch feature/* bercabang dari main, menambah dua commit, lalu digabung kembali; branch hotfix/* bercabang dari main, menambah satu commit, lalu digabung kembali—main terus berjalan maju sepanjang waktu" width="700" />
+  <img src="/static/images/branching-strategy.svg" alt="Branch feature/* bercabang dari main, menambah dua commit, lalu digabung kembali; branch hotfix/* bercabang dari main, menambah satu commit, lalu digabung kembali, main terus berjalan maju sepanjang waktu" width="700" />
 </div>
 
 ## Git Flow
@@ -90,6 +90,6 @@ Mulai dari seberapa sering tim merilis. Bukan dari strategi mana yang kedengaran
 
 Tim yang deploy ke produksi berkali-kali sehari nggak dapat apa-apa dari `develop` dan `release/*` selain merge tambahan yang harus diurus. GitHub Flow atau trunk-based development lebih cocok. Tim yang merilis produk berversi sesuai jadwal, di mana sebuah fix kadang juga harus mendarat di rilis kuartal lalu, justru butuh struktur yang disediakan Git Flow.
 
-Sesuaikan strategi dengan apa yang benar-benar bisa didukung tim, bukan dengan apa yang terlihat rapi di atas kertas. Trunk-based development tanpa feature flag atau CI yang solid tidak menghilangkan kekacauan — cuma memindahkannya dari daftar branch langsung ke `main`. Pilih strategi paling sederhana yang sesuai ritme rilis, dan tambahkan struktur lagi hanya ketika ada masalah nyata (bukan hipotetis) yang benar-benar menuntutnya.
+Sesuaikan strategi dengan apa yang benar-benar bisa didukung tim, bukan dengan apa yang terlihat rapi di atas kertas. Trunk-based development tanpa feature flag atau CI yang solid tidak menghilangkan kekacauan, cuma memindahkannya dari daftar branch langsung ke `main`. Pilih strategi paling sederhana yang sesuai ritme rilis, dan tambahkan struktur lagi hanya ketika ada masalah nyata (bukan hipotetis) yang benar-benar menuntutnya.
 
 **Terima Kasih Sudah Membaca✌️**

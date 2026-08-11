@@ -9,11 +9,11 @@ lang: 'id'
 translationSlug: 'database-transaction'
 ---
 
-Mentransfer uang dari Akun A ke Akun B sebenarnya adalah dua operasi: debit yang satu, kredit yang lain. Sekarang bayangkan aplikasimu crash tepat di antara keduanya. Update pertama sudah berjalan. Update kedua tidak pernah sempat dijalankan. Uangnya begitu saja lenyap—terdebit dari A, tidak pernah terkredit ke B. Database transaction adalah yang mencegah hal ini terjadi.
+Mentransfer uang dari Akun A ke Akun B sebenarnya adalah dua operasi: debit yang satu, kredit yang lain. Sekarang bayangkan aplikasimu crash tepat di antara keduanya. Update pertama sudah berjalan. Update kedua tidak pernah sempat dijalankan. Uangnya begitu saja lenyap: terdebit dari A, tidak pernah terkredit ke B. Database transaction adalah yang mencegah hal ini terjadi.
 
 ## Apa itu Database Transaction
 
-Transaction mengelompokkan beberapa operasi menjadi satu unit all-or-nothing. Entah semua operasi di dalamnya berhasil dan tersimpan, atau tidak ada satu pun yang tersimpan—tidak ada kondisi di mana hanya sebagian langkah yang berhasil.
+Transaction mengelompokkan beberapa operasi menjadi satu unit all-or-nothing. Entah semua operasi di dalamnya berhasil dan tersimpan, atau tidak ada satu pun yang tersimpan: tidak ada kondisi di mana hanya sebagian langkah yang berhasil.
 
 ```sql
 BEGIN TRANSACTION;
@@ -24,7 +24,7 @@ UPDATE accounts SET balance = balance + 50 WHERE id = 'B';
 COMMIT;
 ```
 
-Kalau kedua pernyataan `UPDATE` berhasil, `COMMIT` membuatnya permanen. Kalau ada yang salah di tengah jalan—pelanggaran constraint, koneksi terputus, pengecekan eksplisit yang gagal—kamu memanggil `ROLLBACK`, dan database kembali persis seperti sebelum `BEGIN TRANSACTION` dijalankan, seolah-olah kedua update itu tidak pernah terjadi.
+Kalau kedua pernyataan `UPDATE` berhasil, `COMMIT` membuatnya permanen. Kalau ada yang salah di tengah jalan (pelanggaran constraint, koneksi terputus, pengecekan eksplisit yang gagal), kamu memanggil `ROLLBACK`, dan database kembali persis seperti sebelum `BEGIN TRANSACTION` dijalankan, seolah-olah kedua update itu tidak pernah terjadi.
 
 ```sql
 BEGIN TRANSACTION;
@@ -35,28 +35,28 @@ ROLLBACK; -- saldo Akun A kembali seperti semula
 ```
 
 <div className="flex justify-center">
-  <img src="/static/images/database-transaction.svg" alt="Sebuah transaction mendebit Akun A dan mengkredit Akun B sebagai satu unit—kalau kedua langkah berhasil, transaction di-commit dan tersimpan permanen; kalau ada langkah yang gagal, transaction di-rollback dan semuanya dibatalkan" width="700" />
+  <img src="/static/images/database-transaction.svg" alt="Sebuah transaction mendebit Akun A dan mengkredit Akun B sebagai satu unit: kalau kedua langkah berhasil, transaction di-commit dan tersimpan permanen; kalau ada langkah yang gagal, transaction di-rollback dan semuanya dibatalkan" width="700" />
 </div>
 
 ## Properti ACID
 
 Transaction biasanya dijelaskan lewat empat jaminan, disingkat ACID:
 
-- **Atomicity** — transaction adalah satu unit yang tidak bisa dipecah. Semuanya terjadi sepenuhnya atau tidak sama sekali; tidak ada kondisi setengah jalan.
-- **Consistency** — transaction hanya bisa memindahkan database dari satu kondisi valid ke kondisi valid lainnya. Tidak boleh meninggalkan foreign key yang menunjuk ke mana pun atau melanggar constraint.
-- **Isolation** — transaction yang berjalan bersamaan tidak saling melihat perubahan yang belum di-commit satu sama lain. Satu transaction yang sedang berlangsung terlihat tidak ada bagi transaction lain sampai ia di-commit.
-- **Durability** — begitu transaction di-commit, perubahannya bertahan meski terjadi crash. Datanya sudah tertulis di disk, bukan sekadar berada di memori yang bisa hilang saat listrik padam.
+- **Atomicity**: transaction adalah satu unit yang tidak bisa dipecah. Semuanya terjadi sepenuhnya atau tidak sama sekali; tidak ada kondisi setengah jalan.
+- **Consistency**: transaction hanya bisa memindahkan database dari satu kondisi valid ke kondisi valid lainnya. Tidak boleh meninggalkan foreign key yang menunjuk ke mana pun atau melanggar constraint.
+- **Isolation**: transaction yang berjalan bersamaan tidak saling melihat perubahan yang belum di-commit satu sama lain. Satu transaction yang sedang berlangsung terlihat tidak ada bagi transaction lain sampai ia di-commit.
+- **Durability**: begitu transaction di-commit, perubahannya bertahan meski terjadi crash. Datanya sudah tertulis di disk, bukan sekadar berada di memori yang bisa hilang saat listrik padam.
 
-Atomicity adalah properti yang langsung menyelesaikan masalah transfer bank. Tapi bagaimana kalau dua transaction menyentuh baris yang sama di waktu yang sama? Di situlah isolation berperan—tanpanya, satu transaction bisa membaca update yang belum selesai dari transaction lain dan mengambil keputusan berdasarkan angka yang sebenarnya tidak pernah benar.
+Atomicity adalah properti yang langsung menyelesaikan masalah transfer bank. Tapi bagaimana kalau dua transaction menyentuh baris yang sama di waktu yang sama? Di situlah isolation berperan. Tanpanya, satu transaction bisa membaca update yang belum selesai dari transaction lain dan mengambil keputusan berdasarkan angka yang sebenarnya tidak pernah benar.
 
 ### Isolation Level
 
-Isolation bukan hal yang serba sama—database membiarkanmu mengatur tingkatnya, karena isolation yang lebih ketat mengorbankan performa. Beberapa level umum, dari yang paling longgar sampai paling ketat:
+Isolation bukan hal yang serba sama. Database membiarkanmu mengatur tingkatnya, karena isolation yang lebih ketat mengorbankan performa. Beberapa level umum, dari yang paling longgar sampai paling ketat:
 
-- **Read Uncommitted** — sebuah transaction bisa melihat perubahan transaction lain yang belum di-commit. Cepat, tapi berisiko membaca data yang sesaat kemudian di-rollback.
-- **Read Committed** — default di PostgreSQL dan kebanyakan setup. Kamu hanya pernah melihat perubahan yang sudah di-commit.
-- **Repeatable Read** — membaca baris yang sama dua kali dalam satu transaction selalu mengembalikan nilai yang sama, meski transaction lain meng-commit perubahan di antaranya.
-- **Serializable** — level paling ketat. Transaction berperilaku seolah-olah dijalankan satu per satu, tanpa tumpang tindih sama sekali.
+- **Read Uncommitted**: sebuah transaction bisa melihat perubahan transaction lain yang belum di-commit. Cepat, tapi berisiko membaca data yang sesaat kemudian di-rollback.
+- **Read Committed**: default di PostgreSQL dan kebanyakan setup. Kamu hanya pernah melihat perubahan yang sudah di-commit.
+- **Repeatable Read**: membaca baris yang sama dua kali dalam satu transaction selalu mengembalikan nilai yang sama, meski transaction lain meng-commit perubahan di antaranya.
+- **Serializable**: level paling ketat. Transaction berperilaku seolah-olah dijalankan satu per satu, tanpa tumpang tindih sama sekali.
 
 Isolation yang lebih tinggi berarti lebih banyak locking, yang berarti lebih banyak transaction yang saling menunggu alih-alih berjalan bersamaan. Kebanyakan aplikasi baik-baik saja dengan setelan default database-nya, dan baru beralih ke level yang lebih ketat kalau ada race condition tertentu yang muncul.
 
@@ -78,11 +78,11 @@ await prisma.$transaction(async (tx) => {
 });
 ```
 
-Kalau salah satu `update` melempar error, Prisma otomatis me-rollback keduanya—kamu tidak perlu menulis logika rollback sendiri, cukup biarkan error-nya menjalar dan transaction yang menanganinya.
+Kalau salah satu `update` melempar error, Prisma otomatis me-rollback keduanya. Kamu tidak perlu menulis logika rollback sendiri, cukup biarkan error-nya menjalar dan transaction yang menanganinya.
 
 ## Kapan Kamu Benar-Benar Membutuhkannya
 
-Tidak semua penulisan data butuh transaction. Satu `UPDATE` pada satu baris sudah atomic dengan sendirinya—tidak ada yang perlu dikoordinasikan. Pakai transaction khususnya saat sebuah operasi mencakup lebih dari satu penulisan yang semuanya harus berhasil atau gagal bersama-sama:
+Tidak semua penulisan data butuh transaction. Satu `UPDATE` pada satu baris sudah atomic dengan sendirinya. Tidak ada yang perlu dikoordinasikan. Pakai transaction khususnya saat sebuah operasi mencakup lebih dari satu penulisan yang semuanya harus berhasil atau gagal bersama-sama:
 
 - Memindahkan uang antar dua akun
 - Membuat order sekaligus mengurangi stok inventori dalam satu request
@@ -91,8 +91,8 @@ Tidak semua penulisan data butuh transaction. Satu `UPDATE` pada satu baris suda
 
 ## Kenapa Ini Penting
 
-Tanpa transaction, kegagalan sebagian tidak terlihat seperti error. Ia terlihat seperti bug yang baru muncul saat beban tinggi, ketika sebuah request kebetulan mati di antara dua penulisan yang seharusnya jadi satu unit. Inkonsistensi semacam ini sulit direproduksi dan mahal untuk dibersihkan setelahnya—begitu kamu menyadarinya, data yang salah sudah duduk di production bersama data lainnya.
+Tanpa transaction, kegagalan sebagian tidak terlihat seperti error. Ia terlihat seperti bug yang baru muncul saat beban tinggi, ketika sebuah request kebetulan mati di antara dua penulisan yang seharusnya jadi satu unit. Inkonsistensi semacam ini sulit direproduksi dan mahal untuk dibersihkan setelahnya. Begitu kamu menyadarinya, data yang salah sudah duduk di production bersama data lainnya.
 
 Pola pikir all-or-nothing yang sama juga muncul di bagian lain pekerjaan backend. [API yang idempoten](/writing/id/what-is-idempotency-in-api) mencegah request yang berulang menyebabkan side effect yang berulang juga. Menghindari [N+1 query problem](/writing/id/n-plus-one-query-problem) mencegah satu request memicu query jauh lebih banyak dari yang seharusnya. Transaction menerapkan insting yang sama pada penulisan data: database tidak boleh pernah terjebak dalam kondisi yang hanya separuh benar.
 
-**Thanks for Reading✌️**
+**Terima Kasih Sudah Membaca✌️**

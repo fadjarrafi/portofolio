@@ -16,7 +16,7 @@ Kalau kamu pernah membangun aplikasi web, kemungkinan besar pernah bertemu error
 
 ## Same-origin policy
 
-Secara default, browser hanya mengizinkan sebuah halaman meminta sumber daya dari origin-nya sendiri — domain, protokol, dan port yang sama. Inilah same-origin policy (SOP), yang membatasi bagaimana skrip dari satu origin bisa menjangkau sumber daya di origin lain.
+Secara default, browser hanya mengizinkan sebuah halaman meminta sumber daya dari origin-nya sendiri: domain, protokol, dan port yang sama. Inilah same-origin policy (SOP), yang membatasi bagaimana skrip dari satu origin bisa menjangkau sumber daya di origin lain.
 
 Misalnya kamu punya aplikasi web di `https://www.domain-a.com` yang butuh data dari API di `https://api.domain-b.com`. Karena origin-nya berbeda, ini disebut cross-origin request — dan secara default SOP memblokirnya.
 
@@ -28,7 +28,7 @@ Lalu bagaimana kalau aplikasi kita memang perlu berkomunikasi dengan origin lain
 
 ## Apa itu CORS
 
-Cross-origin resource sharing adalah cara sebuah server memberi tahu browser origin mana saja yang boleh mengakses sumber dayanya. Mekanismenya lewat header HTTP yang ditambahkan ke respons — browser membaca header itu lalu memutuskan apakah datanya boleh diberikan ke skrip kita.
+Cross-origin resource sharing adalah cara sebuah server memberi tahu browser origin mana saja yang boleh mengakses sumber dayanya. Mekanismenya lewat header HTTP yang ditambahkan ke respons. Browser membaca header itu lalu memutuskan apakah datanya boleh diberikan ke skrip kita.
 
 Ada beberapa [header CORS](https://fetch.spec.whatwg.org/#http-cors-protocol), tetapi yang utama adalah:
 
@@ -62,7 +62,7 @@ Content-Type: application/json
 
 Kalau respons mengembalikan `Access-Control-Allow-Origin` yang cocok dengan origin kita, browser meneruskan datanya. Kalau tidak, browser memblokirnya — itulah error di awal tulisan ini.
 
-Request yang bisa mengubah data — `DELETE`, `PUT`, `PATCH`, atau request dengan header kustom — diperlakukan lebih hati-hati. Sebelum mengirim request aslinya, browser melakukan **preflight**: sebuah request `OPTIONS` untuk menanyakan ke server apakah request aslinya diizinkan.
+Request yang bisa mengubah data (`DELETE`, `PUT`, `PATCH`, atau request dengan header kustom) diperlakukan lebih hati-hati. Sebelum mengirim request aslinya, browser melakukan **preflight**: sebuah request `OPTIONS` untuk menanyakan ke server apakah request aslinya diizinkan.
 
 #### Request preflight `OPTIONS` dari browser:
 
@@ -106,4 +106,4 @@ Content-Type: application/json
 
 ## Kenapa CORS penting
 
-CORS membuat server yang menentukan siapa saja yang boleh membaca sumber dayanya. Tanpa itu, situs mana pun bisa diam-diam mengirim request ke domain lain atas nama pengguna — dasar dari serangan seperti [cross-site request forgery (CSRF)](https://owasp.org/www-community/attacks/csrf). Dengan CORS, aplikasi tetap bisa berbagi data lintas origin, tapi hanya kalau server secara eksplisit mengizinkannya.
+CORS membuat server yang menentukan siapa saja yang boleh membaca sumber dayanya. Tanpa itu, situs mana pun bisa diam-diam mengirim request ke domain lain atas nama pengguna: dasar dari serangan seperti [cross-site request forgery (CSRF)](https://owasp.org/www-community/attacks/csrf). Dengan CORS, aplikasi tetap bisa berbagi data lintas origin, tapi hanya kalau server secara eksplisit mengizinkannya.

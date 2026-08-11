@@ -1,7 +1,7 @@
 ---
 title: 'Event Loop di Javascript'
 publishedAt: '2026-06-20'
-summary: 'Event loop membuat JavaScript yang single-thread tetap non-blocking dengan memindahkan operasi lambat ke Web APIs dan mengantrekan callback-nya—menguras semua microtask berprioritas tinggi sebelum setiap macrotask berprioritas rendah—sehingga thread utama tetap responsif.'
+summary: 'Event loop membuat JavaScript yang single-thread tetap non-blocking dengan memindahkan operasi lambat ke Web APIs dan mengantrekan callback-nya (menguras semua microtask berprioritas tinggi sebelum setiap macrotask berprioritas rendah) sehingga thread utama tetap responsif.'
 featured: false
 topics: ['javascript']
 type: 'tutorial'
@@ -23,11 +23,11 @@ Kedengarannya membatasi, tapi justru event loop-lah yang membuat JavaScript bisa
 
 Beberapa operasi browser cukup lambat sampai kita tidak mau menunggunya begitu saja:
 
-1. **Fetch / XMLHttpRequest** — permintaan jaringan bisa berlangsung dari ratusan milidetik hingga beberapa detik, bergantung pada koneksi dan besarnya data yang kembali. Misalnya `fetch('https://api.example.com/data')` yang menarik dataset besar.
-2. **FileReader** — membaca berkas besar yang diunggah pengguna, seperti `fileReader.readAsDataURL(largeImageFile)`.
-3. **IndexedDB** — membaca atau menulis data dalam jumlah banyak, seperti `indexedDB.getAll()` pada store dengan ribuan entri.
-4. **Media processing** — mendekode dan memutar audio atau video besar, seperti `video.play()` pada klip 4K.
-5. **Geolocation** — `navigator.geolocation.getCurrentPosition()` bisa lambat, terutama pada perangkat dengan sinyal GPS lemah.
+1. **Fetch / XMLHttpRequest**: permintaan jaringan bisa berlangsung dari ratusan milidetik hingga beberapa detik, bergantung pada koneksi dan besarnya data yang kembali. Misalnya `fetch('https://api.example.com/data')` yang menarik dataset besar.
+2. **FileReader**: membaca berkas besar yang diunggah pengguna, seperti `fileReader.readAsDataURL(largeImageFile)`.
+3. **IndexedDB**: membaca atau menulis data dalam jumlah banyak, seperti `indexedDB.getAll()` pada store dengan ribuan entri.
+4. **Media processing**: mendekode dan memutar audio atau video besar, seperti `video.play()` pada klip 4K.
+5. **Geolocation**: `navigator.geolocation.getCurrentPosition()` bisa lambat, terutama pada perangkat dengan sinyal GPS lemah.
 
 Kalau JavaScript menjalankan semua ini di thread utama, seluruh aplikasi akan berhenti menunggu satu per satu selesai. Maka JavaScript tidak melakukannya. Operasi berat diserahkan ke Web APIs, yang hidup di luar thread utama.
 

@@ -9,7 +9,7 @@ lang: 'id'
 translationSlug: 'synchronous-vs-asynchronous'
 ---
 
-Kode berjalan dari atas ke bawah—sampai tidak lagi. Begitu ada satu baris yang harus menunggu sesuatu yang lambat, seperti respons jaringan atau timer, JavaScript punya dua pilihan: membekukan semuanya sampai selesai, atau tetap jalan dan menangani hasilnya belakangan. Pilihan itulah yang jadi perbedaan utama antara kode synchronous dan asynchronous.
+Kode berjalan dari atas ke bawah — sampai tidak lagi. Begitu ada satu baris yang harus menunggu sesuatu yang lambat, seperti respons jaringan atau timer, JavaScript punya dua pilihan: membekukan semuanya sampai selesai, atau tetap jalan dan menangani hasilnya belakangan. Pilihan itulah yang jadi perbedaan utama antara kode synchronous dan asynchronous.
 
 ## Kode Synchronous
 
@@ -28,11 +28,11 @@ console.log(heavyLoop()); // seluruh aplikasi menunggu di sini
 console.log('End');
 ```
 
-Loop itu bisa memakan waktu cukup terasa untuk selesai, dan selama itu tidak ada hal lain yang berjalan—tidak ada click handler, tidak ada re-render, tidak ada apa pun. Di tab browser, itu artinya halaman jadi beku. Inilah yang dimaksud "blocking": operasi tersebut menguasai main thread sampai selesai, dan semua yang lain harus antre di belakangnya.
+Loop itu bisa memakan waktu cukup terasa untuk selesai, dan selama itu tidak ada hal lain yang berjalan. Tidak ada click handler, tidak ada re-render, tidak ada apa pun. Di tab browser, itu artinya halaman jadi beku. Inilah yang dimaksud "blocking": operasi tersebut menguasai main thread sampai selesai, dan semua yang lain harus antre di belakangnya.
 
 ## Kode Asynchronous
 
-Kode asynchronous membiarkan operasi yang lambat berjalan di latar belakang—di luar main thread, lewat API milik browser atau Node—sehingga sisa program tetap jalan alih-alih menunggu.
+Kode asynchronous membiarkan operasi yang lambat berjalan di latar belakang (di luar main thread, lewat API milik browser atau Node) sehingga sisa program tetap jalan alih-alih menunggu.
 
 ```js
 console.log('Start');
@@ -44,17 +44,17 @@ fetch('/api/data')
 console.log('End');
 ```
 
-Di sini, `'End'` tercetak lebih dulu sebelum data hasil fetch, padahal `fetch()` ditulis lebih awal dalam file. Request-nya dimulai, JavaScript langsung lanjut, dan callback `.then()` baru berjalan setelah responsnya benar-benar datang—kapan pun itu.
+Di sini, `'End'` tercetak lebih dulu sebelum data hasil fetch, padahal `fetch()` ditulis lebih awal dalam file. Request-nya dimulai, JavaScript langsung lanjut, dan callback `.then()` baru berjalan setelah responsnya benar-benar datang, kapan pun itu.
 
 Kamu akan terus menemui operasi asynchronous dalam kode sungguhan, hampir selalu karena ada sesuatu di luar programmu yang harus terjadi lebih dulu:
 
-- **Network request** — `fetch()`, panggilan API, memuat script dari CDN
-- **Timer** — `setTimeout()`, `setInterval()`
-- **File dan disk I/O** — membaca file di Node, menulis ke IndexedDB di browser
-- **Input pengguna** — menunggu klik, ketikan, atau submit form
-- **Query database** — apa pun yang harus round-trip ke server database
+- **Network request**: `fetch()`, panggilan API, memuat script dari CDN
+- **Timer**: `setTimeout()`, `setInterval()`
+- **File dan disk I/O**: membaca file di Node, menulis ke IndexedDB di browser
+- **Input pengguna**: menunggu klik, ketikan, atau submit form
+- **Query database**: apa pun yang harus round-trip ke server database
 
-Tidak satu pun dari ini selesai secara instan, dan tidak satu pun waktunya bisa dikontrol langsung oleh JavaScript—itulah sebabnya semuanya diserahkan, bukan dijalankan langsung di tempat.
+Tidak satu pun dari ini selesai secara instan, dan tidak satu pun waktunya bisa dikontrol langsung oleh JavaScript. Itulah sebabnya semuanya diserahkan, bukan dijalankan langsung di tempat.
 
 <div className="flex justify-center">
   <img src="/static/images/sync-vs-async.svg" alt="Synchronous: Task A, B, dan C berjalan satu demi satu, masing-masing menunggu yang sebelumnya. Asynchronous: Task A dimulai, diserahkan ke Web API untuk menunggu I/O, sementara Task B dan C langsung berjalan; callback Task A jalan setelah penantiannya selesai" width="700" />
@@ -75,7 +75,7 @@ fs.readFile('data.txt', (err, data) => {
 });
 ```
 
-Sederhana untuk satu langkah async, tapi menyulitkan begitu kamu butuh beberapa langkah berurutan—callback bersarang di dalam callback lain adalah asal-usul istilah "callback hell".
+Sederhana untuk satu langkah async, tapi menyulitkan begitu kamu butuh beberapa langkah berurutan. Callback bersarang di dalam callback lain adalah asal-usul istilah "callback hell".
 
 ### Promise
 
@@ -104,7 +104,7 @@ async function loadData() {
 }
 ```
 
-Perilakunya sama dengan versi promise, tapi terbaca dari atas ke bawah seperti contoh synchronous di awal artikel ini—itulah daya tariknya.
+Perilakunya sama dengan versi promise, tapi terbaca dari atas ke bawah seperti contoh synchronous di awal artikel ini. Itulah daya tariknya.
 
 ## Perbedaan Utama
 
@@ -120,8 +120,8 @@ Berdampingan, trade-off-nya bisa diringkas jadi satu pertanyaan: apakah operasi 
 
 ## Kenapa Ini Penting
 
-Jadi kenapa tidak menulis semuanya secara asynchronous saja? Karena kode async lebih sulit dipahami—hasil bisa datang dengan urutan berbeda dari yang kamu tulis, dan setiap `await` adalah titik di mana sisa fungsi harus menunggu giliran di belakang apa pun yang sedang berjalan. Kode synchronous lebih sederhana justru karena hal itu tidak mungkin terjadi: satu hal terjadi, lalu yang berikutnya, selalu sesuai urutan di halaman. Trade-off-nya, satu panggilan synchronous yang lambat membekukan semua yang ada di belakangnya, termasuk UI, sementara kode asynchronous menjaga aplikasi tetap responsif dengan tambahan kompleksitas itu sebagai harganya.
+Jadi kenapa tidak menulis semuanya secara asynchronous saja? Karena kode async lebih sulit dipahami: hasil bisa datang dengan urutan berbeda dari yang kamu tulis, dan setiap `await` adalah titik di mana sisa fungsi harus menunggu giliran di belakang apa pun yang sedang berjalan. Kode synchronous lebih sederhana justru karena hal itu tidak mungkin terjadi: satu hal terjadi, lalu yang berikutnya, selalu sesuai urutan di halaman. Trade-off-nya, satu panggilan synchronous yang lambat membekukan semua yang ada di belakangnya, termasuk UI, sementara kode asynchronous menjaga aplikasi tetap responsif dengan tambahan kompleksitas itu sebagai harganya.
 
-[Debouncing](/writing/id/debouncing) pada input pencarian adalah contoh bagus dari trade-off ini di dunia nyata: pemanggilan `fetch()` di dalamnya bersifat asynchronous justru supaya ketikan tidak membeku selama request berlangsung. Kalau kamu ingin mekanisme yang lebih dalam—bagaimana JavaScript sebenarnya memutuskan kapan sebuah callback yang tertunda boleh berjalan—itulah yang dibahas di [event loop](/writing/id/event-loop), satu lapis di bawah pembagian sync/async yang dijelaskan di sini.
+[Debouncing](/writing/id/debouncing) pada input pencarian adalah contoh bagus dari trade-off ini di dunia nyata: pemanggilan `fetch()` di dalamnya bersifat asynchronous justru supaya ketikan tidak membeku selama request berlangsung. Kalau kamu ingin mekanisme yang lebih dalam (bagaimana JavaScript sebenarnya memutuskan kapan sebuah callback yang tertunda boleh berjalan), itulah yang dibahas di [event loop](/writing/id/event-loop), satu lapis di bawah pembagian sync/async yang dijelaskan di sini.
 
-**Thanks for Reading✌️**
+**Terima Kasih Sudah Membaca✌️**

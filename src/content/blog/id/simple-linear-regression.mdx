@@ -1,7 +1,7 @@
 ---
 title: 'Simple Linear Regression'
 publishedAt: '2025-10-21'
-summary: 'Panduan langkah demi langkah regresi linier sederhana — menghitung slope, intercept, dan R² dengan dataset nyata serta implementasi JavaScript.'
+summary: 'Panduan langkah demi langkah regresi linier sederhana: menghitung slope, intercept, dan R² dengan dataset nyata serta implementasi JavaScript.'
 featured: false
 topics: ['statistics', 'mathematics']
 type: 'note' 
@@ -9,7 +9,7 @@ lang: 'id'
 translationSlug: 'simple-linear-regression'
 ---
 
-Bagaimana sebuah perusahaan memutuskan berapa besar biaya iklannya, atau seorang agen menentukan harga rumah? Sering kali alat di balik keputusan itu adalah regresi linier sederhana — cara untuk menggambarkan dan memprediksi hubungan antara dua variabel. Bayangkan seperti mencari benang merah yang menghubungkan biaya iklan ($x$) dengan penjualan ($y$).
+Bagaimana sebuah perusahaan memutuskan berapa besar biaya iklannya, atau seorang agen menentukan harga rumah? Sering kali alat di balik keputusan itu adalah regresi linier sederhana: cara untuk menggambarkan dan memprediksi hubungan antara dua variabel. Bayangkan seperti mencari benang merah yang menghubungkan biaya iklan ($x$) dengan penjualan ($y$).
 
 Secara matematis, hubungan itu terlihat seperti ini:
 
@@ -31,8 +31,8 @@ Di mana:
 
 Regresi linier melakukan dua hal:
 
-1. **Membuktikan hubungan** — membuktikan secara statistik apakah dua variabel benar-benar berhubungan, dan mengukur seberapa kuat hubungan itu. *Apakah tingkat pendidikan benar-benar memengaruhi pendapatan?*
-2. **Memprediksi** — memperkirakan nilai di masa depan dari data lampau. *Jika anggaran iklan dinaikkan sebesar $x$, berapa tambahan penjualan ($y$) yang bisa diharapkan?*
+1. **Membuktikan hubungan**: membuktikan secara statistik apakah dua variabel benar-benar berhubungan, dan mengukur seberapa kuat hubungan itu. *Apakah tingkat pendidikan benar-benar memengaruhi pendapatan?*
+2. **Memprediksi**: memperkirakan nilai di masa depan dari data lampau. *Jika anggaran iklan dinaikkan sebesar $x$, berapa tambahan penjualan ($y$) yang bisa diharapkan?*
 
 ## Menghitung Regresi Linier
 
@@ -70,7 +70,7 @@ Mulai dari kedua rata-rata:
 $$ \bar{x} = (100 + 200 + 300 + 400 + 500) / 5 = 300 $$
 $$ \bar{y} = (500 + 700 + 900 + 1100 + 1300) / 5 = 900 $$
 
-Sekarang pembilangnya — tiap $(x_i - \bar{x})(y_i - \bar{y})$:
+Sekarang pembilangnya, tiap $(x_i - \bar{x})(y_i - \bar{y})$:
 
 $$ (100 - 300)(500 - 900) = (-200)(-400) = 80,000 $$
 $$ (200 - 300)(700 - 900) = (-100)(-200) = 20,000 $$
@@ -80,7 +80,7 @@ $$ (500 - 300)(1300 - 900) = (200)(400) = 80,000 $$
 
 $$ \text{Total} = 200,000 $$
 
-Lalu penyebutnya — tiap $(x_i - \bar{x})^2$:
+Lalu penyebutnya, tiap $(x_i - \bar{x})^2$:
 
 $$ (100 - 300)^2 = (-200)^2 = 40,000 $$
 $$ (200 - 300)^2 = (-100)^2 = 10,000 $$
@@ -191,10 +191,10 @@ console.log(`${prediksi} unit`);
 
 Regresi hanya andal jika beberapa asumsi terpenuhi. Ada baiknya diperiksa sebelum kamu mempercayai hasilnya:
 
-1. **Linearitas.** Hubungan antara $x$ dan $y$ harus kira-kira berupa garis lurus. Scatter plot adalah cara cepat memeriksanya — jika titik-titiknya justru melengkung, transformasi data dulu (logaritma atau akar kuadrat biasanya membantu).
+1. **Linearitas.** Hubungan antara $x$ dan $y$ harus kira-kira berupa garis lurus. Scatter plot adalah cara cepat memeriksanya. Jika titik-titiknya justru melengkung, transformasi data dulu (logaritma atau akar kuadrat biasanya membantu).
 2. **Independensi.** Setiap pengamatan harus berdiri sendiri. Ini paling terasa pada data time series: penjualan hari ini seharusnya tidak dipengaruhi penjualan kemarin. Autokorelasi (diperiksa dengan plot ACF atau uji Durbin-Watson) membuat hasilnya bias.
 3. **Homoskedastisitas.** Sebaran error harus tetap konstan di semua nilai $x$ — kesalahan prediksi tidak boleh kecil untuk biaya iklan rendah lalu besar untuk yang tinggi. Plot residual terhadap nilai prediksi; bentuk corong menandakan asumsi ini tidak terpenuhi.
-4. **Normalitas.** Residual harus mengikuti distribusi normal — berbentuk lonceng simetris saat dibuat histogram. Ini penting terutama untuk uji hipotesis dan interval kepercayaan. Periksa dengan Q-Q plot, atau uji formal seperti Shapiro-Wilk.
+4. **Normalitas.** Residual harus mengikuti distribusi normal: berbentuk lonceng simetris saat dibuat histogram. Ini penting terutama untuk uji hipotesis dan interval kepercayaan. Periksa dengan Q-Q plot, atau uji formal seperti Shapiro-Wilk.
 
 ## Menguji Kecocokan dengan R²
 
@@ -210,7 +210,7 @@ Di mana:
 | $\hat{y_i}$       | Nilai prediksi |
 | $\bar{y}$         | Rata-rata nilai aktual |
 
-$R^2$ berkisar dari 0 sampai 1 dan menunjukkan porsi keragaman $y$ yang berhasil ditangkap model — kalikan 100 untuk membacanya sebagai persentase. Untuk menghitungnya, kita perlu nilai prediksi, total sum of squares, dan residual sum of squares.
+$R^2$ berkisar dari 0 sampai 1 dan menunjukkan porsi keragaman $y$ yang berhasil ditangkap model. Kalikan 100 untuk membacanya sebagai persentase. Untuk menghitungnya, kita perlu nilai prediksi, total sum of squares, dan residual sum of squares.
 
 ### Nilai Prediksi ($\hat{y_i}$)
 
@@ -237,7 +237,7 @@ $$ SS_{total} = 400,000 $$
 
 ### Residual Sum of Squares ($SS_{residual}$)
 
-Ini yang tidak tertangkap model — selisih antara aktual dan prediksi, $\sum(y_i - \hat{y_i})^2$:
+Ini yang tidak tertangkap model (selisih antara aktual dan prediksi, $\sum(y_i - \hat{y_i})^2$):
 
 $$ (500 - 500)^2 = 0 $$
 $$ (700 - 700)^2 = 0 $$

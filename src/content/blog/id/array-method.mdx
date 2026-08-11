@@ -10,7 +10,7 @@ translationSlug: 'array-method'
 
 Array ada di mana-mana, dan JavaScript menyediakan sekumpulan method untuk mengolahnya tanpa menulis loop secara manual. Yang paling sering dipakai adalah `map`, `filter`, `reduce`, `find`, `findIndex`, `push`, `pop`, `shift`, `unshift`, `slice`, `splice`, `forEach`, `some`, dan `every`. Mari kita bahas satu per satu.
 
-Tiga yang paling sering dipakai adalah `map`, `filter`, dan `reduce` — mengubah tiap elemen, menyaring yang dibutuhkan, atau meringkas semuanya jadi satu nilai:
+Tiga yang paling sering dipakai adalah `map`, `filter`, dan `reduce` (mengubah tiap elemen, menyaring yang dibutuhkan, atau meringkas semuanya jadi satu nilai):
 
 <div className="flex justify-center">
   <img src="/static/images/array-method.png" alt="map mengubah tiap elemen, filter menyaring elemen yang cocok, reduce menggabungkannya jadi satu nilai" width="640" />
@@ -81,7 +81,7 @@ const johnIndex = users.findIndex((user) => user.name === 'John')
 
 ## push, pop, shift, dan unshift
 
-Method ini mengubah array asli dengan menambah atau menghapus satu elemen di salah satu ujungnya — dasar dari stack dan queue:
+Method ini mengubah array asli dengan menambah atau menghapus satu elemen di salah satu ujungnya (dasar dari stack dan queue):
 
 ```javascript
 const fruits = ['apple']
@@ -108,7 +108,7 @@ letters.splice(1, 1, 'x') // mengganti 'b' dengan 'x' → ['a', 'x', 'c']
 
 ## forEach
 
-`forEach()` menjalankan sebuah fungsi untuk tiap elemen tanpa membuat array baru. Cocok untuk side effect — mencatat log, atau memperbarui sesuatu di luar loop:
+`forEach()` menjalankan sebuah fungsi untuk tiap elemen tanpa membuat array baru. Cocok untuk side effect (mencatat log, atau memperbarui sesuatu di luar loop):
 
 ```javascript
 const items = ['book', 'pen', 'desk']
@@ -122,8 +122,8 @@ items.forEach((item, index) => {
 
 Keduanya mengembalikan boolean setelah menguji elemen array:
 
-- `some()` — apakah ada minimal satu elemen yang cocok?
-- `every()` — apakah semua elemen cocok?
+- `some()`: apakah ada minimal satu elemen yang cocok?
+- `every()`: apakah semua elemen cocok?
 
 ```javascript
 const scores = [75, 80, 95]

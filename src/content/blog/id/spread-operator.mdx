@@ -8,7 +8,7 @@ lang: 'id'
 translationSlug: 'spread-operator'
 ---
 
-Spread operator (`...`) mengekspansi sebuah iterable — array, string, atau objek — menjadi elemen-elemennya satu per satu. Fitur ini hadir sejak ES6 dan cepat jadi salah satu hal yang dipakai tiap hari: menggabungkan array, menyalin objek, atau mengoper daftar argumen, semuanya tanpa mengubah data aslinya.
+Spread operator (`...`) mengekspansi sebuah iterable (array, string, atau objek) menjadi elemen-elemennya satu per satu. Fitur ini hadir sejak ES6 dan cepat jadi salah satu hal yang dipakai tiap hari: menggabungkan array, menyalin objek, atau mengoper daftar argumen, semuanya tanpa mengubah data aslinya.
 
 ## Array
 
@@ -47,7 +47,7 @@ const denganLokasi = { ...pengguna, lokasi: 'Jakarta' }
 // { nama: 'Budi', umur: 30, lokasi: 'Jakarta' }
 ```
 
-Urutan berpengaruh. Properti yang ditulis belakangan menimpa yang di depan — pas untuk menggabungkan nilai default dengan nilai override:
+Urutan berpengaruh. Properti yang ditulis belakangan menimpa yang di depan, pas untuk menggabungkan nilai default dengan nilai override:
 
 ```javascript
 const bawaan = { tema: 'terang', notifikasi: true }
@@ -61,7 +61,7 @@ Balik urutannya, dan nilai default yang menang.
 
 ## Set dan Map
 
-Karena keduanya iterable, spread mengubahnya kembali menjadi array — cara cepat untuk membuang duplikat:
+Karena keduanya iterable, spread mengubahnya kembali menjadi array, cara cepat untuk membuang duplikat:
 
 ```javascript
 const unik = [...new Set([1, 2, 2, 3, 3, 4])]

@@ -15,7 +15,7 @@ Dalam konteks API, ada satu konsep penting yang perlu dipahami: **idempotency**.
 
 Idempotency berarti melakukan request yang sama berulang kali menghasilkan efek yang sama dengan melakukannya sekali. Dengan kata lain, seberapa pun sering client mengirim request yang sama, state di server tetap tidak berubah.
 
-Perlu dicatat, yang harus tetap sama adalah *efeknya*, bukan isi response-nya. Misalnya `DELETE` pertama menghapus data dan mengembalikan `200`, sedangkan `DELETE` berikutnya mengembalikan `404` karena data sudah tidak ada—tetapi state server tetap sama: data itu terhapus.
+Perlu dicatat, yang harus tetap sama adalah *efeknya*, bukan isi response-nya. Misalnya `DELETE` pertama menghapus data dan mengembalikan `200`, sedangkan `DELETE` berikutnya mengembalikan `404` karena data sudah tidak ada, tetapi state server tetap sama: data itu terhapus.
 
 <div className="flex justify-center">
   <img src="/static/images/idempotency.png" alt="Idempotency diagram" width="700" />
@@ -44,6 +44,6 @@ Pada HTTP, masing-masing method memiliki sifat idempotency yang berbeda:
 | POST   | NO         |
 | PATCH  | NO         |
 
-`GET` dan `HEAD` hanya membaca data sehingga tidak mengubah apa pun. `PUT` mengganti seluruh resource dengan nilai yang sama setiap kali, dan `DELETE` menghapus resource yang sama. Sebaliknya, `POST` biasanya membuat resource baru pada setiap request, sehingga tidak idempotent secara default—di sinilah *idempotency key* berperan untuk mencegah duplikasi.
+`GET` dan `HEAD` hanya membaca data sehingga tidak mengubah apa pun. `PUT` mengganti seluruh resource dengan nilai yang sama setiap kali, dan `DELETE` menghapus resource yang sama. Sebaliknya, `POST` biasanya membuat resource baru pada setiap request, sehingga tidak idempotent secara default. Di sinilah *idempotency key* berperan untuk mencegah duplikasi.
 
-**Terima kasih sudah membaca✌️**
+**Terima Kasih Sudah Membaca✌️**

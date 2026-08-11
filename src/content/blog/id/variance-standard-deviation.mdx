@@ -1,6 +1,6 @@
 ---
 title: 'Varians dan Standar Deviasi'
-summary: 'Penjelasan varians dan standar deviasi — matematika di baliknya, varians populasi vs sampel, implementasi JavaScript, dan cara membaca sebaran data.'
+summary: 'Penjelasan varians dan standar deviasi: matematika di baliknya, varians populasi vs sampel, implementasi JavaScript, dan cara membaca sebaran data.'
 publishedAt: '2025-10-21'
 featured: false
 topics: ['statistics', 'mathematics']
@@ -89,24 +89,24 @@ Mengkuadratkan selisih melakukan tiga hal yang berguna:
 
 ## Interpretasi Varians dan Standar Deviasi
 
-Keduanya bukan sekadar angka abstrak — keduanya memberi tahu bentuk sebaran datamu.
+Keduanya bukan sekadar angka abstrak: keduanya memberi tahu bentuk sebaran datamu.
 
 1. **Varians dan standar deviasi kecil.** Nilai-nilai berkumpul rapat di sekitar rata-rata. Dalam produksi suku cadang mobil, standar deviasi kecil berarti ukuran suku cadang yang dihasilkan konsisten.
-2. **Varians dan standar deviasi besar.** Nilai tersebar jauh dari rata-rata, menandakan variabilitas tinggi. Dalam investasi saham, standar deviasi besar berarti volatilitas tinggi — harga bisa berayun jauh.
+2. **Varians dan standar deviasi besar.** Nilai tersebar jauh dari rata-rata, menandakan variabilitas tinggi. Dalam investasi saham, standar deviasi besar berarti volatilitas tinggi: harga bisa berayun jauh.
 3. **Perbandingan antar dataset.** Dua dataset bisa punya **rata-rata sama tetapi varians berbeda**. Jika dua sekolah punya rata-rata nilai ujian sama tetapi satu punya standar deviasi lebih tinggi, hasil di sekolah itu lebih timpang.
-4. **Kaitan dengan distribusi normal.** Dalam distribusi normal, **sekitar 68% data berada dalam satu standar deviasi dari rata-rata**, **95% dalam dua**, dan **99,7% dalam tiga** — cara cepat untuk mengenali outlier.
+4. **Kaitan dengan distribusi normal.** Dalam distribusi normal, **sekitar 68% data berada dalam satu standar deviasi dari rata-rata**, **95% dalam dua**, dan **99,7% dalam tiga**, cara cepat untuk mengenali outlier.
 
 ## Jenis-jenis Varians
 
 Ada dua, tergantung apakah kamu memiliki seluruh populasi atau hanya sampel darinya:
 
-1. **Varians Populasi (σ²)** — dipakai saat kamu memiliki **seluruh nilai dalam populasi**.
+1. **Varians Populasi (σ²)**: dipakai saat kamu memiliki **seluruh nilai dalam populasi**.
 
     $$\sigma^2 = \frac{\sum (x - \mu)^2}{N}$$
 
     Misalnya, data berat badan **seluruh** penduduk suatu kota.
 
-2. **Varians Sampel (s²)** — dipakai saat kamu hanya memiliki **sebagian populasi** (sampel).
+2. **Varians Sampel (s²)**: dipakai saat kamu hanya memiliki **sebagian populasi** (sampel).
 
     $$s^2 = \frac{\sum (x - \bar{x})^2}{n - 1}$$
 

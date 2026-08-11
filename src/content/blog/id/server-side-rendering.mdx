@@ -61,7 +61,7 @@ Tidak ada yang menang mutlak. CSR melempar beban kerja ke client dan membuat ser
 
 Merender di setiap request berarti server benar-benar bekerja untuk setiap pengunjung, bukan cuma yang pertama kali memicu build. Itu model biaya yang jauh berbeda dari menyajikan file statis, dan dampaknya langsung terlihat di time-to-first-byte: server tidak bisa merespons sebelum selesai merender.
 
-Hydration punya cara gagalnya sendiri. Kalau HTML yang dikirim server tidak cocok dengan apa yang akan di-render client — tanggal yang diformat dengan timezone berbeda, pengecekan yang bergantung pada `window` dan berperilaku beda di server — React melempar hydration mismatch, dan bagian yang bermasalah tetap di-render ulang dari nol di client.
+Hydration punya cara gagalnya sendiri. Kalau HTML yang dikirim server tidak cocok dengan apa yang akan di-render client (tanggal yang diformat dengan timezone berbeda, pengecekan yang bergantung pada `window` dan berperilaku beda di server), React melempar hydration mismatch, dan bagian yang bermasalah tetap di-render ulang dari nol di client.
 
 Tidak semua halaman butuh render baru di setiap kunjungan juga. Kalau kontennya tidak berubah antar-request, merendernya sekali saat build (static generation) lebih murah daripada membayar biaya SSR berulang-ulang untuk hasil yang persis sama.
 

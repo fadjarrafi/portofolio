@@ -49,7 +49,7 @@ URL di address bar berubah, komponen yang tampil berganti, dan tidak satu pun da
   <img src="/static/images/client-side-rendering.svg" alt="Pemuatan awal mengambil core bundle dan merender halaman home; navigasi berikutnya ke /dashboard atau /settings mengambil chunk kecil sesuai kebutuhan dan merender di tempat, tanpa request HTML baru ke server" width="700" />
 </div>
 
-Kebanyakan aplikasi juga tidak mengirim semua route dalam bundle pertama itu. Route dashboard dan route settings masing-masing bisa hidup di chunk-nya sendiri, diambil hanya saat pengguna benar-benar bernavigasi ke sana — code splitting, istilah kerennya. Bundle awal jadi lebih kecil, dan biaya untuk route yang tidak pernah dikunjungi tidak pernah dibayar.
+Kebanyakan aplikasi juga tidak mengirim semua route dalam bundle pertama itu. Route dashboard dan route settings masing-masing bisa hidup di chunk-nya sendiri, diambil hanya saat pengguna benar-benar bernavigasi ke sana (code splitting, istilah kerennya). Bundle awal jadi lebih kecil, dan biaya untuk route yang tidak pernah dikunjungi tidak pernah dibayar.
 
 ## Konsekuensinya: Semua Terjadi Sebelum Apa pun Muncul
 
@@ -66,7 +66,7 @@ Mesin pencari sudah makin pintar menjalankan JavaScript sebelum mengindeks halam
 Semua ini bukan berarti CSR pilihan yang salah. Ia justru pilihan yang tepat kalau:
 
 - Aplikasinya berada di balik login, jadi tidak ada SEO yang perlu dijaga dan tidak ada crawler yang relevan
-- Navigasinya lebih mirip mengubah state daripada memuat halaman — alat desain, dashboard data, apa pun di mana "halaman" cuma istilah longgar untuk "tampilan saat ini"
+- Navigasinya lebih mirip mengubah state daripada memuat halaman (alat desain, dashboard data, apa pun di mana "halaman" cuma istilah longgar untuk "tampilan saat ini")
 - Tugas server sebaiknya tetap sederhana: sebuah API yang mengembalikan JSON, tanpa beban kerja render sama sekali
 
 Panel admin internal adalah contoh yang paling jelas. Tidak ada yang mengindeksnya, semua penggunanya sudah melewati pemuatan pertama sekali, dan setiap klik setelah itu memang seharusnya terasa instan. Itu persis yang dijanjikan CSR.

@@ -8,7 +8,7 @@ lang: 'id'
 translationSlug: 'ternary-operator'
 ---
 
-Operator ternary adalah bentuk singkat satu baris dari `if-else`. Ini satu-satunya operator JavaScript yang punya tiga bagian — sebuah kondisi, nilai saat kondisi benar, dan nilai saat kondisi salah.
+Operator ternary adalah bentuk singkat satu baris dari `if-else`. Ini satu-satunya operator JavaScript yang punya tiga bagian: sebuah kondisi, nilai saat kondisi benar, dan nilai saat kondisi salah.
 
 ```js
 kondisi ? nilaiJikaBenar : nilaiJikaSalah
@@ -18,7 +18,7 @@ kondisi ? nilaiJikaBenar : nilaiJikaSalah
   <img src="/static/images/ternary-operator.png" alt="Tiga bagian ternary: kondisi, nilai jika benar, nilai jika salah" width="660" />
 </div>
 
-Bedanya dengan `if-else`, ternary adalah sebuah *ekspresi* — ia menghasilkan nilai yang bisa langsung kamu tetapkan:
+Bedanya dengan `if-else`, ternary adalah sebuah *ekspresi*. Ia menghasilkan nilai yang bisa langsung kamu tetapkan:
 
 ```js
 const keranjang = 'apel'
@@ -45,7 +45,7 @@ return <div>{isLoggedIn ? <UserDashboard /> : <LoginForm />}</div>
 <button className={isActive ? 'btn-active' : 'btn-inactive'}>Klik saya</button>
 ```
 
-Untuk sekadar nilai default, pakai `??` (nullish coalescing) saja — lebih jelas dan hanya jatuh ke default kalau nilainya `null` atau `undefined`:
+Untuk sekadar nilai default, pakai `??` (nullish coalescing) saja, lebih jelas dan hanya jatuh ke default kalau nilainya `null` atau `undefined`:
 
 ```js
 // jalan, tapi bertele-tele

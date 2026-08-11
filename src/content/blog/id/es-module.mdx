@@ -10,7 +10,7 @@ translationSlug: 'es-module'
 
 ES Module (ESM) adalah cara bawaan JavaScript untuk memecah kode ke banyak file dan menyambungkannya kembali. Ia hadir bersama ECMAScript 2015 (ES6) dan menjadi standar yang mendasari seluruh ekosistem modern.
 
-Sebelum ESM, tidak ada jawaban resmi, jadi komunitas membuat caranya sendiri — IIFE, CommonJS (Node.js), AMD (RequireJS), UMD. ESM menggantikan tambal sulam itu dengan satu sintaks yang berjalan native di browser dan Node.
+Sebelum ESM, tidak ada jawaban resmi, jadi komunitas membuat caranya sendiri: IIFE, CommonJS (Node.js), AMD (RequireJS), UMD. ESM menggantikan tambal sulam itu dengan satu sintaks yang berjalan native di browser dan Node.
 
 ## Export dan import
 
@@ -63,7 +63,7 @@ import { sum } from './utils.js'
 export const myFunction = () => {}
 ```
 
-Perbedaan utamanya, `import`/`export` di ESM bersifat **statis** — tetap di bagian atas file dan dianalisis sebelum kode dijalankan. `require()` di CommonJS bersifat dinamis dan diselesaikan saat runtime. Struktur statis inilah yang memungkinkan bundler melakukan *tree shaking*: karena mereka tahu persis apa yang di-import, export yang tidak dipakai bisa dibuang.
+Perbedaan utamanya, `import`/`export` di ESM bersifat **statis**: tetap di bagian atas file dan dianalisis sebelum kode dijalankan. `require()` di CommonJS bersifat dinamis dan diselesaikan saat runtime. Struktur statis inilah yang memungkinkan bundler melakukan *tree shaking*: karena mereka tahu persis apa yang di-import, export yang tidak dipakai bisa dibuang.
 
 ## Di browser
 
@@ -93,4 +93,4 @@ button.addEventListener('click', async () => {
 
 Di sini `chart.js` tidak diunduh sampai tombolnya diklik — dasar dari code splitting dan lazy loading, yang menjaga muatan awal halaman tetap ringan.
 
-Segitu intinya. Setiap framework dan build tool modern — React, Vue, [Vite](https://vite.dev/), [Rollup](https://rollupjs.org/) — dibangun di atas fondasi `import`/`export` yang sama, jadi memahaminya sangat berguna.
+Segitu intinya. Setiap framework dan build tool modern (React, Vue, [Vite](https://vite.dev/), [Rollup](https://rollupjs.org/)) dibangun di atas fondasi `import`/`export` yang sama, jadi memahaminya sangat berguna.
