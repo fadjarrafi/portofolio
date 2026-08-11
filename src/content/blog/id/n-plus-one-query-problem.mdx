@@ -1,0 +1,102 @@
+---
+title: 'N+1 Query Problem'
+publishedAt: '2026-08-11'
+summary: 'N+1 query problem terjadi saat list view memicu satu query per baris, bukan satu query total — cara mengenalinya dan memperbaikinya dengan eager loading dan batching.'
+featured: false
+topics: ['programming', 'database']
+type: 'note'
+lang: 'id'
+translationSlug: 'n-plus-one-query-problem'
+---
+
+Kalau aplikasimu tiba-tiba jadi lambat begitu mulai menampilkan data asli—bukan lagi sekadar beberapa baris data uji—kemungkinan besar penyebabnya adalah N+1 query problem. Ini salah satu bug performa paling umum di kode backend, dan salah satu yang paling gampang ditulis tanpa disadari—N+1 query problem bersembunyi di dalam kode yang terlihat benar-benar benar.
+
+## Apa itu N+1 Query Problem
+
+N+1 query problem terjadi ketika kode menjalankan satu query untuk mengambil daftar record, lalu menjalankan satu query lagi *per record* untuk mengambil data terkait. Untuk daftar 50 post, artinya 1 query untuk post-nya ditambah 50 query untuk masing-masing author-nya—51 query hanya untuk merender satu halaman.
+
+Disebut N+1 karena polanya selalu sama: 1 query awal, lalu N query tambahan, di mana N adalah jumlah baris yang dikembalikan oleh query pertama.
+
+## Contoh Konkret
+
+Misalnya kamu menampilkan daftar blog post beserta nama masing-masing author. Dengan ORM, versi naifnya sering terlihat tidak berbahaya:
+
+```js
+const posts = await Post.findAll(); // 1 query
+
+for (const post of posts) {
+  post.author = await User.findById(post.authorId); // 1 query, per post
+}
+```
+
+Untuk 50 post, ini memicu 51 query. Untuk 500 post, jadi 501. Kodenya terlihat baik-baik saja—tidak ada yang aneh dari `await User.findById()` di dalam loop—dan itulah sebabnya pola ini sering lolos dari code review.
+
+## Kenapa Ini Terjadi
+
+Kebanyakan ORM melakukan lazy-load pada relasi secara default: field `post.author` baru benar-benar diambil saat disentuh. Ini nyaman dipakai di template atau halaman detail tunggal, di mana kamu hanya memuat satu record terkait. Masalahnya muncul justru di dalam loop—list view, feed, dashboard—di mana "satu record" berubah jadi "satu query per record, sebanyak N kali."
+
+Tidak ada yang memperingatkan dari sisi API ORM. Kodenya singkat, mudah dibaca, dan terlihat benar. Jadi bagaimana cara menangkap bug yang tidak terlihat seperti bug? Jumlah query baru terlihat setelah kamu benar-benar memeriksa apa yang menghantam database.
+
+## Cara Mengenalinya
+
+Biasanya kamu tidak menemukan N+1 dengan membaca kode—kamu menemukannya dengan menghitung query. Beberapa tanda yang cukup diandalkan:
+
+- **Query logs**: aktifkan SQL logging di development dan perhatikan jumlahnya melonjak setiap kali halaman daftar dimuat.
+- **APM tools**: New Relic, Datadog, dan sejenisnya akan menandai satu request yang memicu puluhan hingga ratusan query yang hampir identik.
+- **Response time yang naik seiring jumlah baris**: pada contoh di bawah, halaman dengan 500 baris data terasa jauh lebih lambat dibanding yang berisi 50—bukan karena datanya lebih banyak untuk dikirim, tapi karena query yang dijalankan juga jauh lebih banyak.
+
+## Cara Memperbaikinya
+
+Solusinya selalu sama: ganti N kali round trip terpisah dengan satu query yang sudah membawa semua yang kamu butuhkan.
+
+### Eager loading
+
+Kebanyakan ORM mendukung cara memberi tahu query sejak awal relasi mana yang perlu disertakan, sehingga diambil lewat JOIN atau satu query `IN` yang di-batch, bukan satu panggilan per baris.
+
+```js
+// Sequelize
+const posts = await Post.findAll({ include: User }); // 1 query total
+
+// Prisma
+const posts = await prisma.post.findMany({ include: { author: true } });
+
+// Django
+posts = Post.objects.select_related('author')
+```
+
+### Batching dengan loader
+
+Kalau eager loading tidak tersedia—misalnya di seluruh resolver tree GraphQL—lapisan batching seperti [DataLoader](https://github.com/graphql/dataloader) mengumpulkan semua ID yang diminta dalam satu tick lalu mengambilnya dalam satu query, bukan satu query per pemanggilan resolver.
+
+### Batching manual
+
+Kalau keduanya tidak berlaku, kamu bisa melakukannya sendiri: kumpulkan dulu semua ID-nya, ambil dalam satu query `WHERE id IN (...)`, lalu petakan hasilnya kembali ke daftar semula di memori.
+
+```js
+const posts = await Post.findAll();
+const authorIds = [...new Set(posts.map((p) => p.authorId))];
+const authors = await User.findAll({ where: { id: authorIds } }); // 1 query
+const authorsById = new Map(authors.map((a) => [a.id, a]));
+
+posts.forEach((post) => {
+  post.author = authorsById.get(post.authorId);
+});
+```
+
+Hasilnya sama, tapi jumlah query-nya tidak lagi bergantung pada berapa banyak post yang ada.
+
+## Sebelum dan Sesudah
+
+| Post di halaman | Loop naif   | Eager loading / batched |
+| ---------------- | ----------- | ------------------------ |
+| 10                | 11 query    | 2 query                  |
+| 50                | 51 query    | 2 query                  |
+| 500               | 501 query   | 2 query                  |
+
+Versi naif tumbuh linear seiring jumlah data. Versi yang sudah diperbaiki sama sekali tidak tumbuh seiring jumlah data—tetap flat, dan itulah yang kamu inginkan dari sebuah halaman daftar.
+
+## Kenapa Ini Penting
+
+N+1 query jarang terlihat saat development, di mana database seed biasanya hanya berisi lima baris di tiap tabel. Masalah ini baru muncul di production, dengan volume data sungguhan, dalam bentuk halaman daftar yang lambat, timeout, dan beban database yang tiba-tiba melonjak tanpa sebab yang jelas. Menangkap pola ini lebih awal—eager load apa pun yang kamu ambil di dalam loop—jauh lebih murah dibanding melacaknya setelah sudah terlanjur rilis.
+
+**Thanks for Reading✌️**

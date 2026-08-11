@@ -1,0 +1,102 @@
+---
+title: 'The N+1 Query Problem'
+publishedAt: '2026-08-11'
+summary: 'The N+1 query problem happens when a list view fires one query per row instead of one query total — how to spot it and fix it with eager loading and batching.'
+featured: false
+topics: ['programming', 'database']
+type: 'note'
+lang: 'en'
+translationSlug: 'n-plus-one-query-problem'
+---
+
+If your app got slower the moment it started showing real data instead of a handful of test rows, there's a good chance the N+1 query problem is the reason. It's one of the most common performance bugs in backend code, and one of the easiest to write without noticing — the N+1 query problem hides inside code that looks completely correct.
+
+## What is the N+1 Query Problem
+
+The N+1 query problem happens when your code runs one query to fetch a list of records, then runs one more query *per record* to fetch related data. For a list of 50 posts, that's 1 query for the posts plus 50 queries for their authors — 51 queries to render one page.
+
+It's called N+1 because the pattern is always the same shape: 1 initial query, then N additional queries, where N is the number of rows the first query returned.
+
+## A Concrete Example
+
+Say you're listing blog posts along with each author's name. With an ORM, the naive version often looks harmless:
+
+```js
+const posts = await Post.findAll(); // 1 query
+
+for (const post of posts) {
+  post.author = await User.findById(post.authorId); // 1 query, per post
+}
+```
+
+For 50 posts, this fires 51 queries. For 500 posts, it's 501. The code reads fine — nothing about `await User.findById()` inside a loop looks like a bug — which is exactly why this pattern slips through code review so often.
+
+## Why it Happens
+
+Most ORMs lazy-load relationships by default: a `post.author` field isn't actually fetched until you touch it. That's convenient in a template or a single detail view, where you only ever load one related record. The problem shows up specifically in loops — list views, feeds, dashboards — where "one record" becomes "one query per record, N times over."
+
+Nothing in the ORM's API warns you. The code is short, readable, and looks correct. So how do you catch a bug that doesn't look like one? The query count only becomes visible once you look at what's actually hitting the database.
+
+## How to Spot It
+
+You usually don't catch an N+1 by reading code — you catch it by counting queries. A few reliable signals:
+
+- **Query logs**: turn on SQL logging in development and watch the count spike whenever a list page loads.
+- **APM tools**: New Relic, Datadog, and similar tools will flag a single request that triggers dozens or hundreds of near-identical queries.
+- **Response time that scales with row count**: in the example below, a page with 500 rows takes noticeably longer than one with 50 — not because there's more data to send, but because there are that many more queries to run.
+
+## How to Fix It
+
+The fix is always the same idea: replace N separate round trips with one query that already contains everything you need.
+
+### Eager loading
+
+Most ORMs support telling the query up front which relations to include, so it's fetched via a JOIN or a single batched `IN` query instead of one call per row.
+
+```js
+// Sequelize
+const posts = await Post.findAll({ include: User }); // 1 query total
+
+// Prisma
+const posts = await prisma.post.findMany({ include: { author: true } });
+
+// Django
+posts = Post.objects.select_related('author')
+```
+
+### Batching with a loader
+
+When eager loading isn't available — say, across a GraphQL resolver tree — a batching layer like [DataLoader](https://github.com/graphql/dataloader) collects all the IDs requested during a single tick and fetches them in one query, instead of one query per resolver call.
+
+### Manual batching
+
+If neither applies, you can do it by hand: collect the IDs first, fetch them in one `WHERE id IN (...)` query, then map the results back onto the original list in memory.
+
+```js
+const posts = await Post.findAll();
+const authorIds = [...new Set(posts.map((p) => p.authorId))];
+const authors = await User.findAll({ where: { id: authorIds } }); // 1 query
+const authorsById = new Map(authors.map((a) => [a.id, a]));
+
+posts.forEach((post) => {
+  post.author = authorsById.get(post.authorId);
+});
+```
+
+Same result, but the query count stops depending on how many posts there are.
+
+## Before and After
+
+| Posts on the page | Naive loop  | Eager loading / batched |
+| ------------------ | ----------- | ------------------------ |
+| 10                 | 11 queries  | 2 queries                |
+| 50                 | 51 queries  | 2 queries                |
+| 500                | 501 queries | 2 queries                |
+
+The naive version scales linearly with data size. The fixed version doesn't scale with data size at all — it stays flat, which is exactly what you want from a list page.
+
+## Why it Matters
+
+N+1 queries are rarely visible in development, where a seeded database might have five rows in every table. They show up in production, under real data volume, as slow list pages, timeouts, and database load that spikes for no obvious reason. Catching the pattern early — eager load anything you fetch inside a loop — is a lot cheaper than tracking it down after it's already shipped.
+
+**Thanks for Reading✌️**
