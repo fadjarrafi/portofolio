@@ -9,7 +9,7 @@ lang: 'id'
 translationSlug: 'hydration'
 ---
 
-Halaman hasil [server-side rendering](/writing/id/server-side-rendering) muncul dengan cepat. Konten langsung ada di layar begitu HTML tiba. Tapi coba klik tombol di detik pertama itu, tidak akan terjadi apa-apa — markup-nya sudah ada, tapi JavaScript yang seharusnya merespons klik itu belum terpasang. Hydration adalah langkah yang menutup jeda itu.
+Halaman hasil [server-side rendering](/writing/id/server-side-rendering) muncul dengan cepat. Konten langsung ada di layar begitu HTML tiba. Tapi coba klik tombol di detik pertama itu, tidak akan terjadi apa-apa. Markup-nya sudah ada, tapi JavaScript yang seharusnya merespons klik itu belum terpasang. Hydration adalah langkah yang menutup jeda itu.
 
 ## Apa yang Sebenarnya Dilakukan Hydration
 
@@ -23,7 +23,7 @@ createRoot(document.getElementById('root')).render(<App />);
 hydrateRoot(document.getElementById('root'), <App />);
 ```
 
-`createRoot` tidak peduli apa isi `#root` — ia buang semuanya dan bangun dari awal. `hydrateRoot` melakukan kebalikannya: ia menganggap HTML di dalam `#root` sudah benar, menelusurinya node demi node, dan memakai ulang setiap elemen yang ditemukan alih-alih membuatnya lagi. Yang ditambahkan cuma bagian yang tidak bisa diungkapkan HTML sendiri: event listener, state komponen, ref.
+`createRoot` tidak peduli apa isi `#root`. Ia buang semuanya dan bangun dari awal. `hydrateRoot` melakukan kebalikannya: ia menganggap HTML di dalam `#root` sudah benar, menelusurinya node demi node, dan memakai ulang setiap elemen yang ditemukan alih-alih membuatnya lagi. Yang ditambahkan cuma bagian yang tidak bisa diungkapkan HTML sendiri: event listener, state komponen, ref.
 
 ## Cocokkan, Baru Pasang
 
@@ -74,6 +74,6 @@ Itulah bagian anehnya SSR dalam skala besar: kontennya sungguhan, dan halamannya
 
 ## Kenapa Ini Penting
 
-Hydration adalah jahitan di antara dua model rendering yang sudah dibahas sebelumnya. [SSR](/writing/id/server-side-rendering) melewati jeda halaman kosong ala CSR dengan mengirim HTML sungguhan lebih dulu. [CSR](/writing/id/client-side-rendering) membangun dan memasang interaktivitas sekaligus dalam satu proses, dan tidak ada yang ditampilkan sampai keduanya selesai. Hydration adalah yang dibayar SSR belakangan supaya tetap dapat interaktivitas ala CSR, tanpa harus melepas keunggulan first paint yang cepat itu — biaya JavaScript yang sama seperti CSR, cuma dipindah ke setelah konten sudah ada di layar, bukan sebelumnya.
+Hydration adalah jahitan di antara dua model rendering yang sudah dibahas sebelumnya. [SSR](/writing/id/server-side-rendering) melewati jeda halaman kosong ala CSR dengan mengirim HTML sungguhan lebih dulu. [CSR](/writing/id/client-side-rendering) membangun dan memasang interaktivitas sekaligus dalam satu proses, dan tidak ada yang ditampilkan sampai keduanya selesai. Hydration adalah yang dibayar SSR belakangan supaya tetap dapat interaktivitas ala CSR, tanpa harus melepas keunggulan first paint yang cepat itu. Biaya JavaScript-nya tetap sama seperti CSR, cuma dipindah ke setelah konten sudah ada di layar, bukan sebelumnya.
 
 **Terima Kasih Sudah Membaca✌️**
