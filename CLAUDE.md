@@ -26,6 +26,8 @@ Content lives in Astro content collections under `src/content/`:
 
 Schemas are defined with Zod in `src/content/config.ts`. Use `getCollection('blog')` etc. from `astro:content` to query posts — no custom frontmatter parser.
 
+Writing Indonesian (`id`) articles: follow `docs/writing-style-id.md` — it codifies the code-switched Indonesian/English register used across `id/` posts (calibration example: `src/content/blog/id/caching.mdx`). Don't default to formal, fully-translated Indonesian.
+
 Utility functions are in `src/utils/`:
 - `src/utils/posts.ts`: `calculateReadingTime()`, `getGrowthStage()`, `getRelatedPosts()`
 - `src/utils/format.ts`: `formatDate()`
