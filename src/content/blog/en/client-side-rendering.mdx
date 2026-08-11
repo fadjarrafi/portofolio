@@ -1,0 +1,78 @@
+---
+title: 'Client-Side Rendering (CSR)'
+publishedAt: '2026-08-11'
+summary: "Client-side rendering ships an almost-empty page and a JavaScript bundle, then lets the browser build everything — including every page after the first, without ever asking the server for HTML again."
+featured: false
+topics: ['programming', 'web']
+type: 'note'
+lang: 'en'
+translationSlug: 'client-side-rendering'
+---
+
+Click around a well-built single-page app and nothing ever feels like it's loading a page. No flash, no white screen between clicks, no full reload — just the content changing in place. That responsiveness isn't free. It's paid for entirely upfront, the moment the app first loads. That trade is what client-side rendering is.
+
+## What is Client-Side Rendering
+
+The server's job in CSR is almost nothing. It serves a nearly empty HTML file and a script tag:
+
+```html
+<body>
+  <div id="root"></div>
+  <script src="/bundle.js"></script>
+</body>
+```
+
+Everything else happens in the browser. The bundle downloads, runs, and builds the entire page from scratch:
+
+```js
+import { createRoot } from 'react-dom/client';
+
+createRoot(document.getElementById('root')).render(<App />);
+```
+
+There's no separate hydration step here, and that's worth pausing on. [Server-side rendering](/writing/en/server-side-rendering) sends HTML first and wires up interactivity after, in two passes. CSR does both at once: the same `render()` call that builds the DOM also attaches every event listener, because nothing existed before it ran.
+
+## Client-Side Routing
+
+The part that actually makes a CSR app feel fast isn't the first load. It's every load after that. Click a link inside the app, and the router intercepts it before the browser gets a chance to ask the server for a new page:
+
+```js
+function navigate(path) {
+  window.history.pushState({}, '', path);
+  renderRoute(path);
+}
+```
+
+The URL bar updates, the visible components swap out, and none of it touched the network for HTML. The server isn't even asked. That's the entire point of a single-page app: after the first load, "page" stops meaning "a request" and starts meaning "whatever the router decides to render."
+
+<div className="flex justify-center">
+  <img src="/static/images/client-side-rendering.svg" alt="Initial load fetches a core bundle and renders the home page; later navigation to /dashboard or /settings fetches a small chunk on demand and renders in place, without a new HTML request to the server" width="700" />
+</div>
+
+Most apps don't ship every route in that first bundle, either. A dashboard route and a settings route can each live in their own chunk, fetched only when the user actually navigates there — code splitting, in framework terms. The initial bundle stays smaller, and the cost of routes nobody visits never gets paid.
+
+## The Cost: Everything Happens Before Anything Shows
+
+This is the part CSR doesn't get around. Before the user sees a single pixel of real content, the browser has to download the bundle, parse it, execute it, and let it build the page. A large bundle on a slow connection turns that into a real wait, and there's no partial credit: an empty `<div>` looks the same whether the JS is one second away or ten.
+
+That cost is fixed per app load, not per visitor's patience. A user on a fast laptop with cached assets barely notices. A user on a mid-range phone with a spotty connection sits on a blank screen the whole time the other user didn't even register.
+
+## SEO and Crawlers
+
+Search engines have gotten better at running JavaScript before indexing a page, but "better" isn't "equivalent to SSR." Googlebot renders JS in a second pass, after the initial crawl, which means indexing lags behind what a server-rendered page gets immediately. Plenty of other crawlers, like the bots generating link previews for social platforms, don't run JavaScript at all. They read the raw HTML, which for a CSR page is exactly the empty shell shown above. If a link needs to preview correctly when someone pastes it into a chat, an empty `<div>` isn't going to do that job.
+
+## Where CSR Actually Wins
+
+None of this makes CSR the wrong choice. It's the right one when:
+
+- The app sits behind a login, so there's no SEO to protect and no crawler that matters
+- Navigation is closer to changing state than loading a page — a design tool, a data dashboard, anything where "page" is really a loose term for "current view"
+- The server's job should stay simple: an API returning JSON, with zero rendering work attached to it
+
+An internal admin panel is the clean case. Nobody's indexing it, everyone using it already sat through the first load once, and every click after that should feel instant. That's exactly what CSR is built to deliver.
+
+## Why it Matters
+
+CSR isn't a worse version of SSR, it's a different bet on where the cost goes. SSR pays per request, on the server, so every visitor gets fast first content at the cost of server work that scales with traffic. CSR pays once, upfront, in the browser, and every navigation after that is free. Which bet is right depends on what the app actually is: a page someone lands on once from a search result wants the SSR bet. A tool someone keeps open in a tab all day wants the CSR one.
+
+**Thanks for Reading✌️**

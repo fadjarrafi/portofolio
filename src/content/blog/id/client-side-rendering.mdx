@@ -1,0 +1,78 @@
+---
+title: 'Client-Side Rendering (CSR)'
+publishedAt: '2026-08-11'
+summary: 'Client-side rendering mengirim halaman yang hampir kosong dan sebuah bundle JavaScript, lalu membiarkan browser membangun semuanya — termasuk setiap halaman setelah yang pertama, tanpa pernah meminta HTML lagi ke server.'
+featured: false
+topics: ['programming', 'web']
+type: 'note'
+lang: 'id'
+translationSlug: 'client-side-rendering'
+---
+
+Coba klik-klik di single-page app yang dibangun dengan baik, dan tidak ada satu momen pun yang terasa seperti "memuat halaman". Tidak ada kedipan, tidak ada layar putih di antara klik, tidak ada reload penuh — kontennya cuma berubah di tempat. Kelincahan itu tidak gratis. Semuanya dibayar di depan, tepat saat aplikasi pertama kali dimuat. Itulah client-side rendering.
+
+## Apa itu Client-Side Rendering
+
+Tugas server dalam CSR nyaris tidak ada. Ia cuma menyajikan berkas HTML yang hampir kosong dan sebuah tag script:
+
+```html
+<body>
+  <div id="root"></div>
+  <script src="/bundle.js"></script>
+</body>
+```
+
+Sisanya terjadi di browser. Bundle-nya diunduh, dijalankan, dan membangun seluruh halaman dari nol:
+
+```js
+import { createRoot } from 'react-dom/client';
+
+createRoot(document.getElementById('root')).render(<App />);
+```
+
+Tidak ada langkah hydration terpisah di sini, dan ini layak diperhatikan. [Server-side rendering](/writing/id/server-side-rendering) mengirim HTML dulu, baru memasang interaktivitas belakangan, dua tahap terpisah. CSR melakukan keduanya sekaligus: pemanggilan `render()` yang sama yang membangun DOM juga memasang semua event listener, karena memang belum ada apa-apa sebelum itu dijalankan.
+
+## Client-Side Routing
+
+Bagian yang benar-benar membuat aplikasi CSR terasa cepat bukan pemuatan pertamanya. Tapi setiap pemuatan setelah itu. Klik sebuah link di dalam aplikasi, dan router-nya mencegat klik itu sebelum browser sempat meminta halaman baru ke server:
+
+```js
+function navigate(path) {
+  window.history.pushState({}, '', path);
+  renderRoute(path);
+}
+```
+
+URL di address bar berubah, komponen yang tampil berganti, dan tidak satu pun dari itu menyentuh jaringan untuk minta HTML. Server bahkan tidak ditanya. Itulah inti dari single-page app: setelah pemuatan pertama, "halaman" berhenti berarti "sebuah request" dan mulai berarti "apa pun yang diputuskan router untuk dirender."
+
+<div className="flex justify-center">
+  <img src="/static/images/client-side-rendering.svg" alt="Pemuatan awal mengambil core bundle dan merender halaman home; navigasi berikutnya ke /dashboard atau /settings mengambil chunk kecil sesuai kebutuhan dan merender di tempat, tanpa request HTML baru ke server" width="700" />
+</div>
+
+Kebanyakan aplikasi juga tidak mengirim semua route dalam bundle pertama itu. Route dashboard dan route settings masing-masing bisa hidup di chunk-nya sendiri, diambil hanya saat pengguna benar-benar bernavigasi ke sana — code splitting, istilah kerennya. Bundle awal jadi lebih kecil, dan biaya untuk route yang tidak pernah dikunjungi tidak pernah dibayar.
+
+## Konsekuensinya: Semua Terjadi Sebelum Apa pun Muncul
+
+Ini bagian yang tidak bisa dihindari CSR. Sebelum pengguna melihat satu piksel pun konten sungguhan, browser harus mengunduh bundle, mem-parsing-nya, menjalankannya, lalu membiarkannya membangun halaman. Bundle besar di koneksi lambat mengubah ini jadi penantian sungguhan, dan tidak ada nilai parsial: `<div>` kosong terlihat sama saja entah JS-nya satu detik lagi atau sepuluh detik lagi.
+
+Biaya itu tetap per pemuatan aplikasi, bukan per kesabaran pengunjung. Pengguna dengan laptop cepat dan aset yang sudah di-cache nyaris tidak sadar. Pengguna dengan HP kelas menengah dan koneksi yang naik-turun duduk menatap layar kosong selama waktu yang bahkan tidak terasa oleh pengguna yang tadi.
+
+## SEO dan Crawler
+
+Mesin pencari sudah makin pintar menjalankan JavaScript sebelum mengindeks halaman, tapi "makin pintar" bukan berarti "setara dengan SSR". Googlebot merender JS di tahap kedua, setelah crawl awal, yang artinya proses indexing-nya tertinggal dibanding halaman yang di-render server. Banyak crawler lain, seperti bot yang membuat preview link untuk platform sosial, sama sekali tidak menjalankan JavaScript. Mereka cuma membaca HTML mentah, yang untuk halaman CSR ya cuma shell kosong seperti di atas. Kalau sebuah link harus tampil benar saat di-paste ke chat, `<div>` kosong jelas tidak akan bisa melakukan itu.
+
+## Di Mana CSR Sebenarnya Menang
+
+Semua ini bukan berarti CSR pilihan yang salah. Ia justru pilihan yang tepat kalau:
+
+- Aplikasinya berada di balik login, jadi tidak ada SEO yang perlu dijaga dan tidak ada crawler yang relevan
+- Navigasinya lebih mirip mengubah state daripada memuat halaman — alat desain, dashboard data, apa pun di mana "halaman" cuma istilah longgar untuk "tampilan saat ini"
+- Tugas server sebaiknya tetap sederhana: sebuah API yang mengembalikan JSON, tanpa beban kerja render sama sekali
+
+Panel admin internal adalah contoh yang paling jelas. Tidak ada yang mengindeksnya, semua penggunanya sudah melewati pemuatan pertama sekali, dan setiap klik setelah itu memang seharusnya terasa instan. Itu persis yang dijanjikan CSR.
+
+## Kenapa Ini Penting
+
+CSR bukan versi SSR yang lebih buruk, ia cuma taruhan berbeda soal ke mana biaya itu pergi. SSR membayar per request, di server, jadi setiap pengunjung dapat konten cepat dengan konsekuensi kerja server yang naik seiring traffic. CSR membayar sekali, di depan, di browser, dan setiap navigasi setelahnya gratis. Taruhan mana yang tepat tergantung aplikasinya sebenarnya seperti apa: halaman yang cuma sekali dikunjungi orang dari hasil pencarian butuh taruhan ala SSR. Alat yang dibiarkan terbuka di tab seharian butuh taruhan ala CSR.
+
+**Terima Kasih Sudah Membaca✌️**
