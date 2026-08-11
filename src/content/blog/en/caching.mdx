@@ -1,0 +1,101 @@
+---
+title: 'Caching: When to Use It, and When Not To'
+publishedAt: '2026-08-11'
+summary: "Caching trades freshness for speed — worth it once you've confirmed recomputing is the actual bottleneck, a liability when you haven't. Here's how to tell which situation you're in."
+featured: false
+topics: ['programming', 'web']
+type: 'note'
+lang: 'en'
+translationSlug: 'caching'
+---
+
+"Cache it" is the reflex answer to almost any slowness in a system. A page loads slow, a query takes too long, a third-party API call gets expensive. Someone suggests a cache, and it usually helps. But caching isn't free, and reaching for it without knowing why it works, or when it doesn't, tends to trade one problem for a worse one: stale data nobody meant to serve.
+
+## What Caching Actually Is
+
+Caching is storing the result of expensive work somewhere cheaper to read, so the next request that needs the same thing doesn't have to redo the work. "Expensive" can mean a slow database query, a network call to a third-party API, or a computation that costs real CPU time. "Cheaper to read" is usually memory (a `Map`, Redis, an in-process object), something that answers in microseconds instead of milliseconds or seconds.
+
+```js
+// without a cache: every call redoes the expensive work
+async function getExchangeRate(currency) {
+  return fetchFromExternalAPI(currency); // ~300ms, rate-limited
+}
+
+// with a cache: the expensive work runs once per key
+const cache = new Map();
+
+async function getExchangeRate(currency) {
+  if (cache.has(currency)) return cache.get(currency);
+  const rate = await fetchFromExternalAPI(currency);
+  cache.set(currency, rate);
+  return rate;
+}
+```
+
+Same function, same return value. The only difference is that the second version remembers the answer instead of asking again.
+
+## Cache Hit and Cache Miss
+
+Two terms show up in every conversation about caching, and it's worth being precise about them. A **cache hit** is when the value you asked for is already sitting in the cache: no recomputation, just a lookup. A **cache miss** is when it isn't, so the original expensive work has to run, and, usually, the result gets stored before it's returned, so the next request for the same key is a hit.
+
+<div className="flex justify-center">
+  <img src="/static/images/caching.svg" alt="cache.get(key) looks up the key in the cache store and checks whether it was found — a hit returns the cached value directly with no recomputation, a miss runs the expensive work and stores the result before returning it" width="700" />
+</div>
+
+## When It Helps
+
+- **The same expensive work gets requested repeatedly with the same input.** A product page hit by thousands of users is thousands of identical reads for one underlying answer.
+- **The source is slow or rate-limited by nature.** A third-party API with a request quota, or a report that scans millions of rows, is expensive every single time. Caching is often the only lever you have.
+- **The data changes far less often than it's read.** A blog post's rendered HTML doesn't change between edits. A currency exchange rate barely moves minute to minute.
+- **You can tolerate the data being slightly out of date** (seconds, minutes, sometimes longer) without anyone noticing or caring.
+
+## When Not To
+
+- **The value has to be correct on every single read, no exceptions.** An account balance right before a withdrawal, an inventory count at the moment of checkout. Serving a cached number here isn't a performance win, it's a bug that pays out in overdrafts and oversold stock.
+- **Reads and writes happen in roughly equal measure.** A cache only earns its keep when it's read far more often than the underlying data changes. If every write invalidates the cache before the next read even happens, you've added a moving part that never gets used.
+- **The underlying operation is already fast.** A single indexed lookup by primary key doesn't need a cache in front of it. You'd be adding a whole subsystem, with its own failure modes, to save a query that was already taking a few milliseconds.
+- **You don't actually know it's slow yet.** Caching is a fix for a measured bottleneck, not a default you reach for ahead of any evidence.
+
+| Situation | Cache it? |
+| --- | --- |
+| Same expensive query, requested by thousands of users | Yes |
+| Third-party API call with strict rate limits | Yes |
+| Account balance checked right before a withdrawal | No — must be current |
+| Read and write traffic are roughly equal | No — invalidation cost eats the benefit |
+| Already a single indexed lookup | No — nothing to save |
+
+## The Hard Part Is Invalidation
+
+"There are only two hard things in Computer Science: cache invalidation and naming things." The Phil Karlton line gets quoted so often it's a cliché, and it's still true. Storing a value is trivial. Knowing the exact moment that value stops being true is not.
+
+Two strategies cover most of what you'll actually reach for:
+
+- **Time-based expiry (TTL)**: store the value with a timestamp, and treat it as gone once it's older than some threshold. Simple, and it doesn't require whoever writes the data to know the cache exists, but every reader could be looking at data that's up to `TTL` seconds stale.
+- **Explicit invalidation on write**: whoever changes the underlying data also deletes or updates the cached copy. More accurate, but every code path that writes to that data now has to remember to touch the cache too — exactly the kind of thing that gets forgotten six months later, in a hurry, by someone who didn't write the caching layer.
+
+```js
+const cache = new Map();
+const TTL_MS = 60_000;
+
+function getCached(key) {
+  const entry = cache.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.storedAt > TTL_MS) {
+    cache.delete(key);
+    return null;
+  }
+  return entry.value;
+}
+
+function setCached(key, value) {
+  cache.set(key, { value, storedAt: Date.now() });
+}
+```
+
+Neither strategy is "correct" on its own: TTL trades accuracy for simplicity, explicit invalidation trades simplicity for accuracy. Most real systems end up using both: a TTL as a safety net, and explicit invalidation for the writes that can't wait sixty seconds to be seen.
+
+## Why It Matters
+
+Caching is a trade: it exchanges freshness for speed, and that trade is only worth making once you know exactly what you're giving up. Reach for it after you've confirmed recomputing the value is the actual bottleneck, not before. The bug that shows up when you cache too early doesn't announce itself as a performance problem. It looks like a user staring at a number that's just wrong, with nothing in the logs to explain why.
+
+**Thanks for Reading✌️**

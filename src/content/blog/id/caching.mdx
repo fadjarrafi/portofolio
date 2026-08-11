@@ -1,0 +1,101 @@
+---
+title: 'Caching: Kapan Perlu Dipakai, dan Kapan Tidak'
+publishedAt: '2026-08-11'
+summary: 'Caching itu barter kesegaran data demi kecepatan — sepadan kalau proses ulang itu memang bottleneck-nya, jadi beban kalau ternyata bukan. Begini cara membedakan dua situasi itu.'
+featured: false
+topics: ['programming', 'web']
+type: 'note'
+lang: 'id'
+translationSlug: 'caching'
+---
+
+"Cache aja" adalah jawaban refleks untuk hampir semua masalah lambat di sebuah sistem. Halaman loading lama, query kelamaan, panggilan ke API pihak ketiga jadi mahal maka seseorang menyarankan cache, dan biasanya memang membantu. Tapi caching itu free, dan memakainya tanpa tahu kenapa ia bekerja, atau kapan justru tidak, cenderung nge-trade satu masalah dengan masalah lain yang lebih buruk, data nya stale dan tidak valid dengan data yang di update. 
+
+## Apa Sebenarnya Caching Itu
+
+Caching adalah proses menyimpan hasil dari proses yang makan resource a.k.a mahal, jadi request berikutnya yang butuh hal yang sama tidak perlu mengulang prosesnya. "Mahal" disini bisa berarti query database yang lambat, panggilan jaringan ke API pihak ketiga, atau komputasi yang benar-benar memakan CPU. "Lebih murah dibaca" biasanya berarti memori — sebuah `Map`, Redis, objek di dalam proses, sesuatu yang bisa menjawab dalam mikrodetik, bukan milidetik atau detik.
+
+```js
+// tanpa cache: setiap panggilan mengulang kerja yang mahal
+async function getExchangeRate(currency) {
+  return fetchFromExternalAPI(currency); // ~300ms, kena rate limit
+}
+
+// dengan cache: kerja mahal itu cuma jalan sekali per key
+const cache = new Map();
+
+async function getExchangeRate(currency) {
+  if (cache.has(currency)) return cache.get(currency);
+  const rate = await fetchFromExternalAPI(currency);
+  cache.set(currency, rate);
+  return rate;
+}
+```
+
+Fungsinya sama, hasilnya sama. Bedanya cuma versi kedua menyimpan jawabannya, alih-alih bertanya lagi dari awal.
+
+## Cache Hit dan Cache Miss
+
+Dua istilah ini selalu muncul di setiap obrolan soal caching, dan perlu dipahami dengan tepat. **Cache hit** terjadi ketika nilai yang diminta sudah ada di cache, tidak ada komputasi ulang, cuma lookup. **Cache miss** terjadi ketika nilainya belum ada, jadi kerja mahal yang asli harus tetap dijalankan, dan biasanya hasilnya disimpan dulu sebelum dikembalikan, supaya request berikutnya untuk key yang sama jadi hit.
+
+<div className="flex justify-center">
+  <img src="/static/images/caching.svg" alt="cache.get(key) mencari key di cache store dan mengecek apakah ditemukan — kalau hit, nilai yang tersimpan langsung dikembalikan tanpa komputasi ulang; kalau miss, kerja yang mahal dijalankan dan hasilnya disimpan sebelum dikembalikan" width="700" />
+</div>
+
+## Kapan Ini Works
+
+- **Proses yang resource extensive, yang sama diminta berulang kali dengan input yang sama.** Halaman produk yang diakses ribuan pengguna itu ribuan pembacaan identik untuk satu jawaban yang sama.
+- **Resource memang lambat atau kena rate limit.** API pihak ketiga dengan kuota request, atau laporan yang men-scan jutaan baris, mahal setiap kali dipanggil. Caching sering jadi satu-satunya cara mengatasinya.
+- **Datanya jauh lebih jarang berubah dibanding dibaca.** HTML hasil render sebuah blog post tidak berubah di antara dua kali edit. Kurs mata uang nyaris tidak bergerak dari menit ke menit.
+- **Kamu bisa menoleransi data yang sedikit basi** (beberapa detik, beberapa menit, kadang lebih lama) tanpa ada yang sadar atau peduli.
+
+## Kapan Tidak
+
+- **Valuenya harus benar di setiap pembacaan, tanpa kecuali.** Saldo rekening tepat sebelum penarikan, jumlah stok tepat saat checkout. Menyajikan angka dari cache di sini bukan optimasi performa, itu bug yang berujung pada saldo minus dan stok yang terjual melebihi yang ada.
+- **Baca dan tulis terjadi kurang lebih sama seringnya.** Cache cuma sepadan kalau ia dibaca jauh lebih sering dibanding datanya berubah. Kalau setiap penulisan langsung membuat cache-nya invalid sebelum sempat dibaca lagi, kamu cuma menambah satu komponen bergerak yang tidak pernah benar-benar kepakai.
+- **Operasi aslinya sudah cepat.** Satu lookup dengan index primary key tidak butuh cache di depannya — kamu malah menambah satu subsistem penuh, lengkap dengan cara gagalnya sendiri, cuma untuk menghemat query yang tadinya sudah cuma makan beberapa milidetik.
+- **Kamu belum benar-benar tahu itu lambat.** Caching itu solusi untuk bottleneck yang sudah terukur, bukan pilihan default yang diambil duluan sebelum ada buktinya.
+
+| Situasi | Perlu di-cache? |
+| --- | --- |
+| Query mahal yang sama, diminta ribuan pengguna | Ya |
+| Panggilan API pihak ketiga dengan rate limit ketat | Ya |
+| Saldo rekening yang dicek tepat sebelum penarikan | Tidak — harus selalu terkini |
+| Traffic baca dan tulis kurang lebih seimbang | Tidak — biaya invalidasi menghabiskan manfaatnya |
+| Sudah berupa satu lookup dengan index | Tidak — tidak ada yang dihemat |
+
+## Bagian Sulitnya Adalah Invalidasi
+
+"There are only two hard things in Computer Science: cache invalidation and naming things." Kutipan Phil Karlton ini sudah terlalu sering dikutip sampai jadi klise, dan tetap saja benar. Menyimpan nilai itu gampang. Tahu persis kapan nilai itu berhenti benar, itu yang susah.
+
+Dua strategi ini mencakup sebagian besar yang bakal kamu pakai:
+
+- **Kadaluwarsa berbasis waktu (TTL)**: simpan nilainya dengan timestamp, dan anggap sudah tidak berlaku begitu usianya lewat batas tertentu. Sederhana, dan siapa pun yang menulis data itu tidak perlu tahu cache-nya ada, tapi setiap pembaca bisa saja melihat data yang stale sampai `TTL` detik.
+- **Invalidasi eksplisit saat menulis**: siapa pun yang mengubah data aslinya juga menghapus atau memperbarui salinan di cache. Lebih akurat, tapi setiap jalur kode yang menulis ke data itu sekarang harus ingat untuk menyentuh cache-nya juga, persis jenis hal yang gampang terlupa enam bulan kemudian, saat buru-buru, oleh orang yang bahkan tidak menulis lapisan caching-nya.
+
+```js
+const cache = new Map();
+const TTL_MS = 60_000;
+
+function getCached(key) {
+  const entry = cache.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.storedAt > TTL_MS) {
+    cache.delete(key);
+    return null;
+  }
+  return entry.value;
+}
+
+function setCached(key, value) {
+  cache.set(key, { value, storedAt: Date.now() });
+}
+```
+
+Tidak ada satu pun strategi yang "benar" sendirian, TTL nge-trade akurasi dengan simplicity, invalidasi eksplisit nge-trade simplicity dengan akurasi. Kebanyakan sistem sungguhan akhirnya memakai keduanya: TTL sebagai jaring pengaman, dan invalidasi eksplisit untuk penulisan yang tidak bisa menunggu enam puluh detik untuk terlihat.
+
+## Kenapa Ini Penting
+
+Caching itu sebuah barter: ia menukar data freshness dengan kecepatan, dan barter itu cuma sepadan begitu kamu tahu persis apa yang sedang kamu korbankan. Pakai cache setelah kamu memastikan proses ulang nilai itu memang bottleneck-nya, bukan sebelum itu. Bug yang muncul kalau kamu cache terlalu dini tidak akan mengaku sebagai masalah performa. Ia terlihat seperti pengguna yang menatap angka yang salah, tanpa ada apa pun di log yang menjelaskan kenapa.
+
+**Terima Kasih Sudah Membaca✌️**
