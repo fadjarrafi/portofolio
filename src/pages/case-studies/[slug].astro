@@ -18,7 +18,7 @@ const { Content } = await entry.render();
 const readingTime = calculateReadingTime(entry.body ?? '');
 
 const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://fadjarrafi.my.id';
-const ogImage = entry.data.image ?? `${siteUrl}/og-default.png`;
+const ogImage = entry.data.image ?? `${siteUrl}/og-image.png`;
 
 const jsonLd = JSON.stringify({
   '@context': 'https://schema.org',

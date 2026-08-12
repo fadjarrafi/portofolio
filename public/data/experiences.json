@@ -4,6 +4,7 @@
         "company": "PT. Qhome Sukses Abadi",
         "period": "Feb 2026 - Present",
         "location": "Indonesia",
+        "flow": "LMS upload → ffmpeg compress → standard playback",
         "description": "Maintaining an HRIS and building media pipelines for an internal LMS.",
         "highlights": [
             "Diagnosed and fixed broken report exports and form-logic failures across the HRIS, restoring reliable HR operations.",
@@ -21,6 +22,7 @@
         "company": "Square Indonesia",
         "period": "Jul 2023 - Jul 2025",
         "location": "Indonesia",
+        "flow": "checkout → Xendit → webhook → order status",
         "description": "Shipped client-facing e-commerce and company sites end to end, working directly with clients.",
         "highlights": [
             "Built Mawar Florist, an e-commerce site with a full Xendit payment flow including checkout and webhook-based transaction status handling.",
@@ -51,6 +53,7 @@
         "company": "PT. Saranainsan Mudaselaras",
         "period": "Jan 2023 - Jan 2025",
         "location": "Indonesia",
+        "flow": "Android app ⇄ CMS ⇄ backend → real-time sync",
         "description": "Built a CMS for IPTV content and kept internal systems running for hotel deployments.",
         "highlights": [
             "Designed and built a CMS letting hotel staff manage IPTV content, schedules, and user settings in real time.",
@@ -69,6 +72,7 @@
         "company": "PT. Informatika Media Pratama",
         "period": "Sep 2025 - Dec 2025",
         "location": "Kalimalang, East Jakarta",
+        "flow": "LMS content → Qdrant → DeepSeek → summary",
         "description": "Built an AI summarisation service for an existing LMS to cut learner time-to-comprehension.",
         "highlights": [
             "Developed a FastAPI backend exposing REST endpoints for on-demand and batch summary generation.",

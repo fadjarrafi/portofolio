@@ -179,7 +179,7 @@ const serialized = JSON.stringify(posts.map((p) => ({
       const topicsEl = card.querySelector('.post-topics');
       p.topics.slice(0, 2).forEach((t) => {
         const span = document.createElement('span');
-        span.className = 'text-[10px] px-1.5 py-0.5 bg-neutral-100 dark:bg-neutral-800 rounded text-neutral-500';
+        span.className = 'text-[10px] px-1.5 py-0.5 bg-neutral-100 dark:bg-neutral-800 rounded text-[#6b7a00] dark:text-[#BDDB0B]';
         span.textContent = t;
         topicsEl.appendChild(span);
       });

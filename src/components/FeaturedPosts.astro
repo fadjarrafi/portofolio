@@ -13,21 +13,33 @@ const featuredPosts = allPosts.sort((a, b) =>
 
 <div>
   <div class="scroll-animate" data-delay="0">
-    <h2 class="text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-6">Writing</h2>
+    <div class="flex items-baseline justify-between mb-6">
+      <h2 class="text-sm font-medium text-neutral-500 dark:text-neutral-400">Writing</h2>
+      <a
+        href="/writing"
+        class="text-xs text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+      >
+        View all →
+      </a>
+    </div>
   </div>
-  <div class="space-y-6">
-    {featuredPosts.map((post) => {
+  <div class="divide-y divide-neutral-100 dark:divide-neutral-900">
+    {featuredPosts.map((post, index) => {
       const slug = post.id.replace('en/', '').replace(/\.mdx?$/, '');
       return (
-        <div class="scroll-animate" data-delay="100">
-          <a class="block group" href={`/writing/en/${slug}`}>
-            <p class="text-xs text-neutral-400 dark:text-neutral-500 tabular-nums mb-1">
-              {formatDate(post.data.publishedAt, false)}
-            </p>
-            <p class="text-base font-medium mb-1 group-hover:underline">{post.data.title}</p>
-            <p class="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">{post.data.summary}</p>
-          </a>
-        </div>
+        <a
+          class="scroll-animate group flex items-baseline justify-between gap-4 py-3"
+          data-delay={100 * (index + 1)}
+          href={`/writing/en/${slug}`}
+        >
+          <div class="min-w-0">
+            <p class="text-sm font-medium truncate group-hover:underline">{post.data.title}</p>
+            <p class="text-xs text-neutral-500 dark:text-neutral-400 truncate">{post.data.summary}</p>
+          </div>
+          <p class="text-xs text-neutral-400 dark:text-neutral-500 tabular-nums shrink-0">
+            {formatDate(post.data.publishedAt, false)}
+          </p>
+        </a>
       );
     })}
   </div>

@@ -5,12 +5,13 @@ interface Heading {
 }
 interface Props {
   headings: Heading[];
+  id?: string;
 }
-const { headings } = Astro.props;
+const { headings, id = 'toc' } = Astro.props;
 if (headings.length === 0) return;
 ---
 
-<div class="p-4 border border-neutral-200 dark:border-neutral-800 rounded-lg bg-neutral-50 dark:bg-neutral-900" id="toc">
+<div class="p-4 border border-neutral-200 dark:border-neutral-800 rounded-lg bg-neutral-50 dark:bg-neutral-900" id={id}>
   <h2 class="font-semibold mb-3 text-neutral-900 dark:text-neutral-100 text-sm">
     Table of Contents
   </h2>

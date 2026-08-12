@@ -26,7 +26,7 @@ const { Content, headings } = await entry.render();
 const readingTime = calculateReadingTime(entry.body ?? '');
 
 const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://fadjarrafi.my.id';
-const ogImage = entry.data.image ?? `${siteUrl}/og-default.png`;
+const ogImage = entry.data.image ?? `${siteUrl}/og-image.png`;
 
 const tocHeadings = headings
   .filter((h) => h.depth === 2)
@@ -113,7 +113,7 @@ const jsonLd = JSON.stringify({
             {entry.data.topics.map((topic) => (
               <a
                 href={`/writing?topic=${topic}`}
-                class="px-3 py-1 text-xs bg-neutral-100 dark:bg-neutral-800 rounded-full text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+                class="px-3 py-1 text-xs bg-neutral-100 dark:bg-neutral-800 rounded-full text-[#6b7a00] dark:text-[#BDDB0B] hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
               >
                 {topic}
               </a>
@@ -121,19 +121,43 @@ const jsonLd = JSON.stringify({
           </div>
         )}
       </div>
+
+      {(hasTranslation || tocHeadings.length > 0) && (
+        <div class="lg:hidden mt-6 space-y-4">
+          {hasTranslation && translationSlug && (
+            <div class="p-4 border border-neutral-200 dark:border-neutral-800 rounded-lg bg-neutral-50 dark:bg-neutral-900">
+              <a
+                href={`/writing/${targetLang}/${translationSlug}`}
+                class="flex items-center gap-2 text-sm font-mono text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m5 8 6 6" /><path d="m4 14 6-6 2-3" /><path d="M2 5h12" /><path d="M7 2h1" />
+                  <path d="m22 22-5-10-5 10" /><path d="M14 18h6" />
+                </svg>
+                <span class="font-medium">
+                  {lang === 'en' ? 'Baca dalam Bahasa Indonesia' : 'Read in English'}
+                </span>
+              </a>
+            </div>
+          )}
+          {tocHeadings.length > 0 && <TableOfContents headings={tocHeadings} id="toc-mobile" />}
+        </div>
+      )}
     </div>
 
     <div class="scroll-animate" data-delay="100">
       <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,2.5fr)_280px] gap-8 relative">
-        <article class="prose prose-neutral dark:prose-invert prose-p:my-6 w-full leading-8 min-w-0">
-          <Content components={{ YouTube }} />
+        <div class="min-w-0 max-w-[70ch]">
+          <article class="prose prose-neutral dark:prose-invert prose-p:my-6 w-full leading-8">
+            <Content components={{ YouTube }} />
+          </article>
           <RelatedPosts posts={related} currentLang={lang as 'en' | 'id'} />
-        </article>
+        </div>
 
-        <div class="order-first lg:order-last">
+        <div class="lg:order-last">
           <aside class="lg:sticky lg:top-24 lg:self-start space-y-4">
             {hasTranslation && translationSlug && (
-              <div class="p-4 border border-neutral-200 dark:border-neutral-800 rounded-lg bg-neutral-50 dark:bg-neutral-900">
+              <div class="hidden lg:block p-4 border border-neutral-200 dark:border-neutral-800 rounded-lg bg-neutral-50 dark:bg-neutral-900">
                 <a
                   href={`/writing/${targetLang}/${translationSlug}`}
                   class="flex items-center gap-2 text-sm font-mono text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
@@ -148,7 +172,11 @@ const jsonLd = JSON.stringify({
                 </a>
               </div>
             )}
-            {tocHeadings.length > 0 && <TableOfContents headings={tocHeadings} />}
+            {tocHeadings.length > 0 && (
+              <div class="hidden lg:block">
+                <TableOfContents headings={tocHeadings} />
+              </div>
+            )}
           </aside>
         </div>
       </div>

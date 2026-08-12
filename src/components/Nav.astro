@@ -5,7 +5,21 @@ const navItems = [
   { path: '/writing', name: 'writing' },
   { path: '/garden/thoughts', name: 'garden' },
 ];
+
+const currentPath = Astro.url.pathname;
+const isActive = (path: string) => {
+  if (path === '/') return currentPath === '/';
+  const base = `/${path.split('/').filter(Boolean)[0]}`;
+  return currentPath === base || currentPath.startsWith(`${base}/`);
+};
 ---
+
+<a
+  href="#main-content"
+  class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-3 focus:py-2 focus:rounded-md focus:bg-neutral-900 focus:text-white dark:focus:bg-neutral-100 dark:focus:text-neutral-900"
+>
+  Skip to content
+</a>
 
 <aside class="-ml-[8px] mb-16 tracking-tight">
   <div class="lg:sticky lg:top-20">
@@ -14,15 +28,25 @@ const navItems = [
       id="nav"
     >
       <div class="flex flex-row space-x-0 pr-10">
-        {navItems.map(({ path, name }) => (
-          <a
-            href={path}
-            class="transition-all hover:text-neutral-800 dark:hover:text-neutral-200 flex align-middle relative py-1 px-2 m-1"
-          >
-            {name}
-          </a>
-        ))}
+        {navItems.map(({ path, name }) => {
+          const active = isActive(path);
+          return (
+            <a
+              href={path}
+              aria-current={active ? 'page' : undefined}
+              class={`flex align-middle relative py-1 px-2 m-1 border-b-2 transition-colors ${
+                active
+                  ? 'text-neutral-900 dark:text-neutral-100 font-medium border-[#BDDB0B]'
+                  : 'text-neutral-500 dark:text-neutral-400 border-transparent hover:text-neutral-800 dark:hover:text-neutral-200'
+              }`}
+            >
+              {name}
+            </a>
+          );
+        })}
       </div>
     </nav>
   </div>
 </aside>
+
+<div id="main-content"></div>

@@ -27,7 +27,7 @@ const readingTime = calculateReadingTime(entry.body ?? '');
 const status = getGrowthStage(entry.body ?? '', entry.data.status);
 
 const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://fadjarrafi.my.id';
-const ogImage = entry.data.image ?? `${siteUrl}/og-default.png`;
+const ogImage = entry.data.image ?? `${siteUrl}/og-image.png`;
 
 const tocHeadings = headings
   .filter((h) => h.depth === 2)
