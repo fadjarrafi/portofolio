@@ -4,20 +4,40 @@ import Nav from '../components/Nav.astro';
 import WorkExperience from '../components/WorkExperience.astro';
 import FeaturedCaseStudies from '../components/FeaturedCaseStudies.astro';
 import FeaturedPosts from '../components/FeaturedPosts.astro';
+import PipelineDiagram from '../components/PipelineDiagram.astro';
 ---
 
 <BaseLayout>
   <section>
     <Nav />
 
-    <div class="scroll-animate" data-delay="0">
-      <h1 class="mb-4 text-3xl md:text-4xl font-semibold tracking-tighter">Fadjar Rafi</h1>
-      <p class="mb-4 max-w-xl text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
-        Fullstack developer with 3+ years across e-commerce, content systems, and internal tools—from Laravel + Vue shops with live payment flows to an AI summarisation service on FastAPI, Qdrant, and LLMs.
+    <div class="paper-grid -mx-2 md:-mx-0 px-2 md:px-0 pt-6 pb-8 rounded-lg">
+      <p class="font-mono text-xs uppercase tracking-[0.2em] text-neutral-500 dark:text-neutral-400 mb-3">
+        ~ fadjar rafi
       </p>
+      <h1 class="mb-4 text-3xl md:text-4xl font-semibold tracking-tighter">Fullstack Developer</h1>
+      <p class="mb-6 max-w-xl text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+        3+ years shipping systems end to end&mdash;from Laravel + Vue storefronts with live payment
+        flows to a retrieval-augmented summarisation service on FastAPI, Qdrant, and an LLM. Two of
+        those systems, traced:
+      </p>
+
+      <div class="grid gap-3 sm:grid-cols-2 mb-6">
+        <PipelineDiagram
+          caption="payments · square indonesia"
+          flow="checkout → Xendit → webhook → order status"
+          delayStart={100}
+        />
+        <PipelineDiagram
+          caption="ai pipeline · imp"
+          flow="LMS content → Qdrant → DeepSeek → summary"
+          delayStart={450}
+        />
+      </div>
+
       <div class="flex gap-4 text-sm text-neutral-500 dark:text-neutral-400">
         <a
-          class="flex items-center gap-1 hover:text-[#6b7a00] dark:hover:text-[#BDDB0B] transition-colors"
+          class="flex items-center gap-1 hover:text-signal-muted dark:hover:text-signal transition-colors"
           href="https://github.com/fadjarrafi"
           target="_blank"
           rel="noopener noreferrer"
@@ -28,7 +48,7 @@ import FeaturedPosts from '../components/FeaturedPosts.astro';
           github
         </a>
         <a
-          class="flex items-center gap-1 hover:text-[#6b7a00] dark:hover:text-[#BDDB0B] transition-colors"
+          class="flex items-center gap-1 hover:text-signal-muted dark:hover:text-signal transition-colors"
           href="https://www.linkedin.com/in/fadjar-irfan-rafi"
           target="_blank"
           rel="noopener noreferrer"
@@ -41,16 +61,21 @@ import FeaturedPosts from '../components/FeaturedPosts.astro';
       </div>
     </div>
 
-    <div class="mt-20 scroll-animate" data-delay="200">
-      <WorkExperience />
-    </div>
+    <div class="relative border-l border-dashed border-ink/15 dark:border-mist/15 pl-6 sm:pl-8 mt-16 space-y-16">
+      <div class="relative">
+        <span aria-hidden="true" class="absolute -left-[29px] sm:-left-[37px] top-0.5 font-mono text-xs text-ink/35 dark:text-mist/35 select-none">+</span>
+        <WorkExperience />
+      </div>
 
-    <div class="mt-20 scroll-animate" data-delay="200">
-      <FeaturedCaseStudies />
-    </div>
+      <div class="relative">
+        <span aria-hidden="true" class="absolute -left-[29px] sm:-left-[37px] top-0.5 font-mono text-xs text-ink/35 dark:text-mist/35 select-none">+</span>
+        <FeaturedCaseStudies />
+      </div>
 
-    <div class="mt-20 scroll-animate" data-delay="200">
-      <FeaturedPosts />
+      <div class="relative">
+        <span aria-hidden="true" class="absolute -left-[29px] sm:-left-[37px] top-0.5 font-mono text-xs text-ink/35 dark:text-mist/35 select-none">+</span>
+        <FeaturedPosts />
+      </div>
     </div>
 
     <div class="mt-16 mb-16" />

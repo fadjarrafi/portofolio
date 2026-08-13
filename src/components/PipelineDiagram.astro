@@ -1,0 +1,34 @@
+---
+import { parseFlow } from '../utils/flow';
+
+interface Props {
+  caption: string;
+  flow: string;
+  delayStart?: number;
+}
+
+const { caption, flow, delayStart = 0 } = Astro.props;
+const segments = parseFlow(flow);
+---
+
+<div class="pipeline-diagram border border-dashed border-ink/20 dark:border-mist/20 rounded-md px-4 py-3 bg-ink/[0.03] dark:bg-mist/[0.03]">
+  <p class="text-[10px] uppercase tracking-[0.15em] text-neutral-500 dark:text-neutral-400 mb-2 font-mono">
+    {caption}
+  </p>
+  <p class="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-sm leading-relaxed">
+    {segments.map((segment, index) => (
+      <span
+        class={`pipeline-node ${
+          segment.type === 'pipe'
+            ? 'text-signal-muted dark:text-signal font-medium'
+            : segment.type === 'sync'
+              ? 'text-copper font-medium'
+              : 'text-ink dark:text-mist'
+        }`}
+        style={`animation-delay: ${delayStart + index * 90}ms`}
+      >
+        {segment.text}
+      </span>
+    ))}
+  </p>
+</div>

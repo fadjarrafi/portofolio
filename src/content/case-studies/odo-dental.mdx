@@ -47,6 +47,8 @@ Basically I wanted the clinic running the day-to-day on their own, while the pub
 - Tiptap (rich text editor for articles and newsletters)
 - artesaos/seotools (server-side SEO meta and structured data)
 - GSAP (scroll animations on the landing page)
+- spatie/laravel-analytics (Google Analytics data surfaced in the admin dashboard)
+- S3-backed media storage (uploads don't live on the app server's disk)
 
 ## Features
 
@@ -64,26 +66,43 @@ Staff can write, edit, and publish articles with a rich text editor, upload imag
 
 ### 4. Leads
 
-The public forms (newsletter sign-up, forum registration) all funnel visitor details into one leads table, with the source tracked and privacy-policy consent recorded. The staff work through them from the dashboard.
+The public forms (newsletter sign-up, forum registration, contact) all funnel visitor details into one leads table, with consent to the privacy policy recorded. The staff work through them from the dashboard.
 
 ### 5. Newsletter
 
-Admins write up an HTML campaign in the same rich text editor and send it to whoever opted in. Each send tracks how it went, so you can see if it fully sent, partially sent, or failed.
+Admins write up an HTML campaign in the same rich text editor and send it to whoever opted in. Each campaign records how the send went.
 
 ### 6. Doctor Q&A Forum
 
-Patients ask dental questions from the public site, a doctor answers from the admin panel, and the patient gets an email with their original question and the answer. That last bit matters, it means nobody has to remember to reply manually.
+Patients ask dental questions from the public site, a doctor answers from the admin panel, and the patient gets an email with their original question and the answer in one place. Who's allowed to answer isn't hardcoded to a role called "Doctor." It follows the same menu-access matrix as everything else in the dashboard, so a Super Admin can regrant that responsibility to a different role without me touching code.
+
+### 7. Activity Log & Analytics
+
+Every admin action that changes data gets written to a searchable audit log, visible only to Super Admin, useful for "who changed this" questions without digging through a database. The dashboard also pulls in Google Analytics data directly, so the clinic can see traffic and channel performance without leaving the admin panel.
 
 ## The Problems and How I Addressed It
 
+### Making permissions live in the database
+
 Access control gave me the most trouble. The clinic has front office staff, doctors, and admins, and they each need to see a different slice of the dashboard. My first instinct was to just check the role in code, but I realized that meant editing and redeploying every time they wanted to change who could do what. That wasn't going to work for a site I'd eventually hand off.
 
-I ended up moving the whole thing into the database. Roles go in one table, menu items in another, and a pivot table ties them together. A super admin sets it all up through a checkbox matrix in the dashboard, so the clinic can add a role or change access on their own. One thing I was careful about: I don't rely on hiding menu items in the sidebar for security. Anyone can still type a URL directly, so I check permissions on the server for every protected route. I also locked down the system roles so they can't be deleted or edited by accident, and regenerated the session on login.
+I ended up moving the whole thing into the database. Roles go in one table, menu items in another, and a pivot table ties them together. A super admin sets it all up through a checkbox matrix in the dashboard, so the clinic can add a role or change access on their own. One thing I was careful about: I don't rely on hiding menu items in the sidebar for security. Anyone can still type a URL directly, so I check permissions on the server for every protected route. Super Admin itself is locked so it can't be deleted or edited by accident, and the session is regenerated on login.
 
-SEO was the other thing I had to plan around. The clinic obviously wants to show up on Google, but Inertia renders on the client, which means a crawler can land on what's basically an empty page. So I generate the meta tags, Open Graph data, and JSON-LD on the server and drop them into the initial HTML. That way the tags are there before any JavaScript runs.
+### Making the site crawlable
+
+SEO was the other thing I had to plan around. The clinic obviously wants to show up on Google, but Inertia renders on the client, which means a crawler can land on what's basically an empty page. So I generate the meta tags, Open Graph data, and JSON-LD on the server and drop them into the initial HTML across every major page type: the landing page, treatment pages, articles, the dentist listing, and the forum. That way the tags are there before any JavaScript runs.
+
+## Results
+
+- The RBAC system spans 4 roles and 13 menu/permission items, all editable by a Super Admin through the dashboard without a single code change or redeploy.
+- 12 distinct page types render their meta tags, Open Graph data, and structured data server-side, before any client-side JavaScript runs.
+- Every mutating admin action is captured in a searchable audit log, and a Google Analytics-backed widget gives the clinic traffic and channel data without leaving the admin panel.
+- Media uploads go to S3 instead of the app server's local disk, keeping file storage out of the deploy pipeline entirely.
 
 ## Lessons Learned
 
-The main thing I took away was to treat permissions as data, not code. Once roles and access lived in the database with a UI to manage them, the clinic didn't need me anymore to reshuffle their team, which is the whole point when you're handing a project over to a client. It also kept me honest about doing the access checks on the backend, because the frontend can't really be trusted for that.
+The main thing I took away was to treat permissions as data, not code. Once roles and access lived in the database with a UI to manage them, the clinic didn't need me anymore to reshuffle their team, which is the whole point when you're handing a project over to a client. It also kept me honest about doing the access checks on the backend, because the frontend can't really be trusted for that. That same instinct — make it data instead of a hardcoded rule — is what let something like "who can answer patient questions" stay flexible too, without me having to predict every future staffing change.
 
 The SEO part taught me to think about it early rather than bolt it on later. On a client-rendered stack it's easy to forget that crawlers don't run your JavaScript, and by the time you notice, you're retrofitting. Deciding up front that the tags had to render server-side changed how I set up the controllers and the base layout, and it saved me a headache down the line.
+
+If I look back at where I spent my hardening effort, it went almost entirely into the admin side: access control, audit logging, session handling. The public-facing forms and the newsletter pipeline work, but they're the parts I looked at least after they first shipped. It's an easy trap: you polish what you're staring at every day in the dashboard, and the pieces running quietly in the background stay exactly as first-built. Next time I'd budget real time for revisiting the public surface after launch, not just the admin one.

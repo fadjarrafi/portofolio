@@ -8,6 +8,17 @@ export default {
         sans: ['var(--font-space-grotesk)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         mono: ['var(--font-ibm-plex-mono)', 'ui-monospace', 'monospace'],
       },
+      colors: {
+        paper: '#F7F4EC',
+        ink: '#16232C',
+        'surface-dark': '#0F1A21',
+        mist: '#E7E9E4',
+        signal: {
+          DEFAULT: '#BDDB0B',
+          muted: '#6B7A00',
+        },
+        copper: '#C1662F',
+      },
       typography: {
         DEFAULT: {
           css: {

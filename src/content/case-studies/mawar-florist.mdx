@@ -13,9 +13,7 @@ liveUrl: 'https://www.mawarfloristjogja.com/'
 
 ## Short Explanation
 
-Mawar Florist is a flower shop in Yogyakarta. Before this project they took every order over WhatsApp, and there was no real way for customers to pay online or for the owner to see what was actually selling. I built them a web app to replace that.
-
-It has two sides. Customers get a storefront to browse flowers, add things to a cart, and pay. The owner gets a dashboard to manage products, orders, discounts, and customers. Payments run through a gateway that confirms the order and generates a PDF invoice on its own, so nobody has to sit and reply to messages all day just to close a sale.
+Mawar Florist is a flower shop in Yogyakarta that used to run entirely over WhatsApp: every order, every payment confirmation, every "is this still in stock" typed out by hand. I built them a web app that replaces that: a storefront where customers order and pay themselves, and a dashboard where the owner sees everything without scrolling back through chat history.
 
 ## Project Goals
 
@@ -24,9 +22,9 @@ The main thing the owner wanted was to stop running the shop out of a chat inbox
 So the platform needed to:
 
 - Let people browse products and check out, whether or not they have an account
-- Accept the payment methods Indonesians actually use — QRIS, e-wallets, and bank transfer
+- Accept the payment methods Indonesians actually use: QRIS, e-wallets, and bank transfer
 - Confirm paid orders and issue invoices without anyone doing it by hand
-- Give the owner a dashboard for products, orders, discounts, and customers
+- Give the owner a dashboard for products, orders, discounts, customers, and sales reporting
 - Handle Indonesian addresses properly, down to the village
 
 Basically, let the owner deal with flowers instead of admin work, and let a customer finish a purchase without ever needing to message anyone.
@@ -40,7 +38,7 @@ Basically, let the owner deal with flowers instead of admin work, and let a cust
 **Frontend:**
 
 - Vue 3 + TypeScript + Tailwind CSS 4
-- Inertia.js (SPA bridge — no separate REST API)
+- Inertia.js (SPA bridge, no separate REST API), with Ziggy exposing Laravel's named routes to the Vue side
 - Vite 7
 
 **Database:**
@@ -50,9 +48,9 @@ Basically, let the owner deal with flowers instead of admin work, and let a cust
 **Services & Tooling:**
 
 - Xendit (payment gateway)
-- DomPDF (invoice generation)
-- Intervention Image (WebP conversion)
-- Pest PHP (testing) + GitHub Actions (CI/CD)
+- DomPDF (invoice and report generation)
+- Intervention Image (server-side image processing)
+- GitHub Actions (build + SSH deploy pipeline, symlink-based releases)
 
 ## Features
 
@@ -72,26 +70,43 @@ When a payment goes through, Xendit sends a webhook. The app checks the token, m
 
 As soon as an order is confirmed, a PDF invoice gets generated and saved for the customer to download. It's built to be idempotent, so if Xendit fires the same webhook twice (which happens), the customer still ends up with one invoice, not two.
 
-### 5. Admin Dashboard
+### 5. Admin Dashboard & Reporting
 
-A KPI dashboard plus full management for products, orders, discounts, customers, transactions, and reports. Includes multi-image product upload, order status timelines, discount codes with usage limits, and CSV customer export.
+A KPI dashboard plus management for products, orders, discounts, customers, and transactions. Multi-image product uploads with automatic primary-image handling, order status timelines, and discount codes with usage limits and date-bounded validity. A separate reporting module generates sales, financial, product, and customer reports on demand, exportable to PDF or CSV.
 
 ### 6. Indonesian Address System
 
-Cascading Province → Regency → District → Village dropdowns backed by the full Indonesian region dataset. It's a small thing, but it means a delivery address is actually usable instead of someone typing a village name three different ways.
+Cascading Province → Regency → District → Village dropdowns backed by Indonesia's full official administrative code dataset, down to village level. It's a small thing, but it means a delivery address is actually usable instead of someone typing a village name three different ways.
+
+### 7. ID Exposure Hardening
+
+Customer and address records are addressed by ULID instead of incrementing integers, so a URL never leaks how many customers the shop has or lets someone guess their way to another customer's page.
 
 ## The Problems and How I Addressed It
 
-The part that worried me most was the payment webhook. That's how the gateway tells you an order is paid, but the endpoint is public, so in theory anyone could send a fake "paid" event and get free flowers. I handled it by checking Xendit's callback token on every request, looking the order up in my own database instead of trusting whatever came in the payload, and only treating specific gateway statuses as "paid." On top of that I made the invoice step idempotent, mostly because Xendit sometimes sends the same webhook more than once and I didn't want duplicate invoices piling up.
+### Securing the payment webhook
 
-The other thing I had to think about was old orders. What happens to an order from last month if the owner later renames a product or deletes it? I didn't want history to quietly change or break, so I store a copy of the product title and price on each order item at the time of purchase, and I use soft deletes for products and orders instead of really removing them. An old order keeps showing what the customer actually bought.
+The part that worried me most was the payment webhook. That's how the gateway tells you an order is paid, but the endpoint is public, so in theory anyone could send a fake "paid" event and get free flowers. I check the gateway's callback token on every request using a constant-time comparison, look the order up in my own database instead of trusting whatever came in the payload, and only treat specific gateway statuses as "paid." On top of that, invoice generation runs inside a locked database transaction, because the same webhook can legitimately arrive twice — without the lock, two near-simultaneous retries could both see "no invoice yet" and create two.
 
-Halfway through the project the shop switched payment providers, from Midtrans to Xendit. That could have been a mess, but I'd kept all the payment code in one service class instead of sprinkling it through the controllers, so the switch mostly came down to rewriting that one file and running a migration. The checkout flow itself barely moved.
+### Keeping historical orders accurate
+
+The other thing I had to think about was old orders. What happens to an order from last month if the owner later renames a product, changes its price, or deletes it? I didn't want history to quietly change or break, so each order item stores its own copy of the product title and price at the time of purchase, and products, orders, and most other records use soft deletes instead of being removed outright. An old order keeps showing what the customer actually bought, at the price they actually paid.
+
+### Switching payment providers mid-project
+
+Halfway through the project the shop switched payment providers, from Midtrans to Xendit. I'd kept all the provider-specific logic in one service class instead of sprinkling it through the controllers, so the actual payment code swap came down to rewriting that one file, running a migration to rename a few provider-specific columns, and pointing the controller at the new service. That part went as cleanly as I'd hoped. What I hadn't isolated as well were the places the old provider's name had leaked into elsewhere: docs, some admin-view copy, a few customer-facing strings. Cleaning those up took a few follow-up passes after the fact. The lesson wasn't "isolate the payment logic," which I'd already done; it was to isolate the provider's *name*, not just its code, since branding tends to leak into the parts of a codebase you don't think of as "payment code."
+
+## Results
+
+- The dashboard covers the full order lifecycle across nine admin modules: products, categories, discounts, customers, orders, transactions, and reporting — replacing what used to be a WhatsApp thread and a mental model in the owner's head.
+- The address system ships with Indonesia's complete official administrative code dataset down to village level, rather than a partial or manually maintained list.
+- Deploys are push-to-branch: GitHub Actions builds the app and ships it over SSH using a symlink-based release strategy that keeps the last five releases, so a bad deploy is a symlink swap away from being undone.
+- The payment-provider isolation decision has since been tested a second time on a separate branch evaluating another provider: the swap again touched only the same one service class and controller, a better validation of the architecture than the first swap alone.
 
 ## Lessons Learned
 
 The thing that stuck with me is that most of the hard work on an online store isn't the shopping cart — it's the boring, defensive stuff around money. Making sure a payment can't be faked and an invoice can't be duplicated took more thought than the whole product catalog did, and it's the kind of thing you only notice when it goes wrong.
 
-Keeping the payment logic in one place also turned out to be worth it. At the start it felt like an extra layer I didn't strictly need, but when the shop changed providers I only had to touch one service. I'll be doing that with any third-party integration from now on, since you rarely stick with the first one.
+Isolating the payment logic in one service class also turned out to be worth it, twice now. But I learned that isolating the *code* isn't the same as isolating the *provider's name*. Docs, admin copy, and customer-facing strings all quietly assumed "Midtrans" long after the payment logic didn't, and chasing those references down after the fact cost more time than the actual service-class rewrite.
 
-And building both the storefront and the admin side made me realize how easy it is to call a feature "done" too early. It's not enough that a customer can place an order — the owner also has to be able to find it, update it, and fix it when something's off. I'd have missed half of that if I'd only built the customer-facing part.
+And building both the storefront and the admin side made me realize how easy it is to call a feature "done" too early. It's not enough that a customer can place an order: the owner also has to be able to find it, update it, and fix it when something's off. I'd have missed half of that if I'd only built the customer-facing part. Automated tests around the payment path are the next thing I want to add — right now that correctness rests entirely on manual verification, which is the kind of debt that's cheap to carry until the day it isn't.
