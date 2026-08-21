@@ -1,0 +1,57 @@
+---
+title: 'Signed URLs for a Protected Video Course Platform'
+publishedAt: '2026-08-21'
+summary: 'Splitting a video course platform into two services — an API that decides which file to serve and signs a short-lived token, and a separate app that streams it from outside the webroot — so course videos never have a direct, shareable URL.'
+image: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0'
+featured: false
+topics: ['PHP', 'Security', 'API Design']
+role: 'Fullstack Developer'
+---
+
+## Short Explanation
+
+I worked on the video delivery layer for a corporate e-learning platform, split across two services that were already separate: an API that owns the course data, and a web app that renders the course player. Videos were a licensing problem as much as a technical one — the client didn't want a URL anyone could copy, paste into a downloader, and walk away with the file. So instead of just pointing the player at a video path, the API decides which file to serve and signs a short-lived HMAC token for it, and the web app is the only thing that ever touches the actual file, streaming it from a directory outside the webroot. Neither service can do the whole job alone, which was the point.
+
+## Project Goals
+
+The brief was simple to state and less simple to build correctly:
+
+- No video should ever resolve to a stable, guessable, or permanently shareable URL
+- Playback still has to work in a normal HTML5 `<video>` element in the browser — this couldn't turn into a DRM project
+- The API and the web app were already two separate deployments, so the solution had to hold up across that boundary, not just inside one codebase
+- Whatever proved a request was legitimate had to expire on its own, without a background job sweeping up stale grants
+
+## Tech Stack
+
+**Backend:**
+
+- PHP, split across two services (an API and a web app)
+
+**Token scheme:**
+
+- HMAC-SHA256, `hash_hmac()` over the video identifier and an expiry timestamp
+- A single shared secret, provisioned as an environment variable on both services
+
+## How It Works
+
+The API is the only thing that knows which physical file corresponds to a given lesson. When the player requests a video, the API looks up the real filename, builds a payload of the video identifier plus a short expiry, and signs it with the shared secret. That signed, expiring token — not a file path — is what gets handed back to the browser.
+
+The web app never sees the API's database and doesn't need to. It exposes a single endpoint, `GET /video/{token}`, which decodes the token, recomputes the HMAC signature with the same shared secret, checks the expiry, and only then opens the file from a directory that sits outside the public webroot and streams it back. If the signature doesn't match or the token has expired, there's no file to serve — the token itself is the only credential.
+
+Two things fall out of that split: the video files never live anywhere the API can be tricked into exposing directly, and a token is only ever useful for a few minutes, so even a copied link goes stale before it's much use to share.
+
+## The Problem I Kept Coming Back To
+
+The part I spent the most time thinking about wasn't the token generation, it was what it meant for the two services to trust the same secret. Because the signing and the verifying happen in different codebases, changing anything about the scheme — rotating the secret, moving to a different algorithm — means a coordinated deploy on both sides at the same time. Deploy the API first and the web app rejects every token it issues; deploy the web app first and it's now validating a scheme the API hasn't switched to yet.
+
+Asymmetric signing kept coming up as the alternative: something like a JWT with RSA, where the API holds a private key and the web app only ever needs the public one to verify. That removes the shared-secret problem entirely. The web app can never forge a token, and rotating the private key doesn't require touching the verifying side at all. I ended up not switching to it, mainly because the two services are deployed by the same team on the same release cadence anyway, so the coordinated-deploy cost was mostly theoretical rather than something that was actually going to bite anyone. Symmetric HMAC also meant one less library dependency and no key-pair management to think about.
+
+It's a real trade-off, not a free win. If these two services were ever owned by different teams, or deployed independently, I'd lean toward the asymmetric version without much hesitation.
+
+The other option I considered and ruled out early was presigned URLs from cloud object storage, the S3-style pattern. It's a clean solution, but it assumes the files live in object storage in the first place. Here they sat on the app server's own disk, so introducing a cloud storage layer just to get presigned URLs would have solved the licensing problem while creating a migration problem, which wasn't what anyone was asking for.
+
+## Lessons Learned
+
+The biggest thing this project reinforced for me is that "coupling" isn't automatically a design smell — it's a cost you take on deliberately, and the question is whether you're taking it on for a reason that actually applies to you. Shared-secret HMAC coupled these two services together in a way that would look worse on a whiteboard than asymmetric signing. But on a whiteboard you can't see that both services ship from the same pipeline on the same day, which is the fact that made the coupling cheap in practice rather than expensive.
+
+I also came away with a clearer sense of where to put the trust boundary. It would have been simpler to let the web app decide which file to serve and just check some kind of session cookie. Keeping that decision entirely in the API, and making the web app a dumb-but-strict verifier of a token it didn't create, meant the licensing logic only ever lived in one place. If the rules for who can watch what ever get more complicated, there's exactly one service to change, and the streaming side doesn't need to know or care why a token is valid — only that it is.
