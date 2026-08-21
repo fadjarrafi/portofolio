@@ -38,6 +38,10 @@ The API is the only thing that knows which physical file corresponds to a given 
 
 The web app never sees the API's database and doesn't need to. It exposes a single endpoint, `GET /video/{token}`, which decodes the token, recomputes the HMAC signature with the same shared secret, checks the expiry, and only then opens the file from a directory that sits outside the public webroot and streams it back. If the signature doesn't match or the token has expired, there's no file to serve — the token itself is the only credential.
 
+<div className="flex justify-center">
+  <img src="/static/images/signed-url-video-streaming.svg" alt="Diagram of the two-phase flow: the browser requests a playback token from the API service, which looks up the file and signs a 60-second HMAC-SHA256 token back to the browser; the browser then requests GET /video/{token} from the web app service, which verifies the signature and expiry and either streams the file from outside the webroot or returns a 403 with nothing served" width="700" />
+</div>
+
 Two things fall out of that split: the video files never live anywhere the API can be tricked into exposing directly, and a token is only ever useful for a few minutes, so even a copied link goes stale before it's much use to share.
 
 ## The Problem I Kept Coming Back To
