@@ -5,13 +5,14 @@ import Nav from '../../components/Nav.astro';
 import PostsSearch from '../../components/PostsSearch.astro';
 import { calculateReadingTime } from '../../utils/posts';
 
-const allPosts = await getCollection('blog', ({ id }) => id.startsWith('en/'));
+const allPosts = await getCollection('blog');
 const sorted = allPosts.sort((a, b) =>
   new Date(b.data.publishedAt).getTime() - new Date(a.data.publishedAt).getTime()
 );
 
 const posts = sorted.map((post) => ({
   ...post,
+  lang: post.id.split('/')[0] as 'en' | 'id',
   readingTime: calculateReadingTime(post.body ?? ''),
 }));
 

@@ -7,11 +7,12 @@ import GardenPostsSearch from '../../../components/GardenPostsSearch.astro';
 import { calculateReadingTime, getGrowthStage } from '../../../utils/posts';
 import type { PostType } from '../../../utils/posts';
 
-const allThoughts = await getCollection('thoughts', ({ id }) => id.startsWith('en/'));
+const allThoughts = await getCollection('thoughts');
 const posts = allThoughts
   .sort((a, b) => new Date(b.data.publishedAt).getTime() - new Date(a.data.publishedAt).getTime())
   .map((p) => ({
     ...p,
+    lang: p.id.split('/')[0] as 'en' | 'id',
     readingTime: calculateReadingTime(p.body ?? ''),
     data: { ...p.data, status: getGrowthStage(p.body ?? '', p.data.status) },
   }));

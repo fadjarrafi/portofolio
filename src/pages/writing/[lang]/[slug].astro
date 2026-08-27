@@ -71,6 +71,9 @@ const jsonLd = JSON.stringify({
   ogImage={ogImage}
   publishedAt={entry.data.publishedAt}
   type="article"
+  lang={lang as 'en' | 'id'}
+  translationUrl={hasTranslation ? `/writing/${targetLang}/${translationSlug}/` : undefined}
+  translationLang={hasTranslation ? (targetLang as 'en' | 'id') : undefined}
 >
   <Nav />
 

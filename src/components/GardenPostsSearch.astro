@@ -4,6 +4,7 @@ import type { PostType, GrowthStage } from '../utils/posts';
 
 interface Post {
   slug: string;
+  lang: 'en' | 'id';
   data: {
     title: string;
     publishedAt: string;
@@ -32,6 +33,7 @@ const { posts, allTopics, allTypes, topicStats } = Astro.props;
 
 const serialized = JSON.stringify(posts.map((p) => ({
   slug: p.slug.split('/').pop(),
+  lang: p.lang,
   title: p.data.title,
   summary: p.data.summary ?? '',
   topics: p.data.topics ?? [],
@@ -51,6 +53,11 @@ const serialized = JSON.stringify(posts.map((p) => ({
       placeholder="Search..."
       class="flex-1 min-w-[140px] px-3 py-1.5 text-sm bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-400 dark:focus:ring-neutral-600"
     />
+    <select id="gs-lang" class="text-xs px-3 py-2 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg focus:outline-none">
+      <option value="all">All languages</option>
+      <option value="en">English</option>
+      <option value="id">Indonesian</option>
+    </select>
     <select id="gs-stage" class="text-xs px-3 py-2 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg focus:outline-none">
       <option value="all">All stages</option>
       <option value="seed">🌱 Seed</option>
@@ -109,6 +116,7 @@ const serialized = JSON.stringify(posts.map((p) => ({
   const stageEmojis = { seed: '🌱', sapling: '🌿', tree: '🌳' };
 
   const searchEl = document.getElementById('gs-search');
+  const langEl = document.getElementById('gs-lang');
   const stageEl = document.getElementById('gs-stage');
   const typeEl = document.getElementById('gs-type');
   const topicEl = document.getElementById('gs-topic');
@@ -133,13 +141,15 @@ const serialized = JSON.stringify(posts.map((p) => ({
 
   function render() {
     const q = searchEl.value.toLowerCase();
+    const lang = langEl.value;
     const stage = stageEl.value;
     const type = typeEl.value;
     const topic = topicEl.value;
-    const active = q || stage !== 'all' || type !== 'all' || topic !== 'all';
+    const active = q || lang !== 'all' || stage !== 'all' || type !== 'all' || topic !== 'all';
 
     const filtered = posts.filter((p) => {
       if (q && !p.title.toLowerCase().includes(q) && !p.summary.toLowerCase().includes(q)) return false;
+      if (lang !== 'all' && p.lang !== lang) return false;
       if (stage !== 'all' && p.status !== stage) return false;
       if (type !== 'all' && p.type !== type) return false;
       if (topic !== 'all' && !p.topics.includes(topic)) return false;
@@ -166,10 +176,10 @@ const serialized = JSON.stringify(posts.map((p) => ({
     pageItems.forEach((p) => {
       const card = template.content.cloneNode(true);
       const a = card.querySelector('a');
-      a.href = `/garden/thoughts/en/${p.slug}`;
+      a.href = `/garden/thoughts/${p.lang}/${p.slug}`;
       card.querySelector('.post-stage-emoji').textContent = stageEmojis[p.status] || '';
       card.querySelector('.post-type-emoji').textContent = typeEmojis[p.type] || '';
-      card.querySelector('.post-reading-time').textContent = `${p.readingTime}m`;
+      card.querySelector('.post-reading-time').textContent = `${p.lang.toUpperCase()} · ${p.readingTime}m`;
       card.querySelector('.post-title').textContent = p.title;
       card.querySelector('.post-summary').textContent = p.summary;
       const time = card.querySelector('.post-date');
@@ -195,6 +205,7 @@ const serialized = JSON.stringify(posts.map((p) => ({
 
   function clearFilters() {
     searchEl.value = '';
+    langEl.value = 'all';
     stageEl.value = 'all';
     typeEl.value = 'all';
     topicEl.value = 'all';
@@ -208,6 +219,7 @@ const serialized = JSON.stringify(posts.map((p) => ({
   }
 
   searchEl.addEventListener('input', onFilterChange);
+  langEl.addEventListener('change', onFilterChange);
   stageEl.addEventListener('change', onFilterChange);
   typeEl.addEventListener('change', onFilterChange);
   topicEl.addEventListener('change', onFilterChange);

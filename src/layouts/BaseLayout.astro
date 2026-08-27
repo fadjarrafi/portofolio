@@ -13,6 +13,9 @@ interface Props {
   publishedAt?: string;
   type?: 'website' | 'article';
   noindex?: boolean;
+  lang?: 'en' | 'id';
+  translationUrl?: string;
+  translationLang?: 'en' | 'id';
 }
 
 const {
@@ -23,6 +26,9 @@ const {
   publishedAt,
   type = 'website',
   noindex = false,
+  lang = 'en',
+  translationUrl,
+  translationLang,
 } = Astro.props;
 
 const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://fadjarrafi.my.id';
@@ -30,11 +36,12 @@ const pageTitle = title ? `${title} | fadjarrafi` : 'fadjarrafi | fullstack dev'
 const resolvedOg = ogImage ?? `${siteUrl}/og-image.png`;
 const resolvedTwitter = twitterImage ?? ogImage ?? `${siteUrl}/twitter-card.png`;
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
+const resolvedTranslationUrl = translationUrl ? new URL(translationUrl, siteUrl).toString() : undefined;
 ---
 
 <!doctype html>
 <html
-  lang="en"
+  lang={lang}
   style="--font-space-grotesk: 'Space Grotesk', sans-serif; --font-ibm-plex-mono: 'IBM Plex Mono', monospace;"
   class="text-ink bg-paper dark:text-mist dark:bg-surface-dark"
 >
@@ -50,6 +57,13 @@ const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex,nofollow" />}
+    {resolvedTranslationUrl && translationLang && (
+      <>
+        <link rel="alternate" hreflang={lang} href={canonicalUrl} />
+        <link rel="alternate" hreflang={translationLang} href={resolvedTranslationUrl} />
+        <link rel="alternate" hreflang="x-default" href={canonicalUrl} />
+      </>
+    )}
 
     <!-- Open Graph -->
     <meta property="og:type" content={type} />
