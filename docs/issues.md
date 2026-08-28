@@ -4,18 +4,7 @@ Re-audited against the current **Astro 5** codebase. The previous list documente
 
 ## Notable
 
-### 1. Search Console can't fetch the sitemap — Cloudflare, not the app
-
-Submitting `sitemap-index.xml` / `sitemap-0.xml` in Google Search Console returns "Tidak dapat mengambil peta situs" (couldn't fetch sitemap). The origin itself is fine: `curl` against `https://fadjarrafi.my.id/sitemap-index.xml` (even spoofing a Googlebot user-agent) returns a clean `200 OK` with `Content-Type: application/xml`.
-
-The site is served through **Cloudflare**, confirmed by response headers (`Server: cloudflare`, `cf-ray`, etc.) and by the fact that the live `/robots.txt` doesn't match `src/pages/robots.txt.ts` at all — it's Cloudflare's own "Content Signals" managed block (AI Crawl Control), injected/overriding the app's response. That confirms something at the Cloudflare edge intercepts requests before they reach the app, so a bot/security rule there is the most likely cause of the sitemap-fetch failure — not code in this repo.
-
-**Not a code fix.** Diagnose and fix in Cloudflare / Search Console directly:
-- Search Console → URL Inspection → paste the sitemap URL → **Test Live URL**, which reports the exact failure reason using Google's real crawler.
-- Cloudflare → Security → Events, filter recent requests with a "Google" user-agent to see which rule blocked/challenged them.
-- Cloudflare → Security → Bots: ensure Verified Bots (Google) bypass challenges.
-- Confirm Security Level isn't "I'm Under Attack" (JS-challenges everything, including crawlers).
-- Check WAF/firewall custom rules (country/ASN/header-based) and the AI Crawl Control bot-blocking toggle for anything broad enough to also catch Google's sitemap fetcher.
+Nothing currently open — see below.
 
 ---
 
@@ -29,6 +18,14 @@ The Next.js → Astro migration cleared the earlier issues:
 - **Analytics** — replaced by Google Analytics 4, injected in `BaseLayout.astro` only when `PUBLIC_GA_ID` is set.
 - **OG image default & JSON-LD author** — title/description derive from the page; `public/og-image.png` exists and is the real fallback; JSON-LD author is `Fadjar Rafi`.
 - **`pnpm-workspace.yaml`** — now tracked in git.
+
+### Search Console couldn't fetch the sitemap (Cloudflare edge) — re-checked 2026-08-28, now clean
+
+Originally: submitting `sitemap-index.xml` / `sitemap-0.xml` in Search Console returned "Tidak dapat mengambil peta situs." At the time, the live `/robots.txt` didn't match `src/pages/robots.txt.ts` at all — Cloudflare's "Content Signals" (AI Crawl Control) block was overriding it — which pointed at a Cloudflare edge rule intercepting the fetch, not an app bug.
+
+Re-verified on 2026-08-28: `curl` (both a normal UA and a spoofed Googlebot UA) against `sitemap-index.xml` and `sitemap-0.xml` returns clean `200 OK`, `Content-Type: application/xml`, well-formed XML (62 URLs), gzip works, no `X-Robots-Tag`. **The live `/robots.txt` now matches `robots.txt.ts` exactly** — the Cloudflare override is no longer happening. `nginx.conf` and the sitemap `serialize()` in `astro.config.mjs` have no rules that would block this either.
+
+Conclusion: this was a Cloudflare-side issue that has since cleared (the Content Signals override is gone). If Search Console still shows the old error, it's most likely a stale/cached result — re-run **URL Inspection → Test Live URL** on the sitemap URL, or re-submit it, rather than assuming it's still broken.
 
 ### SEO audit fixes (see conversation history for the full audit)
 
