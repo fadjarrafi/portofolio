@@ -33,10 +33,11 @@ if (headings.length === 0) return;
 </div>
 
 <script>
-  const links = document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]');
-
-  const setActive = (id: string) => {
-    links.forEach((link) => {
+  // Always resolves against the live DOM rather than a captured NodeList, so
+  // it stays correct even when called from a click handler bound long before
+  // the current page's TOC existed.
+  function setActiveTocLink(id: string) {
+    document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]').forEach((link) => {
       const isActive = link.dataset.tocLink === id;
       link.className = `text-sm block transition-all duration-200 pl-3 ${
         isActive
@@ -44,32 +45,48 @@ if (headings.length === 0) return;
           : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100'
       }`;
     });
-  };
+  }
 
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) setActive(entry.target.id);
-      });
-    },
-    { rootMargin: '-100px 0px -66% 0px', threshold: 0 }
-  );
+  // Re-scan headings/links on every navigation (astro:page-load fires on the
+  // initial load too), since View Transitions swaps in a fresh TOC + article.
+  document.addEventListener('astro:page-load', () => {
+    const links = document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]');
+    if (links.length === 0) return;
 
-  links.forEach((link) => {
-    const el = document.getElementById(link.dataset.tocLink!);
-    if (el) observer.observe(el);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setActiveTocLink(entry.target.id);
+        });
+      },
+      { rootMargin: '-100px 0px -66% 0px', threshold: 0 }
+    );
+
+    links.forEach((link) => {
+      const el = document.getElementById(link.dataset.tocLink!);
+      if (el) observer.observe(el);
+    });
   });
 
-  document.addEventListener('click', (e) => {
-    const anchor = (e.target as HTMLElement).closest<HTMLAnchorElement>('a[href^="#"]');
-    if (!anchor) return;
-    e.preventDefault();
-    const id = anchor.getAttribute('href')!.substring(1);
-    const target = document.getElementById(id);
-    if (!target) return;
-    const offset = target.getBoundingClientRect().top + window.pageYOffset - 96;
-    window.scrollTo({ top: offset, behavior: 'smooth' });
-    window.history.pushState(null, '', `#${id}`);
-    setActive(id);
-  });
+  // Bound once on `document` (which persists across View Transitions
+  // navigations) rather than re-added on every astro:page-load.
+  //
+  // No preventDefault/scrollTo here — Astro's ClientRouter already
+  // special-cases same-page hash links (moveToLocation() in
+  // astro/dist/transitions/router.js) and performs the native fragment
+  // scroll itself, respecting the .prose heading scroll-margin-top and
+  // html's scroll-behavior: smooth in global.css. This just flips the
+  // active link instantly rather than waiting on the scroll-driven
+  // IntersectionObserver above to catch up.
+  if (!(window as any).__tocClickBound) {
+    (window as any).__tocClickBound = true;
+
+    document.addEventListener('click', (e) => {
+      const anchor = (e.target as HTMLElement).closest<HTMLAnchorElement>('a[href^="#"]');
+      if (!anchor) return;
+      const id = anchor.getAttribute('href')!.substring(1);
+      if (!document.querySelector(`[data-toc-link="${id}"]`)) return;
+      setActiveTocLink(id);
+    });
+  }
 </script>

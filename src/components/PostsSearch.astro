@@ -73,7 +73,15 @@ const serialized = JSON.stringify(posts.map((p) => ({
 
   <p id="ps-count" class="hidden text-xs text-neutral-500 mb-4"></p>
 
-  <div id="ps-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+  <div id="ps-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    {Array.from({ length: 6 }).map(() => (
+      <div class="skel-card">
+        <div class="skel-line h-4 w-3/4 mb-3"></div>
+        <div class="skel-line h-3 w-full mb-2"></div>
+        <div class="skel-line h-3 w-5/6"></div>
+      </div>
+    ))}
+  </div>
   <div id="ps-empty" class="hidden py-16 text-center">
     <p class="text-sm text-neutral-500 mb-2">No posts found</p>
     <button id="ps-clear2" class="text-sm text-neutral-900 dark:text-neutral-100 hover:underline">Clear filters</button>
@@ -103,6 +111,14 @@ const serialized = JSON.stringify(posts.map((p) => ({
 </template>
 
 <script define:vars={{ serialized }}>
+// Guard against this listener being registered more than once if this
+// define:vars script is re-inserted on a repeat visit to this page.
+if (!window.__psPageLoadBound) {
+  window.__psPageLoadBound = true;
+  document.addEventListener('astro:page-load', () => {
+  const root = document.getElementById('posts-search-root');
+  if (!root) return;
+
   const posts = JSON.parse(serialized);
   const typeEmojis = { essay: '📝', tutorial: '💻', note: '📚', reflection: '🤔', review: '⭐' };
 
@@ -210,18 +226,21 @@ const serialized = JSON.stringify(posts.map((p) => ({
   topicEl.addEventListener('change', onFilterChange);
   clearEl.addEventListener('click', clearFilters);
   clearEl2.addEventListener('click', clearFilters);
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   prevBtn.addEventListener('click', () => {
     if (currentPage > 1) {
       currentPage -= 1;
       render();
-      grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      grid.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
     }
   });
   nextBtn.addEventListener('click', () => {
     currentPage += 1;
     render();
-    grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    grid.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
   });
 
   render();
+  });
+}
 </script>
