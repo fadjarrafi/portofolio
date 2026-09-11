@@ -100,6 +100,19 @@ h1, h2, h3, h4, h5, h6, p {
 
 html {
   min-width: 360px;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Keep anchor-jumped headings clear of the sticky nav (matches the 96px
+   offset TableOfContents.astro already uses for its JS-driven scroll). */
+.prose :is(h1, h2, h3, h4, h5, h6)[id] {
+  scroll-margin-top: 6rem;
 }
 
 .prose .anchor {
@@ -317,8 +330,8 @@ table {
    (html.js) confirms it will actually reveal the content again */
 html.js .scroll-animate {
   opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 1s ease, transform 1s ease;
+  transform: translateY(10px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 html.js .scroll-animate.visible {
@@ -331,5 +344,112 @@ html.js .scroll-animate.visible {
     opacity: 1;
     transform: none;
     transition: none;
+  }
+}
+
+/* Image loading skeleton — JS (BaseLayout.astro) tags any <img> that isn't
+   already painted with data-skeleton, then removes it on load/error. Applied
+   as a background on the <img> itself (a replaced element) so no wrapper
+   element or layout shift is needed. */
+img[data-skeleton] {
+  background-color: theme('colors.neutral.100');
+  background-image: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.55) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  animation: img-shimmer 1.4s ease-in-out infinite;
+}
+
+@media (prefers-color-scheme: dark) {
+  img[data-skeleton] {
+    background-color: theme('colors.neutral.800');
+    background-image: linear-gradient(
+      100deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.08) 50%,
+      transparent 70%
+    );
+  }
+}
+
+@keyframes img-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  img[data-skeleton] {
+    animation: none;
+  }
+}
+
+/* Search/garden result-grid skeleton — the grid markup renders these cards
+   as its only static (no-JS) content; the client script clears them the
+   moment it replaces #ps-grid/#gs-grid with real results. */
+.skel-card {
+  @apply p-4 rounded-lg border border-neutral-200 dark:border-neutral-800;
+}
+
+.skel-line {
+  @apply rounded;
+  background-color: theme('colors.neutral.100');
+  background-image: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.55) 50%,
+    transparent 70%
+  );
+  background-size: 200% 100%;
+  animation: img-shimmer 1.4s ease-in-out infinite;
+}
+
+@media (prefers-color-scheme: dark) {
+  .skel-line {
+    background-color: theme('colors.neutral.800');
+    background-image: linear-gradient(
+      100deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.08) 50%,
+      transparent 70%
+    );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skel-line {
+    animation: none;
+  }
+}
+
+/* Route-navigation progress bar, driven by astro:before-preparation /
+   astro:page-load in BaseLayout.astro. */
+#route-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 0%;
+  background: var(--signal);
+  z-index: 9999;
+  opacity: 0;
+  transition: width 0.4s ease, opacity 0.2s ease;
+}
+
+#route-progress.loading {
+  opacity: 1;
+}
+
+#route-progress.done {
+  width: 100%;
+  transition: width 0.2s ease, opacity 0.3s ease 0.15s;
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #route-progress {
+    transition: opacity 0.2s ease;
   }
 }

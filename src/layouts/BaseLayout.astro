@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import 'katex/dist/katex.min.css';
+import { ClientRouter } from 'astro:transitions';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import Lightbox from '../components/Lightbox.astro';
@@ -87,8 +88,11 @@ const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
         </script>
       </>
     )}
+
+    <ClientRouter />
   </head>
   <body class="antialiased max-w-4xl mx-4 mt-8 lg:mx-auto">
+    <div id="route-progress" aria-hidden="true"></div>
     <main class="flex-auto min-w-0 mt-6 flex flex-col px-2 md:px-0">
       <slot />
     </main>
@@ -98,20 +102,61 @@ const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
 </html>
 
 <script>
-  // Scroll animate: observe .scroll-animate elements and add .visible class
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const el = entry.target as HTMLElement;
-          const delay = el.dataset.delay ? parseInt(el.dataset.delay) : 0;
-          setTimeout(() => el.classList.add('visible'), delay);
-          observer.unobserve(el);
-        }
-      });
-    },
-    { threshold: 0, rootMargin: '0px 0px -50px 0px' }
-  );
+  // Re-runs on the initial load AND after every View Transitions navigation
+  // (astro:page-load fires both times), since the swapped-in page has fresh
+  // .scroll-animate / <img> elements that need their own observers.
+  document.addEventListener('astro:page-load', () => {
+    // Scroll animate: observe .scroll-animate elements and add .visible class
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const el = entry.target as HTMLElement;
+            const delay = el.dataset.delay ? parseInt(el.dataset.delay) : 0;
+            setTimeout(() => el.classList.add('visible'), delay);
+            observer.unobserve(el);
+          }
+        });
+      },
+      { threshold: 0, rootMargin: '0px 0px -50px 0px' }
+    );
+    document.querySelectorAll('.scroll-animate').forEach((el) => observer.observe(el));
 
-  document.querySelectorAll('.scroll-animate').forEach((el) => observer.observe(el));
+    // Image loading skeleton: tag any not-yet-painted <img> with a shimmer
+    // background (see img[data-skeleton] in global.css) and drop it on
+    // load/error. Skip images already complete (cached) to avoid a flash.
+    document.querySelectorAll('img').forEach((img) => {
+      if (img.complete) return;
+      img.setAttribute('data-skeleton', '');
+      const clear = () => img.removeAttribute('data-skeleton');
+      img.addEventListener('load', clear, { once: true });
+      img.addEventListener('error', clear, { once: true });
+    });
+  });
+
+  // Route-navigation progress bar. This script tag is identical on every
+  // page, so Astro/Vite bundles and executes it only once for the whole
+  // session — meaning #route-progress must be looked up fresh inside each
+  // handler below rather than cached, since the swap replaces that node on
+  // every navigation. astro:before-preparation fires as soon as a same-origin
+  // navigation starts (before the next page's HTML arrives), astro:page-load
+  // once it has been swapped in and its scripts ran.
+  document.addEventListener('astro:before-preparation', () => {
+    const progress = document.getElementById('route-progress');
+    if (!progress) return;
+    progress.classList.remove('done');
+    progress.style.width = '0%';
+    // next frame so the width transition actually animates from 0
+    requestAnimationFrame(() => {
+      progress.classList.add('loading');
+      progress.style.width = '70%';
+    });
+  });
+  document.addEventListener('astro:page-load', () => {
+    const progress = document.getElementById('route-progress');
+    if (!progress) return;
+    progress.classList.add('done');
+    progress.style.width = '';
+    setTimeout(() => progress.classList.remove('loading', 'done'), 400);
+  });
 </script>

@@ -28,11 +28,30 @@
 </div>
 
 <script>
-  const lightbox = document.getElementById('lightbox') as HTMLElement | null;
-  const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement | null;
-  const closeBtn = document.getElementById('lightbox-close');
+  // Re-wired on every navigation (astro:page-load fires on the initial load
+  // too) since #lightbox and the article's <img> elements are recreated by
+  // each View Transitions swap.
+  document.addEventListener('astro:page-load', () => {
+    const lightbox = document.getElementById('lightbox') as HTMLElement | null;
+    const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement | null;
+    const closeBtn = document.getElementById('lightbox-close');
+    if (!lightbox || !lightboxImg) return;
 
-  if (lightbox && lightboxImg) {
+    const close = () => {
+      lightbox.classList.add('opacity-0');
+      lightboxImg.classList.add('scale-95');
+      lightbox.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      setTimeout(() => {
+        lightbox.classList.add('hidden');
+        lightbox.classList.remove('flex');
+        lightboxImg.src = '';
+      }, 200);
+    };
+    // Always points at the current page's close(), so the one-time-bound
+    // Escape handler below never calls into a stale closure.
+    (window as any).__lightboxClose = close;
+
     const open = (src: string, alt: string) => {
       lightboxImg.src = src;
       lightboxImg.alt = alt;
@@ -47,18 +66,6 @@
       });
     };
 
-    const close = () => {
-      lightbox.classList.add('opacity-0');
-      lightboxImg.classList.add('scale-95');
-      lightbox.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-      setTimeout(() => {
-        lightbox.classList.add('hidden');
-        lightbox.classList.remove('flex');
-        lightboxImg.src = '';
-      }, 200);
-    };
-
     // Wire up every image inside rendered article content.
     document.querySelectorAll<HTMLImageElement>('article.prose img').forEach((img) => {
       img.style.cursor = 'zoom-in';
@@ -70,8 +77,16 @@
     lightbox.addEventListener('click', (e) => {
       if (e.target === lightbox) close();
     });
+
+    // Bound once on `document` (which persists across View Transitions
+    // navigations); calls whichever close() the current page last registered.
+    if ((window as any).__lightboxEscBound) return;
+    (window as any).__lightboxEscBound = true;
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !lightbox.classList.contains('hidden')) close();
+      const activeLightbox = document.getElementById('lightbox');
+      if (e.key === 'Escape' && activeLightbox && !activeLightbox.classList.contains('hidden')) {
+        (window as any).__lightboxClose?.();
+      }
     });
-  }
+  });
 </script>

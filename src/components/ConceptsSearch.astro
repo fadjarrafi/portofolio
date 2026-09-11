@@ -115,6 +115,10 @@ const { concepts, allDomains } = Astro.props;
 </div>
 
 <script>
+document.addEventListener('astro:page-load', () => {
+  const root = document.getElementById('concepts-root');
+  if (!root) return;
+
   const searchEl = document.getElementById('cs-search') as HTMLInputElement;
   const domainEl = document.getElementById('cs-domain') as HTMLSelectElement;
   const clearEl = document.getElementById('cs-clear') as HTMLButtonElement;
@@ -182,10 +186,12 @@ const { concepts, allDomains } = Astro.props;
     if (!target || !(target instanceof HTMLDetailsElement)) return;
     clearFilters();
     target.open = true;
-    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
   });
 
   render();
+});
 </script>
 
 <style>
