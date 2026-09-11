@@ -453,3 +453,84 @@ img[data-skeleton] {
     transition: opacity 0.2s ease;
   }
 }
+
+/* First-visit preloader — see BaseLayout.astro. Hidden by default so a
+   no-JS visitor (html never gets .js) never gets stuck behind it; shown
+   only when html.js is present and .no-preloader (this session already
+   saw it) is absent. */
+#preloader {
+  display: none;
+}
+
+html.js:not(.no-preloader) #preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--paper);
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  html.js:not(.no-preloader) #preloader {
+    background: var(--surface-dark);
+  }
+}
+
+html.js:not(.no-preloader) #preloader.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.preloader-content {
+  text-align: center;
+}
+
+.preloader-logo {
+  display: block;
+  margin: 0 auto;
+  animation: preloader-pulse 1.4s ease-in-out infinite;
+}
+
+.preloader-bar {
+  margin: 0.75rem auto 0;
+  width: 8rem;
+  height: 2px;
+  background: var(--grid-line);
+  overflow: hidden;
+}
+
+.preloader-bar::after {
+  content: '';
+  display: block;
+  width: 40%;
+  height: 100%;
+  background: var(--signal);
+  animation: preloader-sweep 1.1s ease-in-out infinite;
+}
+
+@keyframes preloader-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.94); }
+}
+
+@keyframes preloader-sweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.js:not(.no-preloader) #preloader {
+    transition: opacity 0.2s ease;
+  }
+  .preloader-logo {
+    animation: none;
+  }
+  .preloader-bar::after {
+    animation: none;
+    width: 100%;
+  }
+}
