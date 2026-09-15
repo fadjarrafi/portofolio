@@ -86,11 +86,11 @@ The GA script is conditionally injected in `BaseLayout.astro` only when the vari
 
 ## Docker
 
-The Dockerfile uses a two-stage build: `node:22-alpine` builder → `nginx:alpine` runner. The static `dist/` output is served by nginx on port 80.
+The Dockerfile uses a two-stage build: `node:22-alpine` builder → `nginx:alpine` runner. The static `dist/` output is served by nginx on port 80 *inside* the container; map it to whatever host port the VPS uses (currently `3000`, behind a reverse proxy). Confirm with `docker port portfolio` before deploying rather than assuming.
 
 ```bash
 docker build -t portfolio .
-docker run --name portfolio -d -p 80:80 portfolio
+docker run --name portfolio -d -p 3000:80 portfolio
 ```
 
 To rebuild and replace a running container:
@@ -98,10 +98,12 @@ To rebuild and replace a running container:
 ```bash
 docker rm -f portfolio
 docker build -t portfolio .
-docker run --name portfolio -d -p 80:80 portfolio
+docker run --name portfolio -d -p 3000:80 portfolio
 ```
 
-nginx config is at `nginx.conf`: gzip enabled, 1-year cache for hashed assets, correct MIME types for `.xml` and `.txt`.
+nginx config is at `nginx.conf`: gzip enabled, 1-year cache for hashed assets, `application/xml` for `.xml`, and real `404` statuses via `error_page` (naming `404.html` in `try_files` would serve it as a soft 404).
+
+Because nginx only listens on HTTP behind Cloudflare, `absolute_redirect off` is required — otherwise nginx builds its trailing-slash redirects as `http://`, downgrading HTTPS requests and tripping Search Console's redirect errors.
 
 ### pnpm 11 notes
 

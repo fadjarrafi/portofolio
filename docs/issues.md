@@ -19,13 +19,23 @@ The Next.js → Astro migration cleared the earlier issues:
 - **OG image default & JSON-LD author** — title/description derive from the page; `public/og-image.png` exists and is the real fallback; JSON-LD author is `Fadjar Rafi`.
 - **`pnpm-workspace.yaml`** — now tracked in git.
 
-### Search Console couldn't fetch the sitemap (Cloudflare edge) — re-checked 2026-08-28, now clean
+### Search Console couldn't fetch the sitemap — three nginx bugs, found 2026-09-15
 
-Originally: submitting `sitemap-index.xml` / `sitemap-0.xml` in Search Console returned "Tidak dapat mengambil peta situs." At the time, the live `/robots.txt` didn't match `src/pages/robots.txt.ts` at all — Cloudflare's "Content Signals" (AI Crawl Control) block was overriding it — which pointed at a Cloudflare edge rule intercepting the fetch, not an app bug.
+Symptom: submitting `sitemap-index.xml` in Search Console returned "Tidak dapat mengambil peta situs", and the indexing report showed 11 pages under "Kesalahan pengalihan".
 
-Re-verified on 2026-08-28: `curl` (both a normal UA and a spoofed Googlebot UA) against `sitemap-index.xml` and `sitemap-0.xml` returns clean `200 OK`, `Content-Type: application/xml`, well-formed XML (62 URLs), gzip works, no `X-Robots-Tag`. **The live `/robots.txt` now matches `robots.txt.ts` exactly** — the Cloudflare override is no longer happening. `nginx.conf` and the sitemap `serialize()` in `astro.config.mjs` have no rules that would block this either.
+First pass (2026-08-27): the live `/robots.txt` didn't match `src/pages/robots.txt.ts` because Cloudflare's "Content Signals" (AI Crawl Control) was overriding it. That override is genuinely gone as of 2026-08-28.
 
-Conclusion: this was a Cloudflare-side issue that has since cleared (the Content Signals override is gone). If Search Console still shows the old error, it's most likely a stale/cached result — re-run **URL Inspection → Test Live URL** on the sitemap URL, or re-submit it, rather than assuming it's still broken.
+That first pass then concluded the whole thing was Cloudflare-side and the app was clean. **That conclusion was wrong**, and the reason it was wrong is the useful part: every check had been run through Cloudflare, which silently normalises malformed origin responses. Building the container and curling it directly on `localhost` exposed three real bugs in `nginx.conf`:
+
+1. **HTTPS downgraded to HTTP on every trailing-slash redirect.** nginx only listens on port 80 behind Cloudflare, so it built absolute redirects as `http://`, turning `https://…/writing/en/caching` into `301 → http://…/writing/en/caching/`. This is what Search Console reported as redirect errors. Fixed with `absolute_redirect off`, which emits a relative `Location` and preserves the caller's scheme.
+2. **Two `Content-Type` headers on every `.xml` response.** `add_header Content-Type application/xml` *appends* rather than replaces, so the origin sent both `text/xml` and `application/xml` — malformed under RFC 7230 and rejected by strict parsers. Invisible through Cloudflare, which collapsed them to one. Fixed with `types { }` + `default_type`. The matching `.txt` block was a pure no-op duplicate (nginx already serves `text/plain`) and was removed.
+3. **Soft 404s.** Naming `/404.html` as the last `try_files` argument serves it with `200`. Fixed with `try_files … =404` plus `error_page 404 /404.html`, which keeps the styled page but returns a real `404`.
+
+Verified in the actual `nginx:alpine` container: `nginx -t` passes, one `Content-Type` per response, relative `Location`, `404` for missing pages, and no regression across the homepage, listings, articles, `sitemap-*.xml`, `robots.txt` and `rss.xml`.
+
+**Lesson for next time: test the origin directly, not through Cloudflare.** `docker run -p 8088:80` and curl `localhost` — the edge hides exactly the class of defect that breaks strict consumers like Googlebot.
+
+Still outstanding: Cloudflare's **Always Use HTTPS** is off (`http://` returns `200` with no redirect), and `www.fadjarrafi.my.id` returns `404` — both matter because the Search Console property is a domain property.
 
 ### SEO audit fixes (see conversation history for the full audit)
 
