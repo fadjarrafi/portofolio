@@ -28,9 +28,13 @@ pnpm build
 pnpm preview
 ```
 
-## Docker
+## Deployment
 
-The container runs nginx on port 80 internally. Map it to whatever host port your VPS uses (e.g. `3000`):
+Production deploys itself. Pushing to `main` triggers `.github/workflows/deploy.yml`, which builds the image, pushes it to `ghcr.io/fadjarrafi/portofolio`, and has a self-hosted runner on the VPS pull and recreate the container on port `3000`. **`git push` is the deploy — don't build on the VPS.**
+
+## Docker (local)
+
+The container runs nginx on port 80 internally. Map it to whatever host port you want locally (production uses `3000`):
 
 ```bash
 docker build -t portfolio .

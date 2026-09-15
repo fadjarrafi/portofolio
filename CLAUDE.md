@@ -86,19 +86,20 @@ The GA script is conditionally injected in `BaseLayout.astro` only when the vari
 
 ## Docker
 
-The Dockerfile uses a two-stage build: `node:22-alpine` builder → `nginx:alpine` runner. The static `dist/` output is served by nginx on port 80 *inside* the container; map it to whatever host port the VPS uses (currently `3000`, behind a reverse proxy). Confirm with `docker port portfolio` before deploying rather than assuming.
+The Dockerfile uses a two-stage build: `node:22-alpine` builder → `nginx:alpine` runner. The static `dist/` output is served by nginx on port 80 *inside* the container, published on host port `3000` behind a reverse proxy.
+
+### Deployment is automatic — never build on the VPS
+
+`.github/workflows/deploy.yml` owns production. Pushing to `main` builds the image on a GitHub runner, pushes it to `ghcr.io/fadjarrafi/portofolio` (`:latest` + `:<sha>`), then a **self-hosted runner on the VPS** pulls it and recreates the container with `-p 3000:80 --restart unless-stopped`.
+
+So **`git push` is the deploy**. Do not run `docker build` on the VPS — it would produce an image that the next pull overwrites, and it bypasses the `PUBLIC_GA_ID` build-arg that only exists as a GitHub secret. To redeploy without a code change, re-run the workflow (`workflow_dispatch`).
+
+The commands below are for **local inspection only** — useful for testing `nginx.conf` against the real `nginx:alpine`, which is the only way to catch origin-level defects that Cloudflare masks:
 
 ```bash
-docker build -t portfolio .
-docker run --name portfolio -d -p 3000:80 portfolio
-```
-
-To rebuild and replace a running container:
-
-```bash
-docker rm -f portfolio
-docker build -t portfolio .
-docker run --name portfolio -d -p 3000:80 portfolio
+docker build -t portfolio-verify .
+docker run --name portfolio-verify -d -p 8088:80 portfolio-verify
+curl -sI http://localhost:8088/sitemap-index.xml -H "Host: fadjarrafi.my.id"
 ```
 
 nginx config is at `nginx.conf`: gzip enabled, 1-year cache for hashed assets, `application/xml` for `.xml`, and real `404` statuses via `error_page` (naming `404.html` in `try_files` would serve it as a soft 404).
