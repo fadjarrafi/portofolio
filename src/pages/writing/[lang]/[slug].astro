@@ -92,6 +92,12 @@ const jsonLd = JSON.stringify({
         Back
       </a>
 
+      {entry.data.image && (
+        <div class="relative aspect-video mb-8 rounded-lg overflow-hidden bg-neutral-100 dark:bg-neutral-900">
+          <img src={entry.data.image} alt={entry.data.title} class="object-cover w-full h-full" />
+        </div>
+      )}
+
       <div class="mb-8">
         <div class="flex items-start gap-3 mb-3">
           {entry.data.type && (
