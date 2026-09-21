@@ -47,34 +47,45 @@ const resolvedTranslationUrl = translationUrl ? new URL(translationUrl, siteUrl)
 >
   <head>
     <script is:inline>
-      document.documentElement.classList.add('js');
-      // window.__firstVisit drives the astro:page-load handler below (plain
-      // JS state, untouched by Astro's swap) since that handler can't read
-      // sessionStorage itself to make this call — by the time it runs even
-      // on this very first load, the line below has already written '1'.
-      // The .no-preloader class is a separate, narrower job: it only needs
-      // to prevent a flash on a repeat *hard* reload, where this script runs
-      // again before first paint — the html.no-preloader:has-been-stripped-
-      // by-a-soft-nav case doesn't matter, since #preloader itself is gone
-      // from the DOM by then anyway (see the astro:page-load handler).
-      const seen = sessionStorage.getItem('visited');
-      window.__firstVisit = !seen;
-      if (seen) document.documentElement.classList.add('no-preloader');
-      sessionStorage.setItem('visited', '1');
+      // Wrapped in an IIFE so `seen`/`isDark` never become top-level global
+      // bindings: classic <script> tags share ONE global lexical scope, and
+      // Astro's ClientRouter replays any is:inline script it doesn't
+      // recognize as already-run by cloning and re-inserting it (see
+      // deselectScripts()/runScripts() in astro/dist/transitions). If that
+      // replay ever fires for this script — a still-open Astro edge case
+      // around dedup — a bare `const seen` would collide with the binding
+      // from the real first run and throw "Identifier 'seen' has already
+      // been declared", which aborts every other inline script on the page.
+      (() => {
+        document.documentElement.classList.add('js');
+        // window.__firstVisit drives the astro:page-load handler below (plain
+        // JS state, untouched by Astro's swap) since that handler can't read
+        // sessionStorage itself to make this call — by the time it runs even
+        // on this very first load, the line below has already written '1'.
+        // The .no-preloader class is a separate, narrower job: it only needs
+        // to prevent a flash on a repeat *hard* reload, where this script runs
+        // again before first paint — the html.no-preloader:has-been-stripped-
+        // by-a-soft-nav case doesn't matter, since #preloader itself is gone
+        // from the DOM by then anyway (see the astro:page-load handler).
+        const seen = sessionStorage.getItem('visited');
+        window.__firstVisit = !seen;
+        if (seen) document.documentElement.classList.add('no-preloader');
+        sessionStorage.setItem('visited', '1');
 
-      // Theme: dark is the default look (<html> already carries the .dark
-      // class in the static markup above, so no-JS visitors get dark too).
-      // localStorage 'theme' is only ever written once the visitor
-      // explicitly overrides it via the toggle; absent, stay dark. Applying
-      // it here (before first paint) only matters for the 'light' override
-      // case; re-applied in the astro:after-swap handler below since
-      // ClientRouter resets <html>'s class attribute to match each
-      // newly-fetched page's static (always dark) markup on every soft nav.
-      window.__applyTheme = () => {
-        const isDark = localStorage.getItem('theme') !== 'light';
-        document.documentElement.classList.toggle('dark', isDark);
-      };
-      window.__applyTheme();
+        // Theme: dark is the default look (<html> already carries the .dark
+        // class in the static markup above, so no-JS visitors get dark too).
+        // localStorage 'theme' is only ever written once the visitor
+        // explicitly overrides it via the toggle; absent, stay dark. Applying
+        // it here (before first paint) only matters for the 'light' override
+        // case; re-applied in the astro:after-swap handler below since
+        // ClientRouter resets <html>'s class attribute to match each
+        // newly-fetched page's static (always dark) markup on every soft nav.
+        window.__applyTheme = () => {
+          const isDark = localStorage.getItem('theme') !== 'light';
+          document.documentElement.classList.toggle('dark', isDark);
+        };
+        window.__applyTheme();
+      })();
     </script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
