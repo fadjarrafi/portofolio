@@ -21,7 +21,7 @@ This is an **Astro 5** portfolio/blog site with `output: 'static'` (pure static 
 Content lives in Astro content collections under `src/content/`:
 
 - **Blog** (`src/content/blog/{en,id}/`): Full articles with topics, types, and reading time
-- **Thoughts** (`src/content/thoughts/{en,id}/`): Shorter digital garden posts with growth stages (seed/sapling/tree by word count)
+- **Thoughts** (`src/content/thoughts/en/`): Shorter digital garden posts with growth stages (seed/sapling/tree by word count). English only — no Indonesian translations are provided for thoughts (unlike blog).
 - **Case Studies** (`src/content/case-studies/`): Project case study posts
 
 Schemas are defined with Zod in `src/content/config.ts`. Use `getCollection('blog')` etc. from `astro:content` to query posts — no custom frontmatter parser.
