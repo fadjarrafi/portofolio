@@ -1,6 +1,5 @@
 ---
 import '../styles/global.css';
-import 'katex/dist/katex.min.css';
 import { ClientRouter } from 'astro:transitions';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
@@ -208,18 +207,18 @@ const resolvedTranslationUrl = translationUrl ? new URL(translationUrl, siteUrl)
     const progress = document.getElementById('route-progress');
     if (!progress) return;
     progress.classList.remove('done');
-    progress.style.width = '0%';
-    // next frame so the width transition actually animates from 0
+    progress.style.transform = 'scaleX(0)';
+    // next frame so the transform transition actually animates from 0
     requestAnimationFrame(() => {
       progress.classList.add('loading');
-      progress.style.width = '70%';
+      progress.style.transform = 'scaleX(0.7)';
     });
   });
   document.addEventListener('astro:page-load', () => {
     const progress = document.getElementById('route-progress');
     if (!progress) return;
     progress.classList.add('done');
-    progress.style.width = '';
+    progress.style.transform = '';
     setTimeout(() => progress.classList.remove('loading', 'done'), 400);
   });
 </script>
