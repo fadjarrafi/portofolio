@@ -1,0 +1,66 @@
+---
+title: "Base Cases for Life"
+publishedAt: "2026-09-21"
+summary: "Why 'go to an extreme case' and 'go to a simple case' are really just recursion applied to thinking instead of code"
+topics: ["thinking", "problem-solving", "recursion"]
+type: "note"
+status: "seed"
+lang: "en"
+---
+
+Every recursive function needs a base case, or it never stops.
+
+Human reasoning has the same requirement, it turns out. When a problem is too tangled to hold in your head, you don't solve the tangled version. You manufacture a smaller, solvable one, solve that, and carry the answer back up. Richard Zeckhauser, a Harvard Kennedy School professor, built two of his "maxims for thinking analytically" entirely around this move.
+
+## Go to an Extreme Case
+
+Push one variable in the problem to its extreme (zero, infinity, "what if nothing happens at all") and the right intuition, or the wrong assumption, usually falls out immediately.
+
+The classic version: Mary can paint a room alone in 2 hours, Jim alone in 3. How long together? Most people average the two and blurt out 2.5 hours.
+
+Wrong.
+
+Push Jim's contribution to the extreme: imagine he does nothing, just watches. The answer is still capped at 2 hours, however long Mary takes alone. So if Jim is actually helping at all, the real answer has to be less than 2 hours. Not more than the average.
+
+This isn't just a math trick. Zeckhauser finds the same move everywhere once he goes looking.
+
+In negotiation: push a "proportional" profit split to an extreme ratio like 2000:1, and its unfairness becomes obvious instantly, obvious in a way it wasn't at a reasonable-looking split.
+
+In policy design: the US Department of Labor stress-tested an education subsidy by imagining it had no restrictions at all on how it could be used.
+
+In business: run the worst-case scenario first. Survive the worst stress test and everything milder is already handled.
+
+## Go to a Simple Case
+
+The sibling move. Instead of pushing a variable to its extreme, strip the whole problem down to the fewest moving parts possible, find the insight there, then generalize back to the messier real version.
+
+Zeckhauser once proudly told his own mentor, Howard Raiffa, that he'd simplified a group-decision problem down to three types of agents. Raiffa's reply: "now try it with two."
+
+A student paralyzed for years over choosing between an Economics PhD and a Public Policy PhD got unstuck with one simplifying question: do you want to answer a narrow question precisely, or a big question imprecisely?
+
+There's a "Rule of Three" version too. A youth baseball coach's detailed technical breakdown of batting mechanics put 11-year-olds to sleep. It worked once he cut it down to three words: "Hands, Hips, Head."
+
+Worth saying clearly: simplifying isn't the coward's way out. Choosing the right technique intelligently beats virtuoso computation aimed in the wrong direction, every time.
+
+## Why This Is Recursion, Not Just a Trick
+
+A recursive function without a base case is a stack overflow waiting to happen.
+
+These two maxims are how you manufacture a base case for a real-world problem that doesn't come with one built in. Same instinct as binary search cutting a big, fuzzy search space down to a single well-defined comparison. Same instinct as `factorial(0)` giving recursion somewhere to bottom out.
+
+They're complementary, not competing. "Simple case" reduces the number of moving parts. "Extreme case" reduces a single variable to its boundary. Zeckhauser pairs them himself — simplify first, then push what's left to its extreme.
+
+And once the reduced version is solved, the insight doesn't stay down there. You carry it back up the call stack, the same way a recursive call's return value climbs back to the original invocation.
+
+## Personal Reflection
+
+I already do this. Code review arguments that get too abstract to reason about, I default to: what if there's only one item in the list. What if this runs zero times. What if two requests hit this at the exact same millisecond.
+
+That's maxim 1 and maxim 2 running as debugging heuristics, not math.
+
+The painting-room mistake is the same shape of mistake I see in estimation and capacity planning constantly: averaging instead of reasoning from the extreme. The average feels safe. It's often quietly wrong.
+
+## References
+
+- Dan Levy, *[Maxims for Thinking Analytically: The Wisdom of Legendary Harvard Professor Richard Zeckhauser](https://www.hks.harvard.edu/publications/maxims-thinking-analytically-wisdom-legendary-harvard-professor-richard-zeckhauser)* (2021) — Maxim 1 ("go to an extreme case") and Maxim 2 ("go to a simple case") are the direct source for this piece, including the Mary/Jim painting-room example and the baseball coach's "Hands, Hips, Head."
+- Belfer Center, [Maxims of Richard Zeckhauser and Errors of Commission](https://www.belfercenter.org/publication/maxims-richard-zeckhauser-and-errors-commission)
