@@ -43,7 +43,7 @@ const resolvedTranslationUrl = translationUrl ? new URL(translationUrl, siteUrl)
 <html
   lang={lang}
   style="--font-space-grotesk: 'Space Grotesk', sans-serif; --font-ibm-plex-mono: 'IBM Plex Mono', monospace;"
-  class="text-ink bg-paper dark:text-mist dark:bg-surface-dark"
+  class="dark"
 >
   <head>
     <script is:inline>
@@ -61,6 +61,20 @@ const resolvedTranslationUrl = translationUrl ? new URL(translationUrl, siteUrl)
       window.__firstVisit = !seen;
       if (seen) document.documentElement.classList.add('no-preloader');
       sessionStorage.setItem('visited', '1');
+
+      // Theme: dark is the default look (<html> already carries the .dark
+      // class in the static markup above, so no-JS visitors get dark too).
+      // localStorage 'theme' is only ever written once the visitor
+      // explicitly overrides it via the toggle; absent, stay dark. Applying
+      // it here (before first paint) only matters for the 'light' override
+      // case; re-applied in the astro:after-swap handler below since
+      // ClientRouter resets <html>'s class attribute to match each
+      // newly-fetched page's static (always dark) markup on every soft nav.
+      window.__applyTheme = () => {
+        const isDark = localStorage.getItem('theme') !== 'light';
+        document.documentElement.classList.toggle('dark', isDark);
+      };
+      window.__applyTheme();
     </script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -119,7 +133,7 @@ const resolvedTranslationUrl = translationUrl ? new URL(translationUrl, siteUrl)
 
     <ClientRouter />
   </head>
-  <body class="antialiased max-w-4xl mx-4 mt-8 lg:mx-auto">
+  <body class="antialiased max-w-4xl mx-4 mt-8 lg:mx-auto text-ink bg-paper dark:text-mist dark:bg-surface-dark">
     <div id="preloader" aria-hidden="true">
       <div class="preloader-content">
         <img src="/favicon.svg" alt="" width="48" height="48" class="preloader-logo" />
@@ -186,9 +200,15 @@ const resolvedTranslationUrl = translationUrl ? new URL(translationUrl, siteUrl)
 
     // Image loading skeleton: tag any not-yet-painted <img> with a shimmer
     // background (see img[data-skeleton] in global.css) and drop it on
-    // load/error. Skip images already complete (cached) to avoid a flash.
+    // load/error. Images already complete (cached, or fast enough to beat
+    // this script) skip straight to clearing — some images (e.g. the hero
+    // avatar) render with data-skeleton already in the static markup so the
+    // shimmer is visible from first paint instead of racing this script.
     document.querySelectorAll('img').forEach((img) => {
-      if (img.complete) return;
+      if (img.complete) {
+        img.removeAttribute('data-skeleton');
+        return;
+      }
       img.setAttribute('data-skeleton', '');
       const clear = () => img.removeAttribute('data-skeleton');
       img.addEventListener('load', clear, { once: true });
@@ -220,5 +240,24 @@ const resolvedTranslationUrl = translationUrl ? new URL(translationUrl, siteUrl)
     progress.classList.add('done');
     progress.style.transform = '';
     setTimeout(() => progress.classList.remove('loading', 'done'), 400);
+  });
+
+  // Reset problem as .js above, for the theme override — fired on
+  // astro:after-swap (synchronous, right after the DOM swap, before the next
+  // paint) rather than astro:page-load (fires after the new page finishes
+  // loading, which paints the wrong theme first and flashes to the correct
+  // one).
+  document.addEventListener('astro:after-swap', () => {
+    (window as any).__applyTheme();
+  });
+
+  // Delegated on document (survives soft navigations) rather than bound to
+  // the button directly, since Nav — and its button — gets replaced on swap.
+  document.addEventListener('click', (e) => {
+    const button = (e.target as HTMLElement).closest('#theme-toggle');
+    if (!button) return;
+    const next = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+    localStorage.setItem('theme', next);
+    document.documentElement.classList.toggle('dark', next === 'dark');
   });
 </script>
