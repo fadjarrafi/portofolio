@@ -1,0 +1,3 @@
+[run]
+# Run package bins (astro) on Bun even though their shebang says node
+bun = true

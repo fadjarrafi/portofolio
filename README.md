@@ -15,8 +15,8 @@ Personal portfolio and blog site built with Astro 5, featuring bilingual content
 ## Getting Started
 
 ```bash
-pnpm install
-pnpm dev
+bun install
+bun dev
 ```
 
 Open [http://localhost:4321](http://localhost:4321) to view the site.
@@ -24,8 +24,8 @@ Open [http://localhost:4321](http://localhost:4321) to view the site.
 ## Production Build
 
 ```bash
-pnpm build
-pnpm preview
+bun run build
+bun preview
 ```
 
 ## Deployment
@@ -49,7 +49,7 @@ docker build -t portfolio .
 docker run --name portfolio -d -p 3000:80 portfolio
 ```
 
-> **Note:** The lockfile (`pnpm-lock.yaml`) is intentionally excluded from the Docker build context to avoid pnpm 11's supply-chain age policy blocking freshly-published packages. Restore it once the policy is no longer an issue by adding `pnpm-lock.yaml` back to the `COPY` line and using `--frozen-lockfile`.
+> **Note:** Requires [Bun](https://bun.sh) (version pinned in `package.json` → `packageManager`). `bunfig.toml` forces Astro to run on the Bun runtime, and Docker installs from the committed `bun.lock` with `--frozen-lockfile`.
 
 ## Project Structure
 

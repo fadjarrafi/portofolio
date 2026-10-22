@@ -17,7 +17,7 @@ The Next.js → Astro migration cleared the earlier issues:
 - **`server-only` import** — N/A in Astro; content is read in build-time frontmatter, not shared client/server utils.
 - **Analytics** — replaced by Google Analytics 4, injected in `BaseLayout.astro` only when `PUBLIC_GA_ID` is set.
 - **OG image default & JSON-LD author** — title/description derive from the page; `public/og-image.png` exists and is the real fallback; JSON-LD author is `Fadjar Rafi`.
-- **`pnpm-workspace.yaml`** — now tracked in git.
+- **`pnpm-workspace.yaml`** — tracked in git; later removed when the project moved from pnpm to Bun (settings now in `bunfig.toml`).
 
 ### Search Console couldn't fetch the sitemap — three nginx bugs, found 2026-09-15
 

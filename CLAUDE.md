@@ -5,9 +5,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-pnpm dev      # Start development server (http://localhost:4321)
-pnpm build    # Build for production (static output to dist/)
-pnpm preview  # Preview production build locally
+bun dev        # Start development server (http://localhost:4321)
+bun run build  # Build for production (static output to dist/)
+bun preview    # Preview production build locally
 ```
 
 No test or lint commands are configured.
@@ -86,7 +86,7 @@ The GA script is conditionally injected in `BaseLayout.astro` only when the vari
 
 ## Docker
 
-The Dockerfile uses a two-stage build: `node:22.23.4-alpine` builder → `nginx:alpine` runner. The static `dist/` output is served by nginx on port 80 *inside* the container, published on host port `3000` behind a reverse proxy.
+The Dockerfile uses a two-stage build: `oven/bun:1.3.7-alpine` builder → `nginx:alpine` runner. The static `dist/` output is served by nginx on port 80 *inside* the container, published on host port `3000` behind a reverse proxy.
 
 ### Deployment is automatic — never build on the VPS
 
@@ -106,10 +106,11 @@ nginx config is at `nginx.conf`: gzip enabled, 1-year cache for hashed assets, `
 
 Because nginx only listens on HTTP behind Cloudflare, `absolute_redirect off` is required — otherwise nginx builds its trailing-slash redirects as `http://`, downgrading HTTPS requests and tripping Search Console's redirect errors.
 
-### pnpm 11 notes
+### Bun notes
 
-The project uses pnpm 11 (via corepack), which has two important differences from earlier versions:
+The project uses Bun as both package manager and runtime (no Node, no corepack):
 
-- **`pnpm` field in `package.json` is ignored** — project settings (e.g. `onlyBuiltDependencies`) must go in `pnpm-workspace.yaml`
-- **Build scripts are blocked by default** — the Dockerfile uses `--ignore-scripts` on install to bypass the approval mechanism; `onlyBuiltDependencies` in `pnpm-workspace.yaml` allowlists `@resvg/resvg-js` for local development
-- **Node.js ≥22.13 required** — the base image is pinned to `node:22.23.4-alpine` (October 2026 security release)
+- **Bun runtime is forced via `bunfig.toml`** (`[run] bun = true`) — Astro's bin has a `node` shebang, so without it `bun run build` would silently run on Node
+- **Lifecycle scripts only run for `trustedDependencies`** in `package.json` — none are needed today (esbuild ships its binary as an optional dependency)
+- **Lockfile is `bun.lock`** (text format, committed) and the Dockerfile installs with `--frozen-lockfile`, so run `bun install` and commit the lockfile after any dependency change
+- **Version is pinned in three places** — `packageManager` in `package.json` (read by CI's `setup-bun`), the `oven/bun:<version>-alpine` tag in the Dockerfile, and your local install; bump them together
