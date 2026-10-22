@@ -86,7 +86,7 @@ The GA script is conditionally injected in `BaseLayout.astro` only when the vari
 
 ## Docker
 
-The Dockerfile uses a two-stage build: `node:22-alpine` builder → `nginx:alpine` runner. The static `dist/` output is served by nginx on port 80 *inside* the container, published on host port `3000` behind a reverse proxy.
+The Dockerfile uses a two-stage build: `node:22.23.4-alpine` builder → `nginx:alpine` runner. The static `dist/` output is served by nginx on port 80 *inside* the container, published on host port `3000` behind a reverse proxy.
 
 ### Deployment is automatic — never build on the VPS
 
@@ -112,4 +112,4 @@ The project uses pnpm 11 (via corepack), which has two important differences fro
 
 - **`pnpm` field in `package.json` is ignored** — project settings (e.g. `onlyBuiltDependencies`) must go in `pnpm-workspace.yaml`
 - **Build scripts are blocked by default** — the Dockerfile uses `--ignore-scripts` on install to bypass the approval mechanism; `onlyBuiltDependencies` in `pnpm-workspace.yaml` allowlists `@resvg/resvg-js` for local development
-- **Node.js ≥22.13 required** — the base image is `node:22-alpine`
+- **Node.js ≥22.13 required** — the base image is pinned to `node:22.23.4-alpine` (October 2026 security release)
