@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="370" viewBox="0 0 700 370" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="700" height="370" rx="14" fill="#ffffff"/>
+
+  <!-- ROW 1: request, plan, gate 1, worktree -->
+  <rect x="30" y="40" width="100" height="56" rx="8" fill="#e7f5ff" stroke="#1c7ed6" stroke-width="2"/>
+  <text x="80" y="64" text-anchor="middle" font-size="12" fill="#1864ab" font-family="Consolas, monospace">/task</text>
+  <text x="80" y="82" text-anchor="middle" font-size="10" fill="#495057">from Telegram</text>
+
+  <line x1="132" y1="68" x2="144" y2="68" stroke="#adb5bd" stroke-width="1.5"/>
+  <polygon points="150,68 142,63 142,73" fill="#adb5bd"/>
+
+  <rect x="152" y="40" width="150" height="56" rx="8" fill="#f3f0ff" stroke="#7048e8" stroke-width="2"/>
+  <text x="227" y="64" text-anchor="middle" font-size="11.5" fill="#5f3dc4" font-family="Consolas, monospace">Claude: plan</text>
+  <text x="227" y="82" text-anchor="middle" font-size="10" fill="#5f3dc4" font-family="Consolas, monospace">spec + HTTP checks</text>
+
+  <line x1="304" y1="68" x2="316" y2="68" stroke="#adb5bd" stroke-width="1.5"/>
+  <polygon points="322,68 314,63 314,73" fill="#adb5bd"/>
+
+  <rect x="324" y="40" width="110" height="56" rx="8" fill="#fff9db" stroke="#f08c00" stroke-width="2"/>
+  <text x="379" y="64" text-anchor="middle" font-size="12" font-weight="600" fill="#e67700" font-family="Consolas, monospace">GATE 1</text>
+  <text x="379" y="82" text-anchor="middle" font-size="10" fill="#495057">I approve the plan</text>
+
+  <line x1="436" y1="68" x2="448" y2="68" stroke="#adb5bd" stroke-width="1.5"/>
+  <polygon points="454,68 446,63 446,73" fill="#adb5bd"/>
+
+  <rect x="456" y="40" width="214" height="56" rx="8" fill="#f8f9fa" stroke="#868e96" stroke-width="2"/>
+  <text x="563" y="64" text-anchor="middle" font-size="11" fill="#343a40" font-family="Consolas, monospace">worktree + temp vhost</text>
+  <text x="563" y="82" text-anchor="middle" font-size="10" fill="#495057" font-family="Consolas, monospace">from origin/development</text>
+
+  <!-- worktree down to code -->
+  <line x1="630" y1="96" x2="630" y2="152" stroke="#adb5bd" stroke-width="1.5"/>
+  <polygon points="630,158 625,150 635,150" fill="#adb5bd"/>
+
+  <!-- FIXUP loop: review back to code -->
+  <polyline points="116,160 116,128 540,128 540,152" fill="none" stroke="#e03131" stroke-width="1.5" stroke-dasharray="5 3"/>
+  <polygon points="540,158 535,150 545,150" fill="#e03131"/>
+  <text x="328" y="121" text-anchor="middle" font-size="10.5" fill="#e03131">FIXUP: back to the same worker session (max 2 rounds)</text>
+
+  <!-- ROW 2: code, verify, review (right to left) -->
+  <rect x="456" y="160" width="214" height="56" rx="8" fill="#e7f5ff" stroke="#1c7ed6" stroke-width="2"/>
+  <text x="563" y="184" text-anchor="middle" font-size="11.5" fill="#1864ab" font-family="Consolas, monospace">opencode: code</text>
+  <text x="563" y="202" text-anchor="middle" font-size="10" fill="#495057">cheaper model, inside the worktree</text>
+
+  <line x1="454" y1="188" x2="442" y2="188" stroke="#adb5bd" stroke-width="1.5"/>
+  <polygon points="436,188 444,183 444,193" fill="#adb5bd"/>
+
+  <rect x="234" y="160" width="200" height="56" rx="8" fill="#f8f9fa" stroke="#868e96" stroke-width="2"/>
+  <text x="334" y="180" text-anchor="middle" font-size="11.5" fill="#343a40" font-family="Consolas, monospace">bot verifies</text>
+  <text x="334" y="196" text-anchor="middle" font-size="9.5" fill="#495057" font-family="Consolas, monospace">HTTP before/after, php -l</text>
+  <text x="334" y="209" text-anchor="middle" font-size="9.5" fill="#495057" font-family="Consolas, monospace">merge-tree, screenshot</text>
+
+  <line x1="232" y1="188" x2="210" y2="188" stroke="#adb5bd" stroke-width="1.5"/>
+  <polygon points="204,188 212,183 212,193" fill="#adb5bd"/>
+
+  <rect x="30" y="160" width="172" height="56" rx="8" fill="#f3f0ff" stroke="#7048e8" stroke-width="2"/>
+  <text x="116" y="184" text-anchor="middle" font-size="11.5" fill="#5f3dc4" font-family="Consolas, monospace">Claude: review</text>
+  <text x="116" y="202" text-anchor="middle" font-size="10" fill="#5f3dc4" font-family="Consolas, monospace">diff + evidence</text>
+
+  <!-- review down to gate 2 -->
+  <line x1="116" y1="216" x2="116" y2="262" stroke="#2f9e44" stroke-width="1.5"/>
+  <polygon points="116,268 111,260 121,260" fill="#2f9e44"/>
+  <text x="124" y="246" font-size="10.5" fill="#2f9e44">APPROVE</text>
+
+  <!-- ROW 3: gate 2, result -->
+  <rect x="30" y="270" width="172" height="56" rx="8" fill="#fff9db" stroke="#f08c00" stroke-width="2"/>
+  <text x="116" y="294" text-anchor="middle" font-size="12" font-weight="600" fill="#e67700" font-family="Consolas, monospace">GATE 2</text>
+  <text x="116" y="312" text-anchor="middle" font-size="10" fill="#495057">I approve the diff</text>
+
+  <line x1="204" y1="298" x2="226" y2="298" stroke="#adb5bd" stroke-width="1.5"/>
+  <polygon points="232,298 224,293 224,303" fill="#adb5bd"/>
+
+  <rect x="234" y="270" width="260" height="56" rx="10" fill="#ebfbee" stroke="#2f9e44" stroke-width="2"/>
+  <text x="364" y="294" text-anchor="middle" font-size="12" font-weight="600" fill="#2b8a3e" font-family="Consolas, monospace">BRANCH KEPT</text>
+  <text x="364" y="312" text-anchor="middle" font-size="10" fill="#495057">worktree removed, I merge it myself</text>
+
+  <text x="350" y="352" text-anchor="middle" font-size="10.5" fill="#868e96">devflow never merges, never pushes, and never touches main or development</text>
+</svg>
