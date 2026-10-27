@@ -4,13 +4,16 @@
         "company": "PT. Qhome Sukses Abadi",
         "period": "Feb 2026 - Present",
         "location": "Indonesia",
-        "flow": "LMS upload → ffmpeg compress → standard playback",
-        "description": "Maintain an HRIS—fixing broken report exports and form-logic failures—and built a Bash + FFmpeg pipeline that compresses and standardises LMS course video uploads.",
+        "flow": "request → tiered approval → signed PDF",
+        "description": "Maintain and extend seven internal systems for a retail group—HRIS, ERP, e-learning, asset management, and a supplier portal. Built a document-archive module with multi-tier approval and HRIS-sourced signatures from scratch, hardened the HRIS mobile API against SQL injection and concurrent clock-in races, and shipped signed-URL video streaming for the LMS.",
         "technologies": [
             "CodeIgniter",
+            "PHP",
             "MariaDB",
-            "Bash",
-            "FFmpeg"
+            "Node.js",
+            "Firebase (FCM)",
+            "FFmpeg",
+            "OpenAPI"
         ]
     },
     {
