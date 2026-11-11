@@ -4,16 +4,14 @@
         "company": "PT. Qhome Sukses Abadi",
         "period": "Feb 2026 - Present",
         "location": "Indonesia",
-        "flow": "request → tiered approval → signed PDF",
-        "description": "Maintain and extend seven internal systems for a retail group—HRIS, ERP, e-learning, asset management, and a supplier portal. Built a document-archive module with multi-tier approval and HRIS-sourced signatures from scratch, hardened the HRIS mobile API against SQL injection and concurrent clock-in races, and shipped signed-URL video streaming for the LMS.",
+        "flow": "course video → FFmpeg → standardised format",
+        "description": "Built an asset management module for Odoo so the company can record and track its assets in the system it already uses. Optimised slow database queries, fixed broken report exports and form-logic failures in the HRIS to restore accurate, dependable HR reporting, and automated LMS video compression with a Bash and FFmpeg pipeline that standardises formats and reduces storage overhead.",
         "technologies": [
             "CodeIgniter",
-            "PHP",
+            "Odoo",
             "MariaDB",
-            "Node.js",
-            "Firebase (FCM)",
-            "FFmpeg",
-            "OpenAPI"
+            "Bash",
+            "FFmpeg"
         ]
     },
     {
@@ -22,7 +20,7 @@
         "period": "Jul 2023 - Jul 2025",
         "location": "Indonesia",
         "flow": "checkout → Xendit → webhook → order status",
-        "description": "Shipped e-commerce and company sites end to end for direct clients, including a Laravel + Vue storefront with a full Xendit checkout and webhook-based order status, scoping requirements and triaging fixes myself.",
+        "description": "Launched a client-facing e-commerce site for Mawar Florist where customers order and pay online, with Xendit checkout, webhook-based transaction status, and one place for the owner to monitor transactions, product sales, and financial reports. Also delivered a company profile and blog platform for Odo Dental Indonesia, giving the clinic an online presence and a blog that attracts new patients through search. Worked directly with clients to scope requirements, triage issues, and prioritise fixes after launch.",
         "technologies": [
             "Laravel",
             "Vue.js",
@@ -48,12 +46,12 @@
         "period": "Jan 2023 - Jan 2025",
         "location": "Indonesia",
         "flow": "Android app ⇄ CMS ⇄ backend → real-time sync",
-        "description": "Built a CMS for hotel IPTV deployments—real-time content, schedules, and API sync across the Android app and backend—while keeping internal tools like network monitoring running.",
+        "description": "Built the CMS and APIs for a hospitality IPTV product, letting hotel staff and administrators update content, schedules, and user settings in real time, with changes synced instantly to the IPTV app on Android TVs and set-top boxes. Also built an automated block and unblock feature for an OLT provisioning and billing system that suspends a customer's service when an invoice stays unpaid beyond the grace period and restores it once payment is received.",
         "technologies": [
             "Laravel",
             "MariaDB",
             "Python",
-            "API Integration"
+            "SNMP"
         ]
     },
     {
@@ -62,14 +60,12 @@
         "period": "Sep 2025 - Dec 2025",
         "location": "Kalimalang, East Jakarta",
         "flow": "LMS content → Qdrant → DeepSeek → summary",
-        "description": "Built an AI summarisation service for an existing LMS—a FastAPI backend with a Qdrant retrieval pipeline feeding chunked content to DeepSeek for on-demand and batch summaries.",
+        "description": "Delivered an AI service that condenses learning modules into short summaries, helping learners understand material faster. Built the FastAPI backend with REST endpoints for on-demand and batch generation, and a Qdrant retrieval pipeline (chunked vector storage and semantic search) that feeds relevant context to DeepSeek, keeping summaries grounded in the source content.",
         "technologies": [
             "FastAPI",
             "Python",
             "Qdrant",
-            "DeepSeek",
-            "Vector Search",
-            "LLM"
+            "DeepSeek"
         ]
     }
 ]
