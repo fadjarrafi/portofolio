@@ -34,6 +34,11 @@ const studies = allStudies.sort(
                   <div class="p-6">
                     <h2 class="font-medium text-lg text-neutral-900 dark:text-neutral-100 mb-2 group-hover:text-neutral-600 dark:group-hover:text-neutral-400 transition-colors">
                       {study.data.title}
+                      {study.data.status && (
+                        <span class="ml-2 align-middle px-2 py-0.5 text-[10px] font-mono font-normal border border-neutral-300 dark:border-neutral-700 rounded-full text-neutral-500 dark:text-neutral-400">
+                          {study.data.status}
+                        </span>
+                      )}
                     </h2>
                     <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-4 line-clamp-2">{study.data.summary}</p>
                     <div class="flex flex-wrap items-center gap-3 text-xs text-neutral-500">

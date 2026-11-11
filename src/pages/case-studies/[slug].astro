@@ -72,6 +72,14 @@ const jsonLd = JSON.stringify({
           {entry.data.duration && <><span>·</span><span>{entry.data.duration}</span></>}
           <span>·</span>
           <span>{readingTime} min read</span>
+          {entry.data.status && (
+            <>
+              <span>·</span>
+              <span class="px-2 py-0.5 text-xs font-mono border border-neutral-300 dark:border-neutral-700 rounded-full">
+                {entry.data.status}
+              </span>
+            </>
+          )}
           {entry.data.liveUrl && (
             <>
               <span>·</span>

@@ -26,6 +26,11 @@ if (studies.length === 0) return;
           <div class="min-w-0">
             <h3 class="font-medium text-neutral-900 dark:text-neutral-100 mb-1 line-clamp-2 group-hover:text-neutral-600 dark:group-hover:text-neutral-400 transition-colors">
               {study.data.title}
+              {study.data.status && (
+                <span class="ml-2 align-middle px-2 py-0.5 text-[10px] font-mono font-normal border border-neutral-300 dark:border-neutral-700 rounded-full text-neutral-500 dark:text-neutral-400">
+                  {study.data.status}
+                </span>
+              )}
             </h3>
             <p class="text-sm text-neutral-600 dark:text-neutral-400 line-clamp-2">{study.data.summary}</p>
             {study.data.topics && study.data.topics.length > 0 && (
