@@ -10,7 +10,7 @@ lang: 'en'
 translationSlug: 'hydration'
 ---
 
-A [server-rendered](/writing/en/server-side-rendering) page shows up fast. Content's on screen the moment the HTML arrives. Click a button in that first second, though, and nothing happens — the markup is there, but the JavaScript that's supposed to respond to your click hasn't attached to it yet. Hydration is the step that closes that gap.
+A [server-rendered](/writing/en/server-side-rendering/) page shows up fast. Content's on screen the moment the HTML arrives. Click a button in that first second, though, and nothing happens — the markup is there, but the JavaScript that's supposed to respond to your click hasn't attached to it yet. Hydration is the step that closes that gap.
 
 ## What Hydration Actually Does
 
@@ -75,6 +75,6 @@ That's the uncanny part of SSR done at scale: the content is real, and the page 
 
 ## Why it Matters
 
-Hydration is the seam between the two rendering models covered here already. [SSR](/writing/en/server-side-rendering) skips CSR's blank-page wait by sending real HTML first. [CSR](/writing/en/client-side-rendering) builds and wires up interactivity in one pass, with nothing to show until both are done. Hydration is what SSR pays afterward to get CSR's interactivity anyway, without giving up that fast first paint — the same JavaScript cost as CSR, just moved to after the content's already on screen instead of before.
+Hydration is the seam between the two rendering models covered here already. [SSR](/writing/en/server-side-rendering/) skips CSR's blank-page wait by sending real HTML first. [CSR](/writing/en/client-side-rendering/) builds and wires up interactivity in one pass, with nothing to show until both are done. Hydration is what SSR pays afterward to get CSR's interactivity anyway, without giving up that fast first paint — the same JavaScript cost as CSR, just moved to after the content's already on screen instead of before.
 
 **Thanks for Reading✌️**

@@ -31,7 +31,7 @@ import { createRoot } from 'react-dom/client';
 createRoot(document.getElementById('root')).render(<App />);
 ```
 
-Tidak ada langkah hydration terpisah di sini, dan ini layak diperhatikan. [Server-side rendering](/writing/id/server-side-rendering) mengirim HTML dulu, baru memasang interaktivitas belakangan, dua tahap terpisah. CSR melakukan keduanya sekaligus: pemanggilan `render()` yang sama yang membangun DOM juga memasang semua event listener, karena memang belum ada apa-apa sebelum itu dijalankan.
+Tidak ada langkah hydration terpisah di sini, dan ini layak diperhatikan. [Server-side rendering](/writing/id/server-side-rendering/) mengirim HTML dulu, baru memasang interaktivitas belakangan, dua tahap terpisah. CSR melakukan keduanya sekaligus: pemanggilan `render()` yang sama yang membangun DOM juga memasang semua event listener, karena memang belum ada apa-apa sebelum itu dijalankan.
 
 ## Client-Side Routing
 

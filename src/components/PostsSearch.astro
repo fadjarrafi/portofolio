@@ -180,7 +180,7 @@ if (!window.__psPageLoadBound) {
     pageItems.forEach((p) => {
       const card = template.content.cloneNode(true);
       const a = card.querySelector('a');
-      a.href = `/writing/${p.lang}/${p.slug}`;
+      a.href = `/writing/${p.lang}/${p.slug}/`;
       card.querySelector('.post-type-emoji').textContent = typeEmojis[p.type] || '';
       card.querySelector('.post-reading-time').textContent = `${p.lang.toUpperCase()} · ${p.readingTime}m`;
       card.querySelector('.post-title').textContent = p.title;
