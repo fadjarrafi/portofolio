@@ -94,6 +94,6 @@ Not every write needs a transaction. A single `UPDATE` on one row is already ato
 
 Without transactions, a partial failure doesn't look like an error. It looks like a bug that only shows up under load, when a request happens to die between two writes that were supposed to be one unit. That kind of inconsistency is hard to reproduce and expensive to clean up after the fact — by the time you notice, the bad data is already sitting in production next to everything else.
 
-The same all-or-nothing thinking shows up elsewhere in backend work. An [idempotent API](/writing/en/what-is-idempotency-in-api) keeps repeated requests from causing repeated side effects. Avoiding the [N+1 query problem](/writing/en/n-plus-one-query-problem) keeps a single request from firing far more queries than it needs. Transactions apply that same instinct to writes: the database should never be caught in a state that's only half true.
+The same all-or-nothing thinking shows up elsewhere in backend work. An [idempotent API](/writing/en/what-is-idempotency-in-api/) keeps repeated requests from causing repeated side effects. Avoiding the [N+1 query problem](/writing/en/n-plus-one-query-problem/) keeps a single request from firing far more queries than it needs. Transactions apply that same instinct to writes: the database should never be caught in a state that's only half true.
 
 **Thanks for Reading✌️**

@@ -32,7 +32,7 @@ if (posts.length === 0) return;
   <h2 class="text-lg font-semibold mb-6 tracking-tight">Related Posts</h2>
   <div class="space-y-6">
     {posts.map((post) => (
-      <a href={`/writing/${currentLang}/${post.slug.split('/').pop()}`} class="block group no-underline">
+      <a href={`/writing/${currentLang}/${post.slug.split('/').pop()}/`} class="block group no-underline">
         <article class="space-y-2">
           <div class="flex items-start gap-2">
             {post.data.type && (

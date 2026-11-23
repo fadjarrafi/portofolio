@@ -94,6 +94,6 @@ Tidak semua penulisan data butuh transaction. Satu `UPDATE` pada satu baris suda
 
 Tanpa transaction, kegagalan sebagian tidak terlihat seperti error. Ia terlihat seperti bug yang baru muncul saat beban tinggi, ketika sebuah request kebetulan mati di antara dua penulisan yang seharusnya jadi satu unit. Inkonsistensi semacam ini sulit direproduksi dan mahal untuk dibersihkan setelahnya. Begitu kamu menyadarinya, data yang salah sudah duduk di production bersama data lainnya.
 
-Pola pikir all-or-nothing yang sama juga muncul di bagian lain pekerjaan backend. [API yang idempoten](/writing/id/what-is-idempotency-in-api) mencegah request yang berulang menyebabkan side effect yang berulang juga. Menghindari [N+1 query problem](/writing/id/n-plus-one-query-problem) mencegah satu request memicu query jauh lebih banyak dari yang seharusnya. Transaction menerapkan insting yang sama pada penulisan data: database tidak boleh pernah terjebak dalam kondisi yang hanya separuh benar.
+Pola pikir all-or-nothing yang sama juga muncul di bagian lain pekerjaan backend. [API yang idempoten](/writing/id/what-is-idempotency-in-api/) mencegah request yang berulang menyebabkan side effect yang berulang juga. Menghindari [N+1 query problem](/writing/id/n-plus-one-query-problem/) mencegah satu request memicu query jauh lebih banyak dari yang seharusnya. Transaction menerapkan insting yang sama pada penulisan data: database tidak boleh pernah terjebak dalam kondisi yang hanya separuh benar.
 
 **Terima Kasih Sudah Membaca✌️**

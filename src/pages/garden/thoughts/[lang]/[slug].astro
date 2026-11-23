@@ -85,7 +85,7 @@ const jsonLd = JSON.stringify({
 
     <div class="scroll-animate">
       <a
-        href="/garden/thoughts"
+        href="/garden/thoughts/"
         class="inline-flex items-center text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 mb-8 py-2 px-2 -ml-2"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
@@ -119,7 +119,7 @@ const jsonLd = JSON.stringify({
           <div class="flex flex-wrap gap-2 mt-4">
             {entry.data.topics.map((topic) => (
               <a
-                href={`/garden/thoughts?topic=${topic}`}
+                href={`/garden/thoughts/?topic=${topic}`}
                 class="px-3 py-1 text-xs bg-neutral-100 dark:bg-neutral-800 rounded-full text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
               >
                 {topic}
@@ -142,7 +142,7 @@ const jsonLd = JSON.stringify({
             {hasTranslation && translationSlug && (
               <div class="p-4 border border-neutral-200 dark:border-neutral-800 rounded-lg bg-neutral-50 dark:bg-neutral-900">
                 <a
-                  href={`/garden/thoughts/${targetLang}/${translationSlug}`}
+                  href={`/garden/thoughts/${targetLang}/${translationSlug}/`}
                   class="flex items-center gap-2 text-sm font-mono text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

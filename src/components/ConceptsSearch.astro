@@ -191,6 +191,14 @@ document.addEventListener('astro:page-load', () => {
   });
 
   render();
+
+  // Deep links from thoughts point at /garden/concepts/#concept-<slug>;
+  // the item is a collapsed <details>, so open it once the page loads.
+  const hashTarget = location.hash ? document.getElementById(decodeURIComponent(location.hash.slice(1))) : null;
+  if (hashTarget instanceof HTMLDetailsElement && hashTarget.classList.contains('concept-item')) {
+    hashTarget.open = true;
+    hashTarget.scrollIntoView({ block: 'center' });
+  }
 });
 </script>
 

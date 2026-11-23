@@ -18,7 +18,7 @@ export async function GET(context: APIContext) {
         title: post.data.title,
         pubDate: new Date(post.data.publishedAt),
         description: post.data.summary,
-        link: `/writing/en/${slug.replace(/\.mdx?$/, '')}`,
+        link: `/writing/en/${slug.replace(/\.mdx?$/, '')}/`,
       };
     }),
   });
