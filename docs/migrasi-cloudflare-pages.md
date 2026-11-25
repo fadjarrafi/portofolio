@@ -24,40 +24,60 @@ Status persiapan di repo: `public/_headers` dan dokumen ini. Build dan deploy di
 
 ## 0. Status aktual (2026-11-25)
 
-Cutover apex sudah terjadi lebih cepat dari rencana, lewat jalur CNAME tanpa memindahkan zone.
+Zone sudah pindah ke akun Cloudflare sendiri (jalur B selesai) dan apex sudah dilayani Pages.
 
-- Domain terdaftar di Hostinger; nameserver diarahkan ke `lola`/`valentin.ns.cloudflare.com`
-  (zone di akun Cloudflare teman). Zone **tidak** dipindah.
-- Project Pages `portofolio` (alamat `portofolio-bwa.pages.dev`, karena `portofolio.pages.dev`
-  sudah dipakai akun lain) memakai integrasi Git. Custom domain `fadjarrafi.my.id` berstatus
-  Active, SSL aktif. Apex melayani konten yang sama dengan `*.pages.dev` (hash identik).
-- Pengaturan di zone sudah mengalihkan `http://` ke `https://` (301).
-- `personal.fadjarrafi.my.id` tidak terpakai lagi (pindah ke `personal.fadjardev.my.id`), jadi
-  bagian 5 tidak berlaku.
+Urutan kejadian:
+1. Apex aktif lebih dulu lewat alur CNAME, saat zone masih di akun teman. Domain terdaftar di
+   Hostinger dengan nameserver `lola`/`valentin.ns.cloudflare.com`.
+2. Zone dihapus dari akun teman dan ditambahkan ke akun sendiri; nameserver diperbarui dari akun
+   sendiri. Pasangan nameserver tetap `lola`/`valentin`, tetapi SOA serial berubah.
+
+Keadaan sekarang:
+- Project Pages `portofolio` (alamat `portofolio-bwa.pages.dev`; `portofolio.pages.dev` sudah dipakai
+  akun lain) memakai integrasi Git dari `main`. Custom domain `fadjarrafi.my.id` Active, SSL aktif.
+- Header produksi sudah sesuai `public/_headers` (PR #2 sudah di-merge): `/_astro/*` immutable,
+  `*.pages.dev` mengirim `X-Robots-Tag: noindex`, apex tidak.
+- `http://` dialihkan 301 ke `https://`. Cache edge lama (favicon immutable dari nginx) hilang
+  bersama zone lama.
+- DNSSEC tidak aktif (tidak ada DS di registry `my.id`, tidak ada DNSKEY di zone).
+- `personal.fadjarrafi.my.id` tidak terpakai (pindah ke `personal.fadjardev.my.id`).
 - Terverifikasi di domain produksi: 63/63 URL sitemap 200 dengan canonical sama; 404 asli dengan
   `noindex`, tanpa canonical; `robots.txt`, `rss.xml`, dan kedua sitemap 200 dengan satu
-  Content-Type; tidak ada `X-Robots-Tag`.
+  Content-Type.
 
-Temuan yang masih terbuka:
+Record DNS zone sekarang (6 dari 200):
 
-- [ ] **`www` error 1014** ("CNAME Cross-User Banned", 403). Record `www` menunjuk hostname milik
-  akun Cloudflare lain. Perbaikan di zone: arahkan `www` ke `fadjarrafi.my.id` (proxied), atau
-  tambahkan `www.fadjarrafi.my.id` sebagai custom domain di project Pages. Lalu redirect 301 ke apex
-  (bagian 6). Karena zone di akun teman, ini dikerjakan oleh teman atau Anda dengan akses itu.
-- [ ] **`dev` belum di `main`.** Produksi dibangun dari `main`, yang belum punya `public/_headers`.
-  Akibatnya `/_astro/*` belum `immutable` (terukur: `max-age=14400`) dan `*.pages.dev` belum
-  mengirim `noindex`. Merge `dev` ke `main`, lalu cek ulang.
-- [ ] **Cache edge lama.** `/favicon.ico` di apex masih `max-age=31536000, immutable`, sisa
-  respons nginx lama di cache edge zone. Purge cache (Caching → Configuration → Purge Everything)
-  di akun yang memegang zone, setelah `_headers` ada di produksi.
-- [ ] **`dev.portofolio-bwa.pages.dev` menjawab 404.** Preview branch `dev` belum terbentuk atau
-  aliasnya berbeda; cek tab Deployments dan branch control. Uji 3.2 untuk header dilakukan di
-  produksi setelah merge.
-- [ ] **Ketergantungan pada akun teman.** DNS, aturan, dan cache dikendalikan akun teman. Rencana
-  memindahkan zone ke akun Anda (bagian 2 jalur B) kini opsional, bukan syarat.
-- [ ] Pastikan DNSSEC tidak aktif di Hostinger tanpa DS yang cocok di zone (SERVFAIL bila tidak).
+| Tipe | Nama | Isi | Proxy |
+| --- | --- | --- | --- |
+| A | `@` | `172.66.44.214`, `172.66.47.42` | ya |
+| AAAA | `@` | `2606:4700:310c::ac42:2f2a`, `2606:4700:310c::ac42:2cd6` | ya |
+| CNAME | `www` | `fadjarrafi.my.id` | ya |
+| TXT | `@` | `google-site-verification=...` (verifikasi GSC) | DNS only |
 
-Bagian 3.2 sampai 10 di bawah ditulis sebelum cutover; baca bagian 4, 5, dan 7 sebagai opsional.
+Tidak ada MX, SPF, DKIM, atau DMARC. Belum diketahui apakah zone lama punya record email;
+cocokkan dengan ekspor atau tangkapan layar zone lama di akun teman bila domain dipakai untuk email.
+
+Temuan terbuka:
+
+- [ ] **`www` belum berfungsi.** `https://www.fadjarrafi.my.id/` gagal di TLS handshake dan
+  `http://www...` menjawab 409. Record `www` (CNAME ke apex, proxied) sudah ada, jadi kemungkinan
+  sertifikat/propagasi belum selesai atau rule belum ada. Langkah: (a) tunggu beberapa menit lalu
+  cek ulang; (b) buat Redirect Rule `www` → apex (bagian 6); (c) bila masih gagal, tambahkan
+  `www.fadjarrafi.my.id` sebagai custom domain kedua di project Pages dan sesuaikan recordnya.
+- [ ] **Record apex berupa A/AAAA ke IP tetap.** Isinya sama dengan IP `portofolio-bwa.pages.dev`
+  saat dicek, kemungkinan hasil impor otomatis saat zone ditambahkan. IP edge Cloudflare bisa
+  berubah dan record statis tidak ikut. Ganti keempat record dengan satu CNAME `@` →
+  `portofolio-bwa.pages.dev` (proxied; Cloudflare meratakan CNAME di apex). Lakukan saat jam
+  sepi, lalu cek `https://fadjarrafi.my.id/` dan status custom domain di Pages.
+- [ ] **Record email.** Putuskan apakah domain perlu email; bila ya, buat ulang MX/SPF/DKIM/DMARC.
+- [ ] **GSC.** Pastikan property masih terverifikasi (TXT ada), kirim ulang sitemap, validasi
+  ulang (bagian 10).
+- [ ] **Container lama.** Biarkan hidup 7 hari; paling cepat dimatikan sekitar 2 Desember 2026.
+  Rollback kini harus lewat tunnel di akun sendiri (bagian 9), karena tunnel teman tidak bisa
+  melayani zone di akun ini.
+
+Bagian 3.2 sampai 10 di bawah ditulis sebelum cutover. Bagian 4, 5, dan 7 sudah terlewati dan
+dipertahankan sebagai catatan.
 
 ## 1. Keputusan dan batasan yang sudah diverifikasi
 
@@ -83,7 +103,7 @@ Sumber:
 
 ## 2. Dua jalur
 
-Keadaan sekarang: zone di akun teman (nameserver `lola`/`valentin.ns.cloudflare.com`; pemilik
+Keadaan saat dokumen ditulis: zone di akun teman (nameserver `lola`/`valentin.ns.cloudflare.com`; pemilik
 **[MANUAL]** perlu dipastikan di dashboard akun teman). Rencana Anda: zone dipindah ke akun Anda,
 yaitu jalur B.
 
@@ -94,7 +114,7 @@ yaitu jalur B.
 | `personal.` | Tidak berubah. | Wajib dipindah ke tunnel baru di akun Anda. |
 | Risiko | Hampir nol, tetapi tujuan migrasi tidak tercapai untuk apex. | Gangguan DNS singkat; `personal.` harus diuji sebelum tunnel lama dimatikan. |
 
-Pilih A hanya bila teman menolak memindahkan zone. Sisa dokumen ini menuliskan jalur B; jalur A
+**Jalur B sudah dijalankan (lihat bagian 0).** Pilih A hanya bila teman menolak memindahkan zone. Sisa dokumen ini menuliskan jalur B; jalur A
 cukup langkah 3.1 (buat project) dan 6 (pakai subdomain, mis. `www.`).
 
 ## 3. Persiapan (tidak mengubah produksi)
