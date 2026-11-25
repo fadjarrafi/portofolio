@@ -18,10 +18,9 @@ Tanda di dokumen ini:
 - **[MANUAL]** langkah yang hanya bisa dikerjakan pemilik akun/domain.
 - **[JANGAN]** hal yang tidak boleh dilakukan sebelum waktunya.
 
-Status persiapan di repo (branch `build/cloudflare-pages`, belum di-push): workflow
-`.github/workflows/deploy-pages.yml`, `public/_headers`, dan dokumen ini. Deploy lama
-(`deploy.yml`) tidak diubah. Workflow Pages **tidak berjalan** sampai variabel repo
-`CF_PAGES_ENABLED=true` diisi.
+Status persiapan di repo: `public/_headers` dan dokumen ini. Build dan deploy dilakukan oleh
+**integrasi Git Cloudflare Pages** (tanpa workflow GitHub Actions, tanpa API token). Deploy lama
+(`deploy.yml`) tidak diubah dan tetap jalan sampai Pages stabil.
 
 ## 1. Keputusan dan batasan yang sudah diverifikasi
 
@@ -65,21 +64,30 @@ cukup langkah 3.1 (buat project) dan 6 (pakai subdomain, mis. `www.`).
 
 ### 3.1 Project Pages
 
-1. **[MANUAL]** Di akun Anda: Workers & Pages → Create → Pages → Direct Upload. Nama `portofolio`.
-   Bila nama sudah dipakai, kabari agar nama di workflow (`CF_PAGES_PROJECT`) diganti.
-2. **[MANUAL]** Project Settings → Production branch: `main`.
-3. **[MANUAL]** Buat API token: Account → **Cloudflare Pages → Edit**. Jangan beri izin lain.
-4. **[MANUAL]** Di GitHub repo (Settings → Secrets and variables → Actions) isi:
-   - secret `CLOUDFLARE_API_TOKEN`
-   - secret `CLOUDFLARE_ACCOUNT_ID`
-   - secret `PUBLIC_GA_ID` (sudah ada untuk deploy lama)
-   - variabel `CF_PAGES_ENABLED` = `true` (menyalakan workflow)
-   - variabel `CF_PAGES_PROJECT` (opsional; default `portofolio`)
-5. Setelah branch ini disetujui dan di-push (**[MANUAL]**: tidak saya lakukan), buka PR ke `main`.
-   PR dari repo yang sama menghasilkan preview di `<branch>.portofolio.pages.dev`. Merge ke `main`
-   menghasilkan deploy produksi di `portofolio.pages.dev` saja; domain kustom belum tersentuh.
-6. Direct Upload tidak bisa dialihkan ke integrasi Git nanti. Itu tidak masalah karena
-   deploy lewat GitHub Actions.
+1. **[MANUAL]** Di akun Anda: Workers & Pages → Create → Pages → **Connect to Git**. Pasang GitHub
+   App Cloudflare dan batasi aksesnya ke repo `fadjarrafi/portofolio` saja. Nama project
+   `portofolio` (bila terpakai, kabari).
+2. **[MANUAL]** Pengaturan build:
+   - Framework preset: Astro, atau None dengan isian di bawah.
+   - Build command: `bun install --frozen-lockfile && bun run build`
+   - Build output directory: `dist`
+   - Environment variables (Production dan Preview): `SKIP_DEPENDENCY_INSTALL=1`,
+     `BUN_VERSION=1.3.7`, `NODE_ENV=production`, `PUBLIC_GA_ID=<nilai yang sama dengan deploy lama>`.
+   - Alasan: dokumen Cloudflare tidak menyebut perintah install bawaan untuk `bun.lock`, dan
+     Bun default di build image adalah 1.4.4. `SKIP_DEPENDENCY_INSTALL=1` plus perintah install
+     eksplisit memastikan lockfile beku, dan `BUN_VERSION` menyamakan versi dengan Dockerfile.
+     Bun tidak dibaca dari `package.json`. Nilai `PUBLIC_GA_ID` jangan ditulis di repo.
+3. **[MANUAL]** Settings → Builds & deployments → Production branch: `main`. Branch control
+   preview: All non-Production branches (bawaan). Preview otomatis per branch dan per PR dari
+   repo yang sama; Cloudflare menambah `X-Robots-Tag: noindex` pada preview, dan `_headers`
+   menambahkannya untuk semua host `*.pages.dev`, termasuk alias produksi.
+4. Branch yang sudah di-push (`dev`, `build/cloudflare-pages`) langsung menghasilkan preview
+   setelah koneksi dibuat. Merge ke `main` menghasilkan deploy produksi di `portofolio.pages.dev`
+   saja; domain kustom belum tersentuh.
+5. Integrasi Git tidak bisa dialihkan ke Direct Upload nanti. Itu tidak masalah untuk situs ini.
+   Kedua mode tidak saling konversi, jadi pilihan ini tetap.
+6. Riwayat clone di build image tidak didokumentasikan. `lastmod` sitemap dibaca dari
+   frontmatter (`astro.config.mjs`), bukan dari git, jadi tidak bergantung pada kedalaman clone.
 
 ### 3.2 Uji di `*.pages.dev` (hal yang belum bisa diuji lokal)
 
@@ -88,6 +96,7 @@ cukup langkah 3.1 (buat project) dan 6 (pakai subdomain, mis. `www.`).
 - [ ] 404 asli: `curl -I https://portofolio.pages.dev/tidak-ada/` → `404`.
 - [ ] Semua uji di bagian 8 diulang terhadap `portofolio.pages.dev` (sitemap-nya masih berisi
       URL `https://fadjarrafi.my.id/...`, jadi bandingkan path dan canonical, bukan host).
+- [ ] Log build Cloudflare memakai Bun 1.3.7 dan `bun install --frozen-lockfile` berhasil.
 - [ ] Header cache (`/_astro/*` immutable, lainnya 1 hari) dan `Content-Type` XML.
 - [ ] Perilaku `HEAD`/`gzip`/`brotli` dan HTTP/2 (Pages memampatkan otomatis; nginx dulu hanya gzip).
 
@@ -297,7 +306,7 @@ lokal; CI memakai 1.3.7 sesuai `package.json`).
 | `/garden/concepts/#concept-base-case` di Chrome headless | halaman 200, elemen ada, `<details>` terbuka, tampil di viewport |
 
 Belum bisa diuji lokal (ditandai di bagian 3.2): perilaku host `*.pages.dev` sungguhan,
-sertifikat, HTTP→HTTPS, redirect `www`, kompresi di edge, serta deploy lewat GitHub Actions.
+sertifikat, HTTP→HTTPS, redirect `www`, kompresi di edge, serta build di Cloudflare (versi Bun, `PUBLIC_GA_ID`, perintah install).
 Chrome via ekstensi tidak tersedia di sesi ini, jadi uji browser memakai Chrome headless
 (DevTools Protocol), bukan tampilan visual manual.
 
