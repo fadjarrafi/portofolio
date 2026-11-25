@@ -22,6 +22,43 @@ Status persiapan di repo: `public/_headers` dan dokumen ini. Build dan deploy di
 **integrasi Git Cloudflare Pages** (tanpa workflow GitHub Actions, tanpa API token). Deploy lama
 (`deploy.yml`) tidak diubah dan tetap jalan sampai Pages stabil.
 
+## 0. Status aktual (2026-11-25)
+
+Cutover apex sudah terjadi lebih cepat dari rencana, lewat jalur CNAME tanpa memindahkan zone.
+
+- Domain terdaftar di Hostinger; nameserver diarahkan ke `lola`/`valentin.ns.cloudflare.com`
+  (zone di akun Cloudflare teman). Zone **tidak** dipindah.
+- Project Pages `portofolio` (alamat `portofolio-bwa.pages.dev`, karena `portofolio.pages.dev`
+  sudah dipakai akun lain) memakai integrasi Git. Custom domain `fadjarrafi.my.id` berstatus
+  Active, SSL aktif. Apex melayani konten yang sama dengan `*.pages.dev` (hash identik).
+- Pengaturan di zone sudah mengalihkan `http://` ke `https://` (301).
+- `personal.fadjarrafi.my.id` tidak terpakai lagi (pindah ke `personal.fadjardev.my.id`), jadi
+  bagian 5 tidak berlaku.
+- Terverifikasi di domain produksi: 63/63 URL sitemap 200 dengan canonical sama; 404 asli dengan
+  `noindex`, tanpa canonical; `robots.txt`, `rss.xml`, dan kedua sitemap 200 dengan satu
+  Content-Type; tidak ada `X-Robots-Tag`.
+
+Temuan yang masih terbuka:
+
+- [ ] **`www` error 1014** ("CNAME Cross-User Banned", 403). Record `www` menunjuk hostname milik
+  akun Cloudflare lain. Perbaikan di zone: arahkan `www` ke `fadjarrafi.my.id` (proxied), atau
+  tambahkan `www.fadjarrafi.my.id` sebagai custom domain di project Pages. Lalu redirect 301 ke apex
+  (bagian 6). Karena zone di akun teman, ini dikerjakan oleh teman atau Anda dengan akses itu.
+- [ ] **`dev` belum di `main`.** Produksi dibangun dari `main`, yang belum punya `public/_headers`.
+  Akibatnya `/_astro/*` belum `immutable` (terukur: `max-age=14400`) dan `*.pages.dev` belum
+  mengirim `noindex`. Merge `dev` ke `main`, lalu cek ulang.
+- [ ] **Cache edge lama.** `/favicon.ico` di apex masih `max-age=31536000, immutable`, sisa
+  respons nginx lama di cache edge zone. Purge cache (Caching → Configuration → Purge Everything)
+  di akun yang memegang zone, setelah `_headers` ada di produksi.
+- [ ] **`dev.portofolio-bwa.pages.dev` menjawab 404.** Preview branch `dev` belum terbentuk atau
+  aliasnya berbeda; cek tab Deployments dan branch control. Uji 3.2 untuk header dilakukan di
+  produksi setelah merge.
+- [ ] **Ketergantungan pada akun teman.** DNS, aturan, dan cache dikendalikan akun teman. Rencana
+  memindahkan zone ke akun Anda (bagian 2 jalur B) kini opsional, bukan syarat.
+- [ ] Pastikan DNSSEC tidak aktif di Hostinger tanpa DS yang cocok di zone (SERVFAIL bila tidak).
+
+Bagian 3.2 sampai 10 di bawah ditulis sebelum cutover; baca bagian 4, 5, dan 7 sebagai opsional.
+
 ## 1. Keputusan dan batasan yang sudah diverifikasi
 
 Dicek di dokumentasi resmi Cloudflare pada 2026-11-25.
@@ -29,9 +66,9 @@ Dicek di dokumentasi resmi Cloudflare pada 2026-11-25.
 | Batasan | Isi | Akibat |
 | --- | --- | --- |
 | Pages vs Workers | Halaman `/pages/` menyarankan "Start new projects with Workers". Pages belum dinyatakan deprecated. | Dipilih Pages sesuai keputusan. Bila nanti pindah ke Workers Static Assets, `_headers`/`_redirects` bisa dipakai ulang, tetapi `wrangler.jsonc`, penanganan 404, dan perintah lokal (`wrangler dev`) berubah. Workers tidak mendukung domain yang nameserver-nya bukan Cloudflare. |
-| Apex domain di Pages | "that custom domain must be a zone on the Cloudflare account you have created your Pages project on." | `fadjarrafi.my.id` (apex) hanya bisa dipasang bila zone-nya ada di **akun Anda**. Zone di akun teman = apex Pages mustahil. |
+| Apex domain di Pages | Dokumen: "that custom domain must be a zone on the Cloudflare account you have created your Pages project on." | **Terbantahkan di lapangan**: dashboard menawarkan alur CNAME dan apex `fadjarrafi.my.id` aktif dengan zone di akun teman. Jangan jadikan aturan ini syarat; dokumen dan perilaku berbeda. |
 | Subdomain di Pages | Tidak wajib zone Cloudflare; cukup CNAME ke `<project>.pages.dev`. Tambahkan dulu di dashboard Pages, baru CNAME, kalau tidak 522. | Hanya relevan untuk subdomain, bukan apex. |
-| Tunnel lintas akun | "The cfargotunnel.com subdomain only proxies traffic for DNS records in the same Cloudflare account." | Tunnel teman hanya bisa melayani hostname di zone akun teman. Setelah zone pindah ke akun Anda, `personal.` butuh tunnel baru di akun Anda. |
+| Tunnel lintas akun | "The cfargotunnel.com subdomain only proxies traffic for DNS records in the same Cloudflare account." | Tidak lagi relevan: `personal.` sudah pindah domain. |
 | Pindah zone | DNSSEC dan zone hold harus dilepas sebelum pindah. Ekspor record dulu; bila tidak, Cloudflare mengimpor record proxied yang bisa menyebabkan error 1000. Domain di Cloudflare Registrar dipindah lewat permintaan terpisah (diterima akun tujuan maks. 5 hari). | Lihat jalur B. |
 
 Sumber:
@@ -82,7 +119,7 @@ cukup langkah 3.1 (buat project) dan 6 (pakai subdomain, mis. `www.`).
    repo yang sama; Cloudflare menambah `X-Robots-Tag: noindex` pada preview, dan `_headers`
    menambahkannya untuk semua host `*.pages.dev`, termasuk alias produksi.
 4. Branch yang sudah di-push (`dev`, `build/cloudflare-pages`) langsung menghasilkan preview
-   setelah koneksi dibuat. Merge ke `main` menghasilkan deploy produksi di `portofolio.pages.dev`
+   setelah koneksi dibuat. Merge ke `main` menghasilkan deploy produksi di `portofolio-bwa.pages.dev`
    saja; domain kustom belum tersentuh.
 5. Integrasi Git tidak bisa dialihkan ke Direct Upload nanti. Itu tidak masalah untuk situs ini.
    Kedua mode tidak saling konversi, jadi pilihan ini tetap.
@@ -91,10 +128,10 @@ cukup langkah 3.1 (buat project) dan 6 (pakai subdomain, mis. `www.`).
 
 ### 3.2 Uji di `*.pages.dev` (hal yang belum bisa diuji lokal)
 
-- [ ] Header `X-Robots-Tag: noindex` muncul di `portofolio.pages.dev` dan di alias branch.
+- [ ] Header `X-Robots-Tag: noindex` muncul di `portofolio-bwa.pages.dev` dan di alias branch.
 - [ ] Domain kustom nanti **tidak** mengirim `X-Robots-Tag` (cek setelah cutover, langkah 7).
-- [ ] 404 asli: `curl -I https://portofolio.pages.dev/tidak-ada/` → `404`.
-- [ ] Semua uji di bagian 8 diulang terhadap `portofolio.pages.dev` (sitemap-nya masih berisi
+- [ ] 404 asli: `curl -I https://portofolio-bwa.pages.dev/tidak-ada/` → `404`.
+- [ ] Semua uji di bagian 8 diulang terhadap `portofolio-bwa.pages.dev` (sitemap-nya masih berisi
       URL `https://fadjarrafi.my.id/...`, jadi bandingkan path dan canonical, bukan host).
 - [ ] Log build Cloudflare memakai Bun 1.3.7 dan `bun install --frozen-lockfile` berhasil.
 - [ ] Header cache (`/_astro/*` immutable, lainnya 1 hari) dan `Content-Type` XML.
@@ -156,7 +193,10 @@ Kerjakan di dashboard akun teman (atau minta teman mengirim ekspor). **[MANUAL]*
 4. **[MANUAL]** Samakan pengaturan SSL/TLS, Always Use HTTPS (lihat bagian 6), dan aturan dari
    inventaris sebelum nameserver diganti.
 
-## 5. Menjaga `personal.fadjarrafi.my.id` (tunnel baru di akun Anda)
+## 5. (Tidak berlaku) Menjaga `personal.fadjarrafi.my.id`
+
+> `personal.fadjarrafi.my.id` sudah tidak terpakai (pindah ke `personal.fadjardev.my.id`). Bagian ini
+> dipertahankan hanya sebagai referensi bila zone suatu hari dipindah.
 
 Tunnel teman tidak bisa melayani hostname di zone akun Anda. Karena itu `personal.` dipindah dulu
 ke tunnel baru, **diuji, dan baru** tunnel lama dimatikan.
@@ -235,7 +275,7 @@ curl -sSI https://fadjarrafi.my.id/writing/en/caching       # 1 redirect ke ...c
 curl -sSI https://fadjarrafi.my.id/tidak-ada/ # 404, noindex di body, tanpa canonical
 curl -sSI https://fadjarrafi.my.id/sitemap-index.xml        # 200, satu Content-Type: application/xml
 curl -sSI https://fadjarrafi.my.id/ | grep -i x-robots-tag  # harus kosong
-curl -sSI https://portofolio.pages.dev/ | grep -i x-robots-tag  # harus noindex
+curl -sSI https://portofolio-bwa.pages.dev/ | grep -i x-robots-tag  # harus noindex
 curl -sSI https://personal.fadjarrafi.my.id/  # sama seperti sebelum migrasi
 ```
 
@@ -302,7 +342,7 @@ lokal; CI memakai 1.3.7 sesuai `package.json`).
 | `/favicon.ico`, `/og-image.png` | `public, max-age=86400` (tanpa immutable) |
 | `/data/*.json` | `public, max-age=3600` |
 | Halaman HTML | `public, max-age=0, must-revalidate` (default Pages) |
-| `X-Robots-Tag: noindex` | ada untuk Host `portofolio.pages.dev` dan `abc.portofolio.pages.dev`; kosong untuk Host `fadjarrafi.my.id` (disimulasikan lewat header `Host`) |
+| `X-Robots-Tag: noindex` | ada untuk Host `portofolio-bwa.pages.dev` dan `abc.portofolio-bwa.pages.dev`; kosong untuk Host `fadjarrafi.my.id` (disimulasikan lewat header `Host`) |
 | `/garden/concepts/#concept-base-case` di Chrome headless | halaman 200, elemen ada, `<details>` terbuka, tampil di viewport |
 
 Belum bisa diuji lokal (ditandai di bagian 3.2): perilaku host `*.pages.dev` sungguhan,
